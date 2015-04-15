@@ -2,7 +2,7 @@
 # create_EPIC_weather_files.py
 # email: ritvik@umd.edu, 24th March, 2015.
 #
-# Convert downloaded data to EPIC compatible weather files
+# Convert downloaded data to EPIC compatible weather files.
 ###############################################################################
 import constants, util, multiprocessing, logging, os, pandas, datetime, pdb
 from dateutil.rrule import rrule, DAILY, YEARLY
