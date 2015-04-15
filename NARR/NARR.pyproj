@@ -27,9 +27,6 @@
     </Compile>
     <Compile Include="create_EPIC_weather_files.py" />
     <Compile Include="EPIC_climatology.py" />
-    <Compile Include="test.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="util.py" />
     <Compile Include="wget_NARR.py" />
     <Compile Include="NARR_to_EPIC.py" />
