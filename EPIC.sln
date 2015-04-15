@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A12AA37-4F4F-46C4-83C7-0C8ED206D2DC}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "open_lands_conversion", "open_lands_conversion\open_lands_conversion.pyproj", "{1D9140F6-E89E-4BF7-98BE-64FF3C025889}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "NARR", "NARR\NARR.pyproj", "{8AA8BEE7-4B33-4167-999F-C073004A9CE0}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SSURGO", "SSURGO\SSURGO.pyproj", "{64F816B5-0330-4CDE-A8A6-749CA123666F}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SEIMF", "SEIMF\SEIMF.pyproj", "{5BDAEEB0-D09D-443B-88D8-211BD7F298F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D9140F6-E89E-4BF7-98BE-64FF3C025889}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D9140F6-E89E-4BF7-98BE-64FF3C025889}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AA8BEE7-4B33-4167-999F-C073004A9CE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AA8BEE7-4B33-4167-999F-C073004A9CE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64F816B5-0330-4CDE-A8A6-749CA123666F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64F816B5-0330-4CDE-A8A6-749CA123666F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BDAEEB0-D09D-443B-88D8-211BD7F298F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BDAEEB0-D09D-443B-88D8-211BD7F298F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

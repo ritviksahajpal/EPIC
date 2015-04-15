@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ProfilingTarget xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ProjectTarget>
+    <TargetProject>8aa8bee7-4b33-4167-999f-c073004a9ce0</TargetProject>
+    <FriendlyName>NARR</FriendlyName>
+  </ProjectTarget>
+  <Reports>
+    <Report>
+      <Filename>C:\Users\ritvik\AppData\Local\Temp\NARR_20150324.vsp</Filename>
+    </Report>
+  </Reports>
+</ProfilingTarget>
