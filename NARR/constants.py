@@ -44,14 +44,14 @@ strt_date   = datetime.date(START_YR,1,1)
 end_date    = datetime.date(END_YR,12,31)
 
 # Directories
-base_dir    = parser.get('PATHS','base_dir')+os.sep
+meta_dir    = parser.get('PATHS','meta_dir')+os.sep
 data_dir    = parser.get('PATHS','data_dir')+os.sep
 out_dir     = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep
 epic_dly    = out_dir+os.sep+'daily'+os.sep
 epic_mon    = out_dir+os.sep+'monthly'+os.sep
 
 # Create directories
-util.make_dir_if_missing(base_dir)
+util.make_dir_if_missing(meta_dir)
 util.make_dir_if_missing(data_dir)
 util.make_dir_if_missing(out_dir)
 util.make_dir_if_missing(epic_dly)

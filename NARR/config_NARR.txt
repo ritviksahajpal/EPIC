@@ -3,7 +3,7 @@ project_name = OpenLands_LS                                                     
 TAG          = NARR                                                                       ; A log file is created as Log_<TAG>.txt
 
 [PATHS]
-base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ; Contains WXPM3020.exe to convert daily files to monthly
+meta_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Meta                      ; Contains WXPM3020.exe within Meta directory to convert daily files to monthly
 data_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\NETCDF\narr_download ; Directory where NETCDF NARR files are downloaded
 out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ; Output directory containing NARR files
 

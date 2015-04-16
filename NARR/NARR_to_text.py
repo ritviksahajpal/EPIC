@@ -72,7 +72,10 @@ def process_NARR_to_text(cur_var):
                     lat_str = subprocess.check_output(ncks_get+'x,'+str(i)+','+str(i)+' -d '+'y,'+str(j)+','+str(j)+' -v lat '+unp_nc).strip("\r\n\t '")
                     epic_wth.write(('%5s    %10s    %5.3f    %5.3f\n') % (idx,str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
                     epic_mon.write(('%5s    %10s    %5.3f    %5.3f\n') % (idx,str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
-                    wxrmrun.write(str(j)+'_'+str(i)+'\n')
+                    if(i==(lonui-lonli-1) and j==(latui-latli-1)):
+                        wxrmrun.write(str(j)+'_'+str(i))
+                    else:
+                        wxrmrun.write(str(j)+'_'+str(i)+'\n')
                     idx += 1
 
             epic_wth.close()

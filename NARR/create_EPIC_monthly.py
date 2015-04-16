@@ -1,7 +1,10 @@
 import constants, glob, os, pdb, shutil, subprocess, logging
 
 def create_monthly():
-    shutil.copyfile(constants.base_dir+os.sep+'Meta'+os.sep+constants.WXPM_EXE,constants.epic_dly+constants.WXPM_EXE)
+    try:
+        shutil.copyfile(constants.meta_dir+os.sep+constants.WXPM_EXE,constants.epic_dly+constants.WXPM_EXE)
+    except:
+        logging.info('Error in copying '+constants.meta_dir+os.sep+constants.WXPM_EXE)
     
     for filename in glob.iglob(os.path.join(constants.epic_dly, '*.txt')):
         shutil.copyfile(filename,filename[:-4]+'.PRN')
@@ -10,9 +13,10 @@ def create_monthly():
     cur_dir = os.getcwd()
     os.chdir(constants.epic_dly)
     try:
-        subprocess.call(constants.WXPM_EXE,shell=True)
+        with open(os.devnull, "w") as f:
+            subprocess.call(constants.WXPM_EXE,stdout=f,stderr=f)
     except:
-        logging.info('\n')
+        logging.info('Error in running '+constants.WXPM_EXE)
     os.chdir(cur_dir)
 
     # Copy daily files to the monthly folder and rename to *.PRN    
@@ -25,6 +29,8 @@ def create_monthly():
 
     for filename in glob.iglob(os.path.join(constants.epic_dly, '*.PRN')):
         os.remove(filename)
+
+    logging.info('Done creating monthly files')
 
 if __name__ == '__main__':
     create_monthly()
