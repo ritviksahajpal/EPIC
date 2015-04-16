@@ -1,0 +1,17 @@
+EPIC Variable,Description,EPIC Unit,SSURGO Variable,SSURGO Unit,Unit convertor
+SALB,Soil albedo,,albedodry_r,,
+HSG,"Soil hydrologic group (1=A, 2=B, 3=C, 4=D).",,hydgrp,,
+Z,Depth to bottom of layer,m,hzdepb_r,cm,0.01
+BD,Bulk Density,T/m^3,dbthirdbar_r,gm/cm3,1
+U,Soil water content at wilting point (1500 KPA),m/m,wfifteenbar_r,cm/cm,1
+FC,Water content at field capacity (33 KPA),m/m,wthirdbar_r,cm/cm,1
+SAN,Sand content,%,sandtotal_r,%,1
+SIL,Silt content,%,silttotal_r,%,1
+PH,Soil pH,,ph1to1h2o_r,,
+SMB,Sum of bases,cmol/kg,sumbases_r,cmol/kg,1
+WOC,Organic carbon concentration,%,om_r,%,1
+CAC,Calcium carbonate content of soil,%,caco3_r,%,1
+CEC,Cation exchange capacity,cmol/kg,cec7_r,cmol/kg,1
+ROK,Coarse fragment content,% by vol,Fragvol_r,% by vol,1
+BDD,Bulk density (oven dry),T/m^3,dbovendry_r,T/m^3,1
+SATC,Saturated conductivity,mm/h,ksat_r,mm/sec,3600

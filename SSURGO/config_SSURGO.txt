@@ -5,13 +5,12 @@ LIST_STATES  = StateNames_LakeStates.csv                                        
 
 [PATHS]
 base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ;
-cdl_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\CDL              ; 
-data_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ;
+cdl_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\CDL              ; Contains CDL file for CDL_STATE
+data_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ; Contains SSURGO input data
 out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ;
 
-
 [PARAMETERS]
-ZERO_LINES  = 23
-SLLIST      = ieSlList.dat
-CDL_STATE   = DE
-SIZE        = 56
+ZERO_LINES  = 23                                                                          ; Number of lines with zero's
+SLLIST      = ieSlList.dat                                                                ; 
+CDL_STATE   = DE                                                                          ; 
+SIZE        = 56                                                                          ; Resolution of soil raster

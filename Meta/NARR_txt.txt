@@ -1,0 +1,12 @@
++---------------+------------------------------------------------+---------+-------------------------------------+
+| EPIC Variable |                  Description                   |  Units  |  Notes to convert into EPIC format  |
++---------------+------------------------------------------------+---------+-------------------------------------+
+|     DSWRF     | Daily downward shortwave radiation at surface  |  W m^-2 |          Convert to Mj m^-2         |
+|     USWRF     |  Daily upward shortwave radiation at surface   |  W m^-2 |          Convert to Mj m^-2         |
+|      TMAX     | Max daily temp at 2m height above ground level |    K    | Subtract 273.15 to convert to deg C |
+|      TMIN     | Min daily temp at 2m height above ground level |    K    | Subtract 273.15 to convert to deg C |
+|     PRATE     |        Daily precipitation accumulation        | kg m^-2 |                                     |
+|       RH      |         Relative humidity at 2m height         |    %    |            Divide by 100            |
+|      UGRD     |      Windspeed at 10m height (west->east)      |  m s^-1 |   Wind speed = sqrt(UGRD^2+VGRD^2)  |
+|      VGRD     |     Windspeed at 10m height south->north)      |  m s^-1 |   Wind speed = sqrt(UGRD^2+VGRD^2)  |
++---------------+------------------------------------------------+---------+-------------------------------------+
