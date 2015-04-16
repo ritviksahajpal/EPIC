@@ -1,24 +1,35 @@
-import os, logging, datetime, util, multiprocessing, argparse
+import os, logging, datetime, util, multiprocessing, argparse, pdb, ast
 from datetime import date
+from ConfigParser import SafeConfigParser
+
+# Parse config file
+parser = SafeConfigParser()
+parser.read('config_NARR.txt')
 
 ###############################################################################
 # User modifiable values
 #
 #
 ###############################################################################
-START_YR    = 1979                                                      # Starting year of weather data
-END_YR      = 2014                                                      # Ending year of weather data
-LAT_BOUNDS  = [41.5,49.5]                                               # Lat boundary of study region  
-LON_BOUNDS  = [-98.0,-81.0]                                             # Lon boundary of study region
-TAG         = 'NARR'                                                    # Tag of NARR folder
-EPIC_DLY    = 'iewedlst.dat'                                            # Name of EPIC daily weather station list file
-EPIC_MON    = 'iewealst.dat'                                            # Name of EPIC monthly weather station list file
-WXPMRUN     = 'WXPMRUN.DAT'
-WXPM_EXE    = 'WXPM3020.exe'
-DO_PARALLEL = True                                                      # Use multiprocessing or not?
-DO_SITE     = False                                                     # Run for single site (True) or not (False)
-SITE_LAT    = 42.0                                                      # If DO_SITE is True, then lat
-SITE_LON    = -86.0                                                     # If DO_SITE is True, then lon
+START_YR    = parser.getint('PARAMETERS','START_YR')                  # Starting year of weather data
+END_YR      = parser.getint('PARAMETERS','END_YR')                    # Ending year of weather data
+LAT_BOUNDS  = ast.literal_eval(parser.get('PARAMETERS','LAT_BOUNDS')) # Lat boundary of study region  
+LON_BOUNDS  = ast.literal_eval(parser.get('PARAMETERS','LON_BOUNDS')) # Lon boundary of study region
+TAG         = parser.get('PROJECT','TAG')                             # Tag of NARR folder
+EPIC_DLY    = parser.get('PARAMETERS','EPIC_DLY')                     # Name of EPIC daily weather station list file
+EPIC_MON    = parser.get('PARAMETERS','EPIC_MON')                     # Name of EPIC monthly weather station list file
+WXPMRUN     = parser.get('PARAMETERS','WXPMRUN')
+WXPM_EXE    = parser.get('PARAMETERS','WXPM_EXE')
+DO_PARALLEL = parser.getboolean('PARAMETERS','DO_PARALLEL')           # Use multiprocessing or not?
+DO_SITE     = parser.getboolean('PARAMETERS','DO_SITE')               # Run for single site (True) or not (False)
+SITE_LAT    = parser.getfloat('PARAMETERS','SITE_LAT')                # If DO_SITE is True, then lat
+SITE_LON    = parser.getfloat('PARAMETERS','SITE_LON')                # If DO_SITE is True, then lon
+
+###############################################################################
+# Constants
+#
+#
+###############################################################################
 BASE_CMD    = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/Dailies/monolevel/" # Obtain daily mean data
 TEMP_CMD    = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/"         # For temperature we extract 3 hourly data to get daily min and max
 WMsq_MjMsq  = 0.0864                                                    # Convert W m^-2 into Mj m^-2 http://www.fao.org/docrep/x0490e/x0490e0i.htm
@@ -32,19 +43,15 @@ max_threads = multiprocessing.cpu_count() - 1
 strt_date   = datetime.date(START_YR,1,1)
 end_date    = datetime.date(END_YR,12,31)
 
-# Parse command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-t','--tag',help='Project name',default='OpenLands_LS')
-args   = vars(parser.parse_args())
-
 # Directories
-base_dir    = os.sep.join(os.path.dirname(__file__).split(os.sep)[:-3])
-data_dir    = base_dir+os.sep+'Data'+os.sep+'NETCDF'+os.sep+'narr_download'+os.sep
-out_dir     = base_dir+os.sep+'EPIC'+os.sep+args['tag']+os.sep
+base_dir    = parser.get('PATHS','base_dir')+os.sep
+data_dir    = parser.get('PATHS','data_dir')+os.sep
+out_dir     = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep
 epic_dly    = out_dir+os.sep+'daily'+os.sep
 epic_mon    = out_dir+os.sep+'monthly'+os.sep
 
 # Create directories
+util.make_dir_if_missing(base_dir)
 util.make_dir_if_missing(data_dir)
 util.make_dir_if_missing(out_dir)
 util.make_dir_if_missing(epic_dly)
@@ -54,7 +61,7 @@ util.make_dir_if_missing(epic_mon)
 LOG_FILENAME   = out_dir+os.sep+'Log_'+TAG+'.txt'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO,\
                     format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s',\
-                    datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL
+                    datefmt="%m-%d %H:%M") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL
 
 # Check if we want to do just a single site
 if(DO_SITE):

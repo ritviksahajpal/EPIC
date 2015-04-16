@@ -1,0 +1,17 @@
+[PROJECT]
+project_name = OpenLands_LS                                                               ; Name of project directory (to be created within out_dir)
+TAG          = SSURGO                                                                     ; A log file is created as Log_<TAG>.txt
+LIST_STATES  = StateNames_LakeStates.csv                                                  ; List of states to process               
+
+[PATHS]
+base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ;
+cdl_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\CDL              ; 
+data_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ;
+out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ;
+
+
+[PARAMETERS]
+ZERO_LINES  = 23
+SLLIST      = ieSlList.dat
+CDL_STATE   = DE
+SIZE        = 56

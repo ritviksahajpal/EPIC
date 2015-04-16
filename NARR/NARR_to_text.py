@@ -56,7 +56,8 @@ def process_NARR_to_text(cur_var):
         wth_fl = constants.out_dir+os.sep+constants.EPIC_DLY
         mon_fl = constants.out_dir+os.sep+constants.EPIC_MON
         wxr_fl = constants.epic_dly+os.sep+constants.WXPMRUN
-        if(year==constants.START_YR and not(os.path.isfile(wth_fl)) and not(os.path.isfile(mon_fl)) and not(os.path.isfile(wxr_fl))):
+
+        if(year==constants.START_YR and (not(os.path.isfile(wth_fl)) or not(os.path.isfile(mon_fl)) or not(os.path.isfile(wxr_fl)))):
             logging.info('Creating EPIC weather station list file')
             # Create EPIC weather list file            
             epic_wth = open(wth_fl,'w')

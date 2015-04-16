@@ -32,6 +32,11 @@
     <Compile Include="NARR_to_EPIC.py" />
     <Compile Include="NARR_to_text.py" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="config_NARR.txt">
+      <SubType>Code</SubType>
+    </Content>
+  </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
 </Project>

@@ -1,4 +1,9 @@
-import os, sys, logging, pdb, arcpy, errno, argparse, multiprocessing
+import os, sys, logging, pdb, arcpy, errno, multiprocessing
+from ConfigParser import SafeConfigParser
+
+# Parse config file
+parser = SafeConfigParser()
+parser.read('config_SSURGO.txt')
 
 # ArcGIS initialization
 arcpy.CheckOutExtension("spatial")
@@ -10,8 +15,18 @@ arcpy.env.extent = "MAXOF"
 #
 #
 ###############################################################################
-TAG            = 'SSURGO'
-LIST_STATES    = 'StateNames_LakeStates.csv'
+TAG            = parser.get('PROJECT','TAG')          # Tag of SSURGO folder
+LIST_STATES    = parser.get('PROJECT','LIST_STATES')     # CSV containing list of states to process
+ZERO_LINES     = parser.getint('PARAMETERS','ZERO_LINES')
+SLLIST         = parser.get('PARAMETERS','SLLIST')
+CDL_STATE      = parser.get('PARAMETERS','CDL_STATE')
+cdl_res        = parser.getint('PARAMETERS','SIZE')  
+
+###############################################################################
+# Constants
+#
+#
+###############################################################################
 SSURGO_SEP     = '|'
 MUAGGATT       = 'muaggatt'
 COMPONENT      = 'comp'
@@ -24,14 +39,12 @@ MUKEY          = 'MUKEY'
 CONV_DEPTH     = 0.01    # cm to m
 CONV_KSAT      = 3.6     # mm/sec to mm/h
 CONV_OM_TO_WOC = 0.58    # fraction
-ZERO_LINES     = 23      #
 SOIL           = 'ssurgo'
 OUTPUT         = 'output'
 CATALOG        = 'catalog'
 LANDUSE        = 'cdl'
-CDL_STATE      = 'DE'
 INPUT          = 'input'
-SLLIST         = 'ieSlList.dat'
+
 
 epic_soil_vars = {33:'sandtotal_r',51:'silttotal_r',60:'claytotal_r',66:'om_r',\
                   72:'dbthirdbar_r',78:'dbovendry_r',82:'ksat_r',85:'awc_r',\
@@ -51,18 +64,10 @@ muaggatt_vars  = {3:'slopegraddcp',4:'slopegradwta',5:'brockdepmin',6:'wtdepannm
                   20:'niccdcd',21:'niccdcdpct',39:'mukey'}
 chfrags_vars   = {1:'Fragvol_r',10:'chkey'}
 
-# Parse command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-t','--tag',help='Project name',default='OpenLands_LS')
-parser.add_argument('-s','--size',help='Raster resolution',default=56)
-args   = vars(parser.parse_args())
-
-cdl_res    = args['size']
-#dates     = datetime.datetime.now().strftime("mon_%m_day_%d_%H_%M")
-base_dir   = os.sep.join(os.path.dirname(__file__).split(os.sep)[:-3])
-cdl_dir    = base_dir+os.sep+'Data'+os.sep+'GIS'+os.sep+'CDL'+os.sep
-data_dir   = base_dir+os.sep+'Data'+os.sep+'GIS'+os.sep+'SSURGO'+os.sep
-out_dir    = base_dir+os.sep+'EPIC'+os.sep+args['tag']+os.sep
+base_dir   = parser.get('PATHS','base_dir')+os.sep
+cdl_dir    = parser.get('PATHS','cdl_dir')+os.sep
+data_dir   = parser.get('PATHS','data_dir')+os.sep
+out_dir    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep
 r_soil_dir = out_dir+os.sep+'Data'+os.sep
 t_soil_dir = out_dir+os.sep+'soils'+os.sep
 

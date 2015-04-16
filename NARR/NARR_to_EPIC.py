@@ -18,6 +18,7 @@ def NARR_to_EPIC(vals):
     lat,lon = vals
     # Output pandas frame into EPIC weather file
     out_fl   = constants.epic_dly+os.sep+str(lat)+'_'+str(lon)+'.txt'
+
     if(not(os.path.isfile(out_fl))):
         logging.info(out_fl) 
         # List all years for which we will create EPIC file
@@ -57,26 +58,16 @@ def NARR_to_EPIC(vals):
                     tmp_df[cur_var] = tmp_df[cur_var].map(lambda x:float(x))
         
             # Get into right units
-            if(cur_var=='wnd'):
-                tmp_df['wnd']      = pandas.Series(tmp_df['uwnd.10m'].astype(float)**2.0+\
-                                                    tmp_df['vwnd.10m'].astype(float)**2.0,index=tmp_df.index)
-                tmp_df['wnd']      = tmp_df['wnd']**0.5
-            elif(cur_var=='rhum.2m'):
-                tmp_df['rhum.2m']  = tmp_df['rhum.2m'].map(lambda x:float(x)/100.0)
-            elif(cur_var=='swr_diff'):
-                tmp_df['swr_diff'] = pandas.Series(tmp_df['dswrf']-tmp_df['uswrf.sfc'],index=tmp_df.index)
-            elif(cur_var=='srad'):
-                tmp_df['srad']     = tmp_df['swr_diff'].map(lambda x:constants.WMsq_MjMsq*x)
-            elif(cur_var=='year'):
-                tmp_df['year']     = tmp_df.index.year
-            elif(cur_var=='month'):
-                tmp_df['month']    = tmp_df.index.month
-            elif(cur_var=='day'):
-                tmp_df['day']      = tmp_df.index.day
-            else:
-                tmp_df[cur_var]    = 0.0
+            tmp_df['wnd']      = pandas.Series(tmp_df['uwnd.10m'].astype(float)**2.0+\
+                                                tmp_df['vwnd.10m'].astype(float)**2.0,index=tmp_df.index)
+            tmp_df['wnd']      = tmp_df['wnd']**0.5
+            tmp_df['rhum.2m']  = tmp_df['rhum.2m'].map(lambda x:float(x)/100.0)
+            tmp_df['swr_diff'] = pandas.Series(tmp_df['dswrf']-tmp_df['uswrf.sfc'],index=tmp_df.index)
+            tmp_df['srad']     = tmp_df['swr_diff'].map(lambda x:constants.WMsq_MjMsq*x)
+            tmp_df['year']     = tmp_df.index.year
+            tmp_df['month']    = tmp_df.index.month
+            tmp_df['day']      = tmp_df.index.day
             epic_df            = epic_df.combine_first(tmp_df)
-
         # Output dataframe to text file with right formatting
         for index, row in epic_df.iterrows():
             out_str = '%6.0f%4.0f%4.0f%6.1f%6.1f%6.1f%6.1f%6.2f%6.1f' % \
