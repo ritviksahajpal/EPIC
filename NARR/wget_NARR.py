@@ -4,7 +4,7 @@
 #
 # Download NARR data based on user specified region/site, variables and years
 ###############################################################################
-import constants, multiprocessing, logging, os, wget, util
+import constants, logging, os, wget, util, multiprocessing
 
 ###############################################################################
 # download_NARR
