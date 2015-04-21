@@ -1,0 +1,31 @@
+[PROJECT]
+project_name = OpenLands_LS                              ; Name of project directory (to be created within out_dir)
+TAG          = Apr20_LakeStates_NoWheat7_                ; A log file is created as Log_<TAG>.txt
+LIST_STATES  = StateNames_LakeStates.csv                 ; List of states to process               
+METRIC       = LCC
+
+[PATHS]
+prj_dir    = C:\Users\ritvik\Documents\PhD\Projects\
+
+[PARAMETERS]
+START_YEAR  = 2008           ; Starting year of weather data
+END_YEAR    = 2013           ; Ending year of weather data
+DO_WHEAT    = False
+SET_SNAP    = True
+REPLACE     = True
+USE_INTERIM = False
+DO_MOSAIC   = True
+FILTER_SIZE = 1
+
+[CONSTANTS]
+M2_TO_HA    = 0.0001
+CONVERSION  = conversion
+RECL        = recl
+WHEAT       = 498
+CORN        = 499
+SOY         = 501
+OPEN        = 500
+FOREST      = 503
+URBAN       = 505
+WATER       = 504
+OTHER       = 502

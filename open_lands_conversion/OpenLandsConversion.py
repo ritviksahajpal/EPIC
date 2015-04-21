@@ -4,13 +4,18 @@
 # email: ritvik@umd.edu
 #
 #################################################################
+import os, time, pdb, operator, csv, glob, logging, shutil, arcpy, datetime, numpy, sys, pandas, multiprocessing
+from dbfpy import dbf
+from arcpy.sa import *
+from itertools import groupby, combinations, combinations_with_replacement
+from collections import Counter
+from ConfigParser import SafeConfigParser
+import constants
 
-# Google Python Style Guide
-# function_name, local_var_name, ClassName, method_name, ExceptionName, 
-# GLOBAL_CONSTANT_NAME, global_var_name, module_name, package_name,  
-# instance_var_name, function_parameter_name
-
-from constants import *
+# Arcpy constants
+arcpy.CheckOutExtension("spatial")
+arcpy.env.overwriteOutput= True
+arcpy.env.extent         = "MAXOF"
 
 ###############################################################################
 #
@@ -20,7 +25,7 @@ from constants import *
 ###############################################################################
 def dbf_to_csv(file_name):
     if file_name.endswith('.dbf'):
-        logger.info("Converting %s to csv" % file_name)
+        logging.info("Converting %s to csv" % file_name)
         
         csv_fn = file_name[:-4]+ ".csv"
         
@@ -35,7 +40,7 @@ def dbf_to_csv(file_name):
                 out_csv.writerow(rec.fieldData)
             in_db.close()
     else:
-        logger.info("\tFilename does not end with .dbf")
+        logging.info("\tFilename does not end with .dbf")
 
     return csv_fn
 
@@ -52,17 +57,7 @@ def backup_source_code(out_dir):
     try:
         shutil.copy(os.path.realpath(__file__),out_dir)
     except:
-        print "WARNING: could not save source code file"
-        
-###############################################################################
-#
-#
-#
-#
-###############################################################################
-def make_dir_if_missing(d):
-    if not os.path.exists(d):
-        os.makedirs(d)
+        logging.info("WARNING: could not save source code file")
 
 ###############################################################################
 #
@@ -88,8 +83,8 @@ def output_as_matrix(mat, name):
     
     # Output both matrix as well as net values matrix
     net_df_t = (df_t-df_t.T)+numpy.diag(numpy.diag(df_t))
-    df_t.to_csv(out_dir+name+'.csv')
-    net_df_t.to_csv(out_dir+'Net_'+name+'.csv')
+    df_t.to_csv(constants.out_dir+name+'.csv')
+    net_df_t.to_csv(constants.out_dir+'Net_'+name+'.csv')
 
 ###############################################################################
 #
@@ -98,7 +93,7 @@ def output_as_matrix(mat, name):
 #
 ###############################################################################
 def check_if_ag(val):
-    if(val==WHEAT or val==CORN or val==SOY or val==OTHER):
+    if(val==constants.WHEAT or val==constants.CORN or val==constants.SOY or val==constants.OTHER):
         return True
     else:
         return False
@@ -114,32 +109,32 @@ def year_of_conversion(row):
     conv_field    = 'Ignore'
 
     # Check if there are any open lands
-    if(row.count(OPEN)):
+    if(row.count(constants.OPEN)):
         # If there are any open lands, check if there is conversion in last year
         # Also, 1st year should be OPEN                            
-            if (USE_INTERIM or row[0]==OPEN):
-                if(row[len(row)-1] != OPEN):
+            if (constants.USE_INTERIM or row[0]==constants.OPEN):
+                if(row[len(row)-1] != constants.OPEN):
                     # Find out what was final conversion
-                    if(row[len(row)-1] == CORN):
+                    if(row[len(row)-1] == constants.CORN):
                         conv_field = 'Corn'
-                    elif(row[len(row)-1] == WHEAT):
+                    elif(row[len(row)-1] == constants.WHEAT):
                         conv_field = 'Wheat'
-                    elif(row[len(row)-1] == SOY):
+                    elif(row[len(row)-1] == constants.SOY):
                         conv_field = 'Soy'
-                    elif(row[len(row)-1] == FOREST):
+                    elif(row[len(row)-1] == constants.FOREST):
                         conv_field = 'Forest'     
-                    elif(row[len(row)-1] == URBAN):
+                    elif(row[len(row)-1] == constants.URBAN):
                         conv_field = 'Urban'
-                    elif(row[len(row)-1] == WATER):
+                    elif(row[len(row)-1] == constants.WATER):
                         conv_field = 'Water'
                     else:
                         conv_field = 'Other'   
-                elif(not(USE_INTERIM) and row[len(row)-1]==OPEN): #Both first and last LU are OPEN
+                elif(not(constants.USE_INTERIM) and row[len(row)-1]==constants.OPEN): #Both first and last LU are OPEN
                     return(-1,conv_field)                                                                                 
                 # Find out year of conversion from open land
-                idx_last_cult = len(row) - 1 - row[::-1].index(OPEN)
+                idx_last_cult = len(row) - 1 - row[::-1].index(constants.OPEN)
                 
-                return (START_YEAR+idx_last_cult+1,conv_field)
+                return (constants.START_YEAR+idx_last_cult+1,conv_field)
 
     return (-1,conv_field)
     
@@ -167,7 +162,7 @@ def consecutive_cropping(row,crop_id):
 def identify_monoculture(row):
     if(len(set(row)) == 1):
         return 1
-    elif(Counter(set(row))==Counter(CORN_SOY)):# Counter gets the unique values in a list
+    elif(Counter(set(row))==Counter(constants.CORN_SOY)):# Counter gets the unique values in a list
         return 1
     else:
         return 0
@@ -182,14 +177,14 @@ def number_yrs_after_open(row):
     num_yrs = 0
     cult_yr = 0
     
-    if(row.count(OPEN)):
-        if(USE_INTERIM or row[0]==OPEN):
+    if(row.count(constants.OPEN)):
+        if(constants.USE_INTERIM or row[0]==constants.OPEN):
             # Find the last year of open land
-            last_yr = row[::-1].index(OPEN)
+            last_yr = row[::-1].index(constants.OPEN)
             
             # Determine the number of years of cultivation after that
             if(last_yr > 0):
-                for j in CULTIVATED:
+                for j in constants.CULTIVATED:
                     cult_yr += row[-last_yr:].count(j)    
                 
                 if(cult_yr > 0):
@@ -204,14 +199,14 @@ def number_yrs_after_open(row):
 #
 ###############################################################################
 def any_cultivation(row):
-    for j in CULTIVATED:
+    for j in constants.CULTIVATED:
         if(j in row):
             return True
     
     return False
 
 def output_raster_attribute_to_csv(reg,state,ras,TITL,replace):
-    state_dir = out_dir+os.sep+state+os.sep
+    state_dir = constants.out_dir+os.sep+state+os.sep
     out_csv   = state_dir+TITL+reg+'_'+state+'.csv'
     fields    = "*"
       
@@ -238,9 +233,9 @@ def output_raster_attribute_to_csv(reg,state,ras,TITL,replace):
                 f.close()
       
         except:  
-            logger.info('\t '+ras+" - is not integer or has no attribute table")  
+            logging.info('\t '+ras+" - is not integer or has no attribute table")  
 
-    logger.info('\tOutputting csv for region '+reg+' in state '+state)
+    logging.info('\tOutputting csv for region '+reg+' in state '+state)
     return out_csv    
       
 ###############################################################################
@@ -250,7 +245,7 @@ def output_raster_attribute_to_csv(reg,state,ras,TITL,replace):
 #
 ###############################################################################
 def join_csv(reg,state,ras,out_csv,replace):
-    state_dir    = out_dir+os.sep+state+os.sep
+    state_dir    = constants.out_dir+os.sep+state+os.sep
     out_CR       = state_dir+state+'_cr'
     
     if not(replace):
@@ -261,9 +256,9 @@ def join_csv(reg,state,ras,out_csv,replace):
             arcpy.BuildRasterAttributeTable_management(ras, "Overwrite")
             arcpy.JoinField_management(ras,"VALUE",out_CR,"VALUE","")
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
         
-    logger.info('\tJoining region ' +reg+' for state '+state)
+    logging.info('\tJoining region ' +reg+' for state '+state)
     return ras
 
 ###############################################################################
@@ -273,11 +268,11 @@ def join_csv(reg,state,ras,out_csv,replace):
 #
 ###############################################################################
 def extract_by_mask(state,extract_comb,titl,replace):
-    state_dir = out_dir+os.sep+state+os.sep
+    state_dir = constants.out_dir+os.sep+state+os.sep
     list_ras  = []
-    for reg in REGION:
-        ext_ras  = state_dir+titl+reg+'_'+state+'_'+str(START_YEAR)[2:]+'_'+str(END_YEAR)[2:]
-        vec_mask = base_dir+os.sep+'Data\\GIS\\Lake_States_Outline'+os.sep+reg+'_'+'LakeStates.shp'
+    for reg in constants.REGION:
+        ext_ras  = state_dir+titl+reg+'_'+state+'_'+str(constants.START_YEAR)[2:]+'_'+str(constants.END_YEAR)[2:]
+        vec_mask = constants.base_dir+os.sep+'Data\\GIS\\Lake_States_Outline'+os.sep+reg+'_'+'LakeStates.shp'
         list_ras.append(ext_ras)
         
         if arcpy.Exists(ext_ras) and not(replace):
@@ -286,9 +281,9 @@ def extract_by_mask(state,extract_comb,titl,replace):
             try:
                 arcpy.gp.ExtractByMask_sa(extract_comb,vec_mask,ext_ras)                
             except:
-                logger.info(arcpy.GetMessages())
+                logging.info(arcpy.GetMessages())
         
-        logger.info('\Extracting for '+reg+' in state '+state)
+        logging.info('\tExtracting for '+reg+' in state '+state)
         
     return list_ras
 
@@ -299,9 +294,9 @@ def extract_by_mask(state,extract_comb,titl,replace):
 #
 ###############################################################################
 def extract_LU_change(state,ras,replace):
-    state_dir = out_dir+os.sep+state+os.sep
-    ext_ras   = state_dir+'LU_'+state+'_'+str(START_YEAR)[2:]+'_'+str(END_YEAR)[2:]
-    where     = CONVERSION+" > -1" 
+    state_dir = constants.out_dir+os.sep+state+os.sep
+    ext_ras   = state_dir+'LU_'+state+'_'+str(constants.START_YEAR)[2:]+'_'+str(constants.END_YEAR)[2:]
+    where     = constants.CONVERSION+" > -1" 
 
     if arcpy.Exists(ext_ras) and not(replace):
         pass
@@ -311,9 +306,9 @@ def extract_LU_change(state,ras,replace):
             att_extract = ExtractByAttributes(ras,where) 
             att_extract.save(ext_ras)
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
 
-    logger.info('\tRemove no LU pixels for state '+state)
+    logging.info('\tRemove no LU pixels for state '+state)
     return ext_ras
 
 ###############################################################################
@@ -323,15 +318,23 @@ def extract_LU_change(state,ras,replace):
 #
 ###############################################################################
 def filter_and_project_raster(reg,state,ras,replace):    
-    filtered_state =  out_dir+os.sep+state+os.sep+'f_'+reg+'_'+state+'_'+str(START_YEAR)[2:]+'_'+str(END_YEAR)[2:]
-    tmp_ras        =  out_dir+os.sep+state+os.sep+'t_'+reg+'_'+state+'_'+str(START_YEAR)[2:]+'_'+str(END_YEAR)[2:]
+    filtered_state =  constants.out_dir+os.sep+state+os.sep+'f_'+reg+'_'+state+'_'+str(constants.START_YEAR)[2:]+'_'+str(constants.END_YEAR)[2:]
+    tmp_ras        =  constants.out_dir+os.sep+state+os.sep+'t_'+reg+'_'+state+'_'+str(constants.START_YEAR)[2:]+'_'+str(constants.END_YEAR)[2:]
     
     if arcpy.Exists(filtered_state) and not(replace):
         pass
     else:
         try:
-            out_set_null = SetNull(Lookup(RegionGroup(ras,"","","NO_LINK",""),"Count") <= FILTER_SIZE,ras)
+            where = "COUNT > "+str(constants.FILTER_SIZE)
+            att_extract = ExtractByAttributes(ras,where) 
+            att_extract.save(tmp_ras)
+        except:
+            logging.info(arcpy.GetMessages())
+
+        try:
+            out_set_null = SetNull(Lookup(RegionGroup(tmp_ras,"","","NO_LINK",""),"Count") <= constants.FILTER_SIZE,tmp_ras)
             out_set_null.save(filtered_state)
+
             #arcpy.Copy_management(ras,filtered_state)
             
             ####arcpy.BuildRasterAttributeTable_management(ras,"NONE")
@@ -347,9 +350,9 @@ def filter_and_project_raster(reg,state,ras,replace):
             coord_sys = dsc.spatialReference
             arcpy.DefineProjection_management(filtered_state,coord_sys)
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
     
-    logger.info('\t Filtering small pixels from state '+state)
+    logging.info('\t Filtering small pixels from state '+state)
     return filtered_state
 
 ###############################################################################
@@ -359,11 +362,11 @@ def filter_and_project_raster(reg,state,ras,replace):
 #
 ###############################################################################
 def sieve(state,extract_comb):
-    filtered_state =  out_dir+os.sep+state+os.sep+'fs_'+reg+'_'+state+'_'+str(START_YEAR)[2:]+'_'+str(END_YEAR)[2:]#out_dir+os.sep+state+os.sep+'final_'+state
+    filtered_state =  constants.out_dir+os.sep+state+os.sep+'fs_'+reg+'_'+state+'_'+str(constants.START_YEAR)[2:]+'_'+str(constants.END_YEAR)[2:]#constants.out_dir+os.sep+state+os.sep+'final_'+state
     
     try:
         tmp1 = RegionGroup(extract_comb, "EIGHT", "WITHIN", "NO_LINK", "") 
-        query = "VALUE > " + FILTER_SIZE
+        query = "VALUE > " + constants.FILTER_SIZE
         tmp2 = ExtractByAttributes(tmp1, query)
         
         out_raster = Nibble(extract_comb, tmp2)
@@ -374,9 +377,9 @@ def sieve(state,extract_comb):
         coord_sys = dsc.spatialReference
         arcpy.DefineProjection_management(filtered_state,coord_sys)
     except:
-        logger.info(arcpy.GetMessages())
+        logging.info(arcpy.GetMessages())
         
-    logger.info('\t Filtering small pixels from state '+state)
+    logging.info('\t Filtering small pixels from state '+state)
     return filtered_state
 
 ###############################################################################
@@ -386,8 +389,8 @@ def sieve(state,extract_comb):
 #
 ###############################################################################
 def filter_polygon(state,extract_comb):
-    poly_1 = out_dir+os.sep+state+os.sep+'poly_1.shp'
-    poly_2 = out_dir+os.sep+state+os.sep+'poly_2.shp'
+    poly_1 = constants.out_dir+os.sep+state+os.sep+'poly_1.shp'
+    poly_2 = constants.out_dir+os.sep+state+os.sep+'poly_2.shp'
     
     arcpy.RasterToPolygon_conversion(extract_comb, poly_1, "NO_SIMPLIFY", "VALUE")
     arcpy.CalculateAreas_stats(poly_1,poly_2)
@@ -399,8 +402,8 @@ def filter_polygon(state,extract_comb):
 #
 ###############################################################################   
 def identify_no_change_pixels(state,ras,replace):
-    state_dir   = out_dir+os.sep+state+os.sep
-    out_csv     = shared_dir+state+'_not_filtered.csv'#state_dir+state+'_not_filtered.csv'
+    state_dir   = constants.out_dir+os.sep+state+os.sep
+    out_csv     = constants.shared_dir+state+'_not_filtered.csv'#state_dir+state+'_not_filtered.csv'
     field_names = []
     
     if arcpy.Exists(out_csv) and not(replace):
@@ -410,7 +413,7 @@ def identify_no_change_pixels(state,ras,replace):
             w = csv.writer(f)
 
             try:
-                arcpy.AddField_management(ras,CONVERSION,"LONG")
+                arcpy.AddField_management(ras,constants.CONVERSION,"LONG")
                 arcpy.AddField_management(ras,'YR_CONVERSION',"LONG")
                 arcpy.AddField_management(ras,'CONV_FIELD',"TEXT")
                 arcpy.AddField_management(ras,'CULTIVATED',"LONG")
@@ -418,7 +421,7 @@ def identify_no_change_pixels(state,ras,replace):
                 arcpy.AddField_management(ras,'CORN',"LONG")
                 arcpy.AddField_management(ras,'SOY',"LONG")
             except:
-                logger.info(arcpy.GetMessages())                        
+                logging.info(arcpy.GetMessages())                        
                             
             cursor = arcpy.UpdateCursor(ras)
             # Lets make a list of all of the fields in the table
@@ -429,17 +432,17 @@ def identify_no_change_pixels(state,ras,replace):
                         
             for row in cursor:
                 land_use_trend = []
-                for j in range(START_YEAR, END_YEAR+1):            
+                for j in range(constants.START_YEAR, constants.END_YEAR+1):            
                     land_use_trend.append(row.getValue('RECL_'+state.upper()+'_'+str(j)))
                 if(identify_monoculture(land_use_trend)):
-                    row.setValue(CONVERSION,-1)
+                    row.setValue(constants.CONVERSION,-1)
                 elif(not(any_cultivation(land_use_trend))):
-                    row.setValue(CONVERSION,0)
+                    row.setValue(constants.CONVERSION,0)
                 else:
-                    row.setValue(CONVERSION,1)
+                    row.setValue(constants.CONVERSION,1)
 
-                num_consecutive_corn = consecutive_cropping(land_use_trend,CORN)
-                num_consecutive_soy  = consecutive_cropping(land_use_trend,SOY)
+                num_consecutive_corn = consecutive_cropping(land_use_trend,constants.CORN)
+                num_consecutive_soy  = consecutive_cropping(land_use_trend,constants.SOY)
                 cult_yr, num_yrs     = number_yrs_after_open(land_use_trend)
                 year, conv_field     = year_of_conversion(land_use_trend)
                 
@@ -459,8 +462,8 @@ def identify_no_change_pixels(state,ras,replace):
                 
                 #row = cursor.next()
     
-    #arcpy.ExportXYv_stats(ras,field_names,"COMMA",shared_dir+state+'_all.csv',"ADD_FIELD_NAMES")
-    logger.info('\tIdentifying monoculture and no cultivation pixels in state '+state)
+    #arcpy.ExportXYv_stats(ras,field_names,"COMMA",constants.shared_dir+state+'_all.csv',"ADD_FIELD_NAMES")
+    logging.info('\tIdentifying monoculture and no cultivation pixels in state '+state)
     return out_csv
 
 ###############################################################################
@@ -472,18 +475,18 @@ def identify_no_change_pixels(state,ras,replace):
 def erase_PAD(state,ras,replace):
     # Process: Erase
     
-    pad_state     = pad_dir+'PAD-US_'+state+'\\PADUS1_3_'+state+'.gdb\\PADUS1_3'+state    
-    pad_out_dir   = pad_dir+'output\\'+state+os.sep
-    bound_out_dir = bound_dir+'output\\'+state+os.sep
-    state_dir     = out_dir+os.sep+state+os.sep
+    pad_state     = constants.pad_dir+'PAD-US_'+state+'\\PADUS1_3_'+state+'.gdb\\PADUS1_3'+state    
+    pad_out_dir   = constants.pad_dir+'output\\'+state+os.sep
+    bound_out_dir = constants.bound_dir+'output\\'+state+os.sep
+    state_dir     = constants.out_dir+os.sep+state+os.sep
     
-    make_dir_if_missing(pad_out_dir)
-    make_dir_if_missing(bound_out_dir)
-    make_dir_if_missing(state_dir)
+    constants.make_dir_if_missing(pad_out_dir)
+    constants.make_dir_if_missing(bound_out_dir)
+    constants.make_dir_if_missing(state_dir)
     
     select_state  = bound_out_dir+state+'.shp'
     erased_pad    = pad_out_dir+state+'.shp'
-    extract_comb  = state_dir+'ext_'+state+'_'+str(START_YEAR)[2:]+'_'+str(END_YEAR)[2:]
+    extract_comb  = state_dir+'ext_'+state+'_'+str(constants.START_YEAR)[2:]+'_'+str(constants.END_YEAR)[2:]
 
     #
     if arcpy.Exists(select_state) and not(replace):
@@ -491,9 +494,9 @@ def erase_PAD(state,ras,replace):
     else:
         where = '"STATE_ABBR" = ' + "'%s'" %state.upper()
         try:
-            arcpy.Select_analysis(BOUNDARIES,select_state,where)
+            arcpy.Select_analysis(constants.BOUNDARIES,select_state,where)
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
 
     #
     if arcpy.Exists(erased_pad) and not(replace):
@@ -502,7 +505,7 @@ def erase_PAD(state,ras,replace):
         try:
             arcpy.Erase_analysis(select_state,pad_state,erased_pad, "")
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
 
     #
     if arcpy.Exists(extract_comb) and not(replace):
@@ -516,9 +519,9 @@ def erase_PAD(state,ras,replace):
             #arcpy.Clip_management(ras,rectangle,extract_comb,erased_pad,"#","ClippingGeometry")
             arcpy.gp.ExtractByMask_sa(ras,erased_pad,extract_comb)
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
 
-    logger.info('\t Erasing PAD from state '+state)
+    logging.info('\t Erasing PAD from state '+state)
     return extract_comb
 
 ###############################################################################
@@ -527,33 +530,48 @@ def erase_PAD(state,ras,replace):
 #
 #
 ###############################################################################
-def reclassify_and_combine(state,state_lcc,state_cdl_files,replace):
+def reclassify_and_combine(state,state_lcc,state_cdl_files,range_of_yrs,replace):
     to_comb_rasters = []
-      
+    open_ras        = constants.out_dir+os.sep+state+os.sep+'Open_'+str(constants.END_YEAR)+'_'+state # OPEN_20xx_<state_name>
+
     # Create output directory for each state
-    state_dir  = out_dir+os.sep+state+os.sep
-    make_dir_if_missing(state_dir)
+    state_dir  = constants.out_dir+os.sep+state+os.sep
+    constants.make_dir_if_missing(state_dir)
 
     # Reclass for each year
-    for j in range(len(range_of_yrs)):
-        recl_raster = shared_dir+RECL+'_'+state+'_'+str(range_of_yrs[j])
+    idx = 0
+    for yr in range_of_yrs:
+        recl_raster = constants.shared_dir+constants.RECL+'_'+state+'_'+str(yr)
 
-        if arcpy.Exists(recl_raster) and not(replace):            
-            pass
+        if arcpy.Exists(recl_raster) and not(replace):      
+            idx += 1      
         else:
             try:
-                out_reclass = ReclassByASCIIFile(state_cdl_files[j],REMAP_FILE,"NODATA")        
+                out_reclass = ReclassByASCIIFile(state_cdl_files[idx],constants.REMAP_FILE,"NODATA")        
                 out_reclass.save(recl_raster)
+                idx        += 1
             except:
-                logger.info(arcpy.GetMessages())
+                logging.info(arcpy.GetMessages())
         
-        logger.info('\tReclassified...'+recl_raster)
+        logging.info('\tReclassified...'+recl_raster)
         to_comb_rasters.append(recl_raster)
+
+        if (yr == constants.END_YEAR): 
+            if arcpy.Exists(open_ras) and not(replace):
+                pass
+            else:
+                where = "VALUE = "+str(constants.OPEN)
+                try:
+                    att_extract = ExtractByAttributes(recl_raster,where) 
+                    att_extract.save(open_ras)                    
+                except:
+                    logging.info(arcpy.GetMessages())
+                logging.info('\tExtracted Open Lands...'+open_ras)
 
     to_comb_rasters.append(state_lcc)
     
     # Combine all input rasters
-    comb_raster = shared_dir+os.sep+'comb_'+state+'_'+str(range_of_yrs[0])[2:]+'_'+str(range_of_yrs[len(range_of_yrs)-1])[2:]
+    comb_raster = constants.shared_dir+os.sep+'comb_'+state+'_'+str(range_of_yrs[0])[2:]+'_'+str(range_of_yrs[len(range_of_yrs)-1])[2:]
       
     if arcpy.Exists(comb_raster) and not(replace):
         pass
@@ -562,9 +580,9 @@ def reclassify_and_combine(state,state_lcc,state_cdl_files,replace):
             out_combine = Combine(to_comb_rasters)
             out_combine.save(comb_raster)
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
         
-    logger.info('\tCombined...'+comb_raster)
+    logging.info('\tCombined...'+comb_raster)
     return comb_raster
 
 ###############################################################################
@@ -574,11 +592,11 @@ def reclassify_and_combine(state,state_lcc,state_cdl_files,replace):
 #
 ############################################################################### 
 def create_state_ssurgo(state,replace):    
-    state_lcc_dir  = lcc_dir+state+os.sep
+    state_lcc_dir  = constants.lcc_dir+state+os.sep
     
-    state_ssurgo = state_lcc_dir+state+'ssurgo'
-    lu_ssurgo    = state_lcc_dir+state+'_lu_ssurgo'    
-    out_state_sgo  = state_lcc_dir+state+'_sgo_'+METRIC.lower()
+    state_ssurgo  = state_lcc_dir+state+'ssurgo'
+    lu_ssurgo     = state_lcc_dir+state+'_lu_ssurgo'    
+    out_state_sgo = state_lcc_dir+state+'_sgo_'+constants.METRIC.lower()
     
     # Join with LCC csv
     if arcpy.Exists(out_state_sgo) and not(replace):
@@ -587,27 +605,27 @@ def create_state_ssurgo(state,replace):
         arcpy.BuildRasterAttributeTable_management(state_ssurgo, "Overwrite")
 
         try:
-            if(METRIC=='LCC'):
-                arcpy.JoinField_management (state_ssurgo,"VALUE",LCC_CR,"mukey","")
+            if(constants.METRIC=='LCC'):
+                arcpy.JoinField_management (state_ssurgo,"VALUE",constants.LCC_CR,"mukey","")
             else: # DI or PI            
                 arcpy.JoinField_management (state_ssurgo,"VALUE",DI_PI_CR,"mukey","")                
         except:
-            logger.info(arcpy.GetMessages())
+            logging.info(arcpy.GetMessages())
             
         # Lookup to create new raster with new VALUE field
         # Execute Lookup
         lup_column = ''
         remap_file = ''
         
-        if(METRIC=='LCC'):
+        if(constants.METRIC=='LCC'):
             lup_column = 'NICCDCD'
-            remap_file = SSURGO_REMAP_FILE
-        elif(METRIC=='PI'):
+            remap_file = constants.SSURGO_REMAP_FILE
+        elif(constants.METRIC=='PI'):
             lup_column = 'PI'
-            remap_file = PI_REMAP_FILE
-        elif(METRIC=='DI'):
+            remap_file = constants.PI_REMAP_FILE
+        elif(constants.METRIC=='DI'):
             lup_column = 'DI'
-            remap_file = DI_REMAP_FILE
+            remap_file = constants.DI_REMAP_FILE
                         
         lu_tmp = Lookup(state_ssurgo,lup_column)        
         # Save the output 
@@ -618,7 +636,7 @@ def create_state_ssurgo(state,replace):
         out_reclass = ReclassByASCIIFile(lu_ssurgo,remap_file,"NODATA")        
         out_reclass.save(out_state_sgo)
     
-    logger.info('\t SSURGO state '+state)
+    logging.info('\t SSURGO state '+state)
     return out_state_sgo
 
 ###############################################################################
@@ -628,7 +646,7 @@ def create_state_ssurgo(state,replace):
 #
 ###############################################################################    
 def merge_csv_files(list_csv_files,fname):
-    write_file = out_dir+fname+'.csv'
+    write_file = constants.out_dir+fname+'.csv'
      
     with open(write_file,'w+b') as append_file:
         need_headers = True
@@ -642,7 +660,7 @@ def merge_csv_files(list_csv_files,fname):
                 # Now write the rest of the input file.
                 for line in read_file:
                     append_file.write(line)
-    logger.info('Appended CSV files')
+    logging.info('Appended CSV files')
     return write_file
     
 ###############################################################################
@@ -651,24 +669,25 @@ def merge_csv_files(list_csv_files,fname):
 #
 #
 ###############################################################################       
-def lu_change_analysis(df):
+def lu_change_analysis(state,df):
     names_lu_conversion = []
+    non_region_csv_fl   = []
     matrix_names        = []
-    for i in combinations_with_replacement(LANDUSE, 2):
+    for i in combinations_with_replacement(constants.LANDUSE, 2):
         # Do not include transition like CULT_CORN
         # or SOY_CULT etc. Only CULT_ 'Non cult' transitions
         # make sense
-        if(i[0]=='CULT' and check_if_ag(LANDUSE[i[1]])):
+        if(i[0]=='CULT' and check_if_ag(constants.LANDUSE[i[1]])):
             pass
-        elif(i[1]=='CULT' and check_if_ag(LANDUSE[i[0]])):
+        elif(i[1]=='CULT' and check_if_ag(constants.LANDUSE[i[0]])):
             pass
         else:
             names_lu_conversion.append(i[0]+'_'+i[1])
             if(i[0] <> i[1]):            
                 names_lu_conversion.append(i[1]+'_'+i[0])
                 
-        if(LANDUSE[i[1]]==WHEAT or LANDUSE[i[1]]==CORN or LANDUSE[i[1]]==SOY or LANDUSE[i[1]]==WATER or\
-           LANDUSE[i[0]]==WHEAT or LANDUSE[i[0]]==CORN or LANDUSE[i[0]]==SOY or LANDUSE[i[0]]==WATER or\
+        if(constants.LANDUSE[i[1]]==constants.WHEAT or constants.LANDUSE[i[1]]==constants.CORN or constants.LANDUSE[i[1]]==constants.SOY or constants.LANDUSE[i[1]]==constants.WATER or\
+           constants.LANDUSE[i[0]]==constants.WHEAT or constants.LANDUSE[i[0]]==constants.CORN or constants.LANDUSE[i[0]]==constants.SOY or constants.LANDUSE[i[0]]==constants.WATER or\
            (i[0]=='CULT' and i[1]=='OTHER') or\
            (i[0]=='OTHER' and i[1]=='CULT')):
             pass
@@ -683,25 +702,25 @@ def lu_change_analysis(df):
         df[i] = 0.0
     
     # Iterate through df rows and compute land use conversion between the different LU classes
-    name_init = 'RECL_'+state.upper()+'_'+str(START_YEAR)
-    name_finl = 'RECL_'+state.upper()+'_'+str(END_YEAR)    
+    name_init = 'RECL_'+state.upper()+'_'+str(constants.START_YEAR)
+    name_finl = 'RECL_'+state.upper()+'_'+str(constants.END_YEAR)    
     
     # Iterate through names_lu_conversion and determine land use change area
     for index, row in df.iterrows():
         # Convert from LU to column name
         #col_name = lu_to_colname()
 
-        init = OPP_LU[row[name_init]]
-        finl = OPP_LU[row[name_finl]]        
+        init = constants.OPP_LU[row[name_init]]
+        finl = constants.OPP_LU[row[name_finl]]        
         col_name = init+'_'+finl
         df.loc[index,col_name] = row['COUNT']
         
-        if(init in CULT and finl in CULT):
+        if(init in constants.CULT and finl in constants.CULT):
             pass            
-        elif(init in CULT and finl not in CULT):
+        elif(init in constants.CULT and finl not in constants.CULT):
             col_name = 'CULT'+'_'+finl
             df.loc[index,col_name] = row['COUNT']
-        elif(init not in CULT and finl in CULT):
+        elif(init not in constants.CULT and finl in constants.CULT):
             col_name = init+'_'+'CULT'
             df.loc[index,col_name] = row['COUNT']
         else:
@@ -709,20 +728,19 @@ def lu_change_analysis(df):
                     
     # Create new data frame
     #mat_df = pandas.DataFrame(columns=names_lu_conversion, index = numpy.arange(1))
-    print matrix_names
     mat_df = pandas.DataFrame(columns=matrix_names, index = numpy.arange(1))
     
     # Output region to matrix 
-    for reg in REGION:                    
+    for reg in constants.REGION:                    
         for i in matrix_names:#names_lu_conversion:
             reg_df    = df[df['REGION']==reg]
             mat_df[i] = reg_df[i].sum()        
-            output_as_matrix(mat_df,'matrix_'+reg+'_'+state+'_'+TAG)
+            output_as_matrix(mat_df,'matrix_'+reg+'_'+state+'_'+constants.TAG)
                         
     # Output entire state
     for i in matrix_names:#names_lu_conversion:
         mat_df[i] = df[i].sum()            
-    output_as_matrix(mat_df,'matrix_'+state+'_'+TAG)        
+    output_as_matrix(mat_df,'matrix_'+state+'_'+constants.TAG)        
     
 
     # Use all columns except the ones with values that are not the same for the same VALUE 
@@ -742,10 +760,139 @@ def lu_change_analysis(df):
     
     gr = df.groupby(['VALUE'],as_index=False)[cols_to_append].sum()   
     df2  = df2.merge(gr,how='left',on='VALUE')
-    df2.to_csv(out_dir+state+'_'+TAG+'.csv') # Contains results with no region separation
-    non_region_csv_fl.append(out_dir+state+'_'+TAG+'.csv')
+    df2.to_csv(constants.out_dir+state+'_'+constants.TAG+'.csv') # Contains results with no region separation
+    non_region_csv_fl.append(constants.out_dir+state+'_'+constants.TAG+'.csv')
     
-    merge_csv_files(non_region_csv_fl,'NonRegion_'+TAG)
+    merge_csv_files(non_region_csv_fl,'NonRegion_'+constants.TAG)
+
+def open_lands_conv(st):
+    state             = st[1]
+    # Loop across all states   
+    list_csv_files    = []
+    list_filt_ras     = [] 
+    list_dbf_csv      = []
+    region_csv_files  = []
+    state_cdl_files   = []
+    range_of_yrs      = numpy.arange(constants.START_YEAR,constants.END_YEAR+1)
+   
+    for subdir, dir_list, files in os.walk(constants.cdl_dir):
+            break   
+
+    # Collect all CDL files for state within given year range   
+    for yr in range_of_yrs:
+        for position, item in enumerate(dir_list):
+            if (str(yr) in item):
+                cdl_file = glob.glob(constants.cdl_dir+os.sep+dir_list[position]+os.sep+state+os.sep+'*_'+state+'_*'+str(yr)+'*.tif')
+                if cdl_file:                    
+                    state_cdl_files.append(''.join(cdl_file))
+                else:
+                    logging.info(cdl_file + 'not found!')
+                    sys.exit(0)
+
+    # Set snap extent
+    arcpy.env.snapRaster     = state_cdl_files[0]
+    logging.info('\tSet snap extent')
+
+    # 0. Create SSURGO file
+    state_sgo     = create_state_ssurgo(state,True and constants.REPLACE)
+
+    # 1. Combine CDL (START_YEAR ... END_YEAR) + SSURGO    
+    comb_raster   = reclassify_and_combine(state,state_sgo,state_cdl_files,range_of_yrs,False)#True and constants.REPLACE)
+
+    # 2. Add field indicating land-use conversion and corn/soy cropping
+    out_csv       = identify_no_change_pixels(state,comb_raster,True and constants.REPLACE)
+
+    # 5. Erase the PAD
+    extract_comb  = erase_PAD(state,comb_raster,True and constants.REPLACE)
+                
+    # 4. Remove non LU change pixels from raster
+    LU_change_ras = extract_LU_change(state,extract_comb,True and constants.REPLACE)        
+
+    # 5. Extract by regional mask
+    extract_mask  = extract_by_mask(state,LU_change_ras,'',True and constants.REPLACE)
+    all_mask  = extract_by_mask(state,extract_comb,'al',True and constants.REPLACE)
+                                
+    reg_indx = 0
+    state_csv_files = []
+    state_filt_ras  = []
+    to_merge_all    = [] 
+    for ras in extract_mask:
+        reg = constants.REGION[reg_indx]            
+        reg_indx += 1
+            
+        # 5.5 Output csv corresponding to ras
+        for r in all_mask:
+            try:
+                out_CR = constants.out_dir+os.sep+state+os.sep+'all_'+state+'_'+reg+'_cr'
+                arcpy.CopyRows_management(out_csv,out_CR)        
+                arcpy.BuildRasterAttributeTable_management(r,"Overwrite")
+                arcpy.JoinField_management(r,"VALUE",out_CR,"VALUE","")
+            except:
+                logging.info(arcpy.GetMessages())
+            
+        all_reg_csv = output_raster_attribute_to_csv(reg,state,r,'all_',True and constants.REPLACE)
+        # read in all_reg_csv into pandas dataframe, extract only CONVERSION < 0, output back into csv
+        tmp_df = pandas.DataFrame.from_csv(all_reg_csv,index_col=False)
+        tmp_df = tmp_df[tmp_df['CONVERSION']<0]
+        tmp_df.to_csv(constants.out_dir+os.sep+state+os.sep+'all_unchanged_'+state+'_'+reg+'.csv')
+        to_merge_all.append(constants.out_dir+os.sep+state+os.sep+'all_unchanged_'+state+'_'+reg+'.csv')
+        # 6. Remove small pixels
+        filtered_ras = filter_and_project_raster(reg,state,ras,False and constants.REPLACE)
+                 
+        # 7. Join back the csv
+        join_csv(reg,state,filtered_ras,out_csv,True and constants.REPLACE)
+        list_filt_ras.append(filtered_ras)
+        state_filt_ras.append(filtered_ras)
+         
+        # 8. Join back the csv
+        out_csv_file = output_raster_attribute_to_csv(reg,state,filtered_ras,'',True and constants.REPLACE)
+        state_csv_files.append(out_csv_file)
+    
+         
+    # Get raster cell area
+    try:
+        ras_cell_size = int(arcpy.GetRasterProperties_management(filtered_ras, 'CELLSIZEX').getOutput(0))
+        ras_area      = ras_cell_size*ras_cell_size*constants.M2_TO_HA # Assuming cell is a square
+    except:
+        logging.info(arcpy.GetMessages())
+
+    # Merge state csv files
+    # Each state csv file contains all the data but separated by region     
+    state_csv = merge_csv_files(state_csv_files,'append_'+state+'_'+constants.TAG)#+'_'+date)
+    region_csv_files.append(state_csv)
+    df   = pandas.DataFrame.from_csv(state_csv,index_col=False)
+    df['COUNT_1'] *= ras_area
+    df['COUNT'] *= ras_area
+
+    # Perform land use change analysis
+    lu_change_analysis(state,df)        
+
+    region_csv_files.extend(to_merge_all) # extending because to_merge_all is itself a list
+    # Zonal state analysis for county specific totals
+    if(constants.DO_MOSAIC):
+        try:
+            out_CR   = constants.out_dir+os.sep+'out_cr'
+            merg_ras = state+"_merge_"+constants.METRIC
+                
+            # Combine all filtered rasters
+            arcpy.MosaicToNewRaster_management(";".join(state_filt_ras),constants.out_dir,merg_ras,"","32_BIT_SIGNED","","1","LAST","FIRST")
+            arcpy.BuildRasterAttributeTable_management(constants.out_dir+merg_ras, "Overwrite")
+            logging.info('Mosaiced... '+constants.out_dir+merg_ras)
+                
+            # Zonal stat
+            in_zone_data = constants.base_dir+'Data\\GIS\\UScounties\\LakeStateCounty.shp'        
+            out_zsat     = ZonalStatisticsAsTable(in_zone_data,'FIPS',constants.out_dir+merg_ras,constants.out_dir+state+'_zsat.dbf', "DATA", "SUM")
+            logging.info('Zonal stat... '+constants.out_dir+merg_ras)   
+                
+            out_zonal_statistics = ZonalStatistics(in_zone_data,'FIPS',constants.out_dir+merg_ras,"SUM","DATA")
+            # Save the output 
+            out_zonal_statistics.save(constants.out_dir+state+'_zsat')         
+            fl = dbf_to_csv(constants.out_dir+state+'_zsat.dbf')
+            list_dbf_csv.append(fl)
+        except:
+            logging.info(arcpy.GetMessages())
+
+    return list_dbf_csv, region_csv_files
 
 ###############################################################################
 # main
@@ -754,166 +901,31 @@ def lu_change_analysis(df):
 #
 ###############################################################################   
 if __name__ == "__main__":    
-    # make output dir
-    make_dir_if_missing(out_dir)
-    make_dir_if_missing(shared_dir)
-    # Read in all state names
-    lines = open(inp_dir+os.sep+list_states, 'rb').readlines()
-    
-    range_of_yrs = []
-    for i in range(END_YEAR-START_YEAR+1):
-        range_of_yrs.append(START_YEAR+i)
-    
-    for subdir, dir_list, files in os.walk(cdl_dir):
-            break        
-    
-    # Logger
-    LOG_FILENAME   = out_dir+os.sep+'Log_'+TAG+'_'+date+'.txt'
-    logging.basicConfig(filename = LOG_FILENAME, level=logging.DEBUG,\
-                        format='%(asctime)s    %(levelname)s %(module)s - %(funcName)s: %(message)s',\
-                        datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, IN    FO, WARNING, ERROR, and CRITICAL
-    logger = logging
+    # Read in all state names  
+    with open(constants.inp_dir+os.sep+constants.list_states, 'rb') as f:
+        reader  = csv.reader(f)
+        list_st = list(reader)     
 
     # Backup source code
-    backup_source_code(out_dir)
+    backup_source_code(constants.out_dir)
     
     # Convert LCC_CSV into copy rows file
     try:
-        arcpy.CopyRows_management(LCC_CSV,LCC_CR,"")
-        arcpy.CopyRows_management(DI_PI_CSV,DI_PI_CR,"")       
+        arcpy.CopyRows_management(constants.LCC_CSV,constants.LCC_CR,"")
+        arcpy.CopyRows_management(constants.DI_PI_CSV,constants.DI_PI_CR,"")       
+        logging.info('Copying rows '+constants.LCC_CSV)
     except:
-        logger.info(arcpy.GetMessages())
-            
-    # Loop across all states   
-    list_csv_files    = []
-    list_filt_ras     = [] 
-    list_dbf_csv      = []
-    region_csv_files  = []
-    non_region_csv_fl = []
-    for line in lines:
-        state_cdl_files = []
-        # Find out state name    
-        state = line.split()[0]
-        logger.info(state)
-        
-        # Collect all CDL files for state within given year range     
-        for j in range(len(range_of_yrs)):
-            for position, item in enumerate(dir_list):
-                if (str(range_of_yrs[j]) in item):
-                    cdl_file = glob.glob(cdl_dir+os.sep+dir_list[position]+os.sep+state+os.sep+'*_'+state+'_*'+str(range_of_yrs[j])+'*.tif')
-                    if cdl_file:                    
-                        state_cdl_files.append(''.join(cdl_file))
-                    else:
-                        logger.info(cdl_file + 'not found!')
-                        sys.exit(0)
-        
-        # Set snap extent
-        if(SET_SNAP):
-            arcpy.env.snapRaster     = state_cdl_files[0]
-            SET_SNAP                 = False
-            logger.info('\tSet snap extent')
-        # 0. Create SSURGO file
-        state_sgo     = create_state_ssurgo(state,True and REPLACE)
+        logging.info(arcpy.GetMessages())                
 
-        # 1. Combine CDL (START_YEAR ... END_YEAR) + SSURGO    
-        comb_raster   = reclassify_and_combine(state,state_sgo,state_cdl_files,False)#True and REPLACE)
+    pool = multiprocessing.Pool(constants.max_threads)
+    list_dbf_csv, region_csv_files = pool.map(open_lands_conv,list_st)
+    pool.close()
+    pool.join()
 
-        # 2. Add field indicating land-use conversion and corn/soy cropping
-        out_csv       = identify_no_change_pixels(state,comb_raster,True and REPLACE)
-
-        # 5. Erase the PAD
-        extract_comb  = erase_PAD(state,comb_raster,True and REPLACE)
-                
-        # 4. Remove non LU change pixels from raster
-        LU_change_ras = extract_LU_change(state,extract_comb,True and REPLACE)        
-
-        # 5. Extract by regional mask
-        extract_mask  = extract_by_mask(state,LU_change_ras,'',True and REPLACE)
-        all_mask  = extract_by_mask(state,extract_comb,'al',True and REPLACE)
-                                
-        reg_indx = 0
-        state_csv_files = []
-        state_filt_ras  = []
-        to_merge_all    = [] 
-        for ras in extract_mask:
-            reg = REGION[reg_indx]            
-            reg_indx += 1
-            
-            # 5.5 Output csv corresponding to ras
-            for r in all_mask:
-                try:
-                    out_CR = out_dir+os.sep+state+os.sep+'all_'+state+'_'+reg+'_cr'
-                    arcpy.CopyRows_management(out_csv,out_CR)        
-                    arcpy.BuildRasterAttributeTable_management(r,"Overwrite")
-                    arcpy.JoinField_management(r,"VALUE",out_CR,"VALUE","")
-                except:
-                    logger.info(arcpy.GetMessages())
-            
-            all_reg_csv = output_raster_attribute_to_csv(reg,state,r,'all_',True and REPLACE)
-            # read in all_reg_csv into pandas dataframe, extract only CONVERSION < 0, output back into csv
-            tmp_df = pandas.DataFrame.from_csv(all_reg_csv,index_col=False)
-            tmp_df = tmp_df[tmp_df['CONVERSION']<0]
-            tmp_df.to_csv(out_dir+os.sep+state+os.sep+'all_unchanged_'+state+'_'+reg+'.csv')
-            to_merge_all.append(out_dir+os.sep+state+os.sep+'all_unchanged_'+state+'_'+reg+'.csv')
-            # 6. Remove small pixels
-            filtered_ras = filter_and_project_raster(reg,state,ras,True and REPLACE)
-                 
-            # 7. Join back the csv
-            join_csv(reg,state,filtered_ras,out_csv,True and REPLACE)
-            list_filt_ras.append(filtered_ras)
-            state_filt_ras.append(filtered_ras)
-         
-            # 8. Join back the csv
-            out_csv_file = output_raster_attribute_to_csv(reg,state,filtered_ras,'',True and REPLACE)
-            state_csv_files.append(out_csv_file)
+    pdb.set_trace()    
+    #if(constants.DO_MOSAIC):
+    #    merge_csv_files(list_dbf_csv,'Zonal_'+constants.TAG)    
     
-         
-        # Get raster cell area
-        try:
-            ras_cell_size = int(arcpy.GetRasterProperties_management(filtered_ras, 'CELLSIZEX').getOutput(0))
-            ras_area      = ras_cell_size*ras_cell_size*M2_TO_HA # Assuming cell is a square
-        except:
-            logging.info(arcpy.GetMessages())
-         
-        # Merge state csv files
-        # Each state csv file contains all the data but separated by region     
-        state_csv = merge_csv_files(state_csv_files,'append_'+state+'_'+TAG+'_'+date)
-        region_csv_files.append(state_csv)
-        df   = pandas.DataFrame.from_csv(state_csv,index_col=False)
-        df['COUNT_1'] *= ras_area
-        df['COUNT'] *= ras_area
- 
-        # Perform land use change analysis
-        lu_change_analysis(df)        
-
-        region_csv_files.extend(to_merge_all) # extending because to_merge_all is itself a list
-        # Zonal state analysis for county specific totals
-        if(DO_MOSAIC):
-            try:
-                out_CR   = out_dir+os.sep+'out_cr'
-                merg_ras = state+"_merge_"+METRIC
-                
-                # Combine all filtered rasters
-                arcpy.MosaicToNewRaster_management(";".join(state_filt_ras),out_dir,merg_ras,"","32_BIT_SIGNED","","1","LAST","FIRST")
-                arcpy.BuildRasterAttributeTable_management(out_dir+merg_ras, "Overwrite")
-                logger.info('Mosaiced... '+out_dir+merg_ras)
-                
-                # Zonal stat
-                in_zone_data = base_dir+'Data\\GIS\\UScounties\\LakeStateCounty.shp'        
-                out_zsat     = ZonalStatisticsAsTable(in_zone_data,'FIPS',out_dir+merg_ras,out_dir+state+'_zsat.dbf', "DATA", "SUM")
-                logger.info('Zonal stat... '+out_dir+merg_ras)   
-                
-                out_zonal_statistics = ZonalStatistics(in_zone_data,'FIPS',out_dir+merg_ras,"SUM","DATA")
-                # Save the output 
-                out_zonal_statistics.save(out_dir+state+'_zsat')         
-                fl = dbf_to_csv(out_dir+state+'_zsat.dbf')
-                list_dbf_csv.append(fl)
-            except:
-                logger.info(arcpy.GetMessages())
-    
-    if(DO_MOSAIC):
-        merge_csv_files(list_dbf_csv,'Zonal_'+TAG)    
-    
-    merge_csv_files(region_csv_files,'Region_'+TAG)    
-    logger.info('Done!')
+    #merge_csv_files(region_csv_files,'Region_'+constants.TAG)    
+    logging.info('Done!')
     

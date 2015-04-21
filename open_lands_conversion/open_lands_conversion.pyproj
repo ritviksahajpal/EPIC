@@ -21,6 +21,9 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="config_open_lands.txt">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="MI.txt" />
     <Content Include="MI_MN_WI.txt" />
     <Content Include="MN.txt" />

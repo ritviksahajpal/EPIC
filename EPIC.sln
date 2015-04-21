@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A12AA37-4F4F-46C4-83C7-0C8ED206D2DC}"
+	ProjectSection(SolutionItems) = preProject
+		Creating EPIC soil files from SSURGO.ipynb = Creating EPIC soil files from SSURGO.ipynb
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "open_lands_conversion", "open_lands_conversion\open_lands_conversion.pyproj", "{1D9140F6-E89E-4BF7-98BE-64FF3C025889}"
 EndProject
