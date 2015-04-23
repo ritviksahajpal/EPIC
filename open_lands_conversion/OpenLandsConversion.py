@@ -9,7 +9,6 @@ from dbfpy import dbf
 from arcpy.sa import *
 from itertools import groupby, combinations, combinations_with_replacement
 from collections import Counter
-from ConfigParser import SafeConfigParser
 import constants
 
 # Arcpy constants
@@ -953,7 +952,7 @@ def open_lands_conv(state):
 if __name__ == "__main__":
     # Backup source code
     backup_source_code(constants.out_dir)
-    
+
     # Convert LCC_CSV into copy rows file
     try:
         arcpy.CopyRows_management(constants.LCC_CSV,constants.LCC_CR,"")

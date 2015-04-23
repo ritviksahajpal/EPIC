@@ -21,22 +21,24 @@ USE_INTERIM    = parser.getboolean('PARAMETERS','USE_INTERIM')
 DO_MOSAIC      = parser.getboolean('PARAMETERS','DO_MOSAIC')  
 FILTER_SIZE    = parser.getint('PARAMETERS','FILTER_SIZE')
 list_st        = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
+project_name   = parser.get('PROJECT','project_name')
 
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1
 
 # Directories
-prj_dir     = parser.get('PATHS','prj_dir')+os.sep                # Get relative path
-cdl_dir     = prj_dir+os.sep+'CropIntensity\\input\\'              # Contains input CDL files
-base_dir    = prj_dir+os.sep+'Lake_States\\'
-inp_dir     = base_dir+'Code\\Python\\open_lands_conversion\\'
+prj_dir     = parser.get('PATHS','prj_dir')+os.sep                 # Get relative path
+cdl_dir     = prj_dir+os.sep+'CropIntensity'+os.sep+'input'+os.sep # Contains input CDL files
+base_dir    = prj_dir+os.sep+'Lake_States'+os.sep
+epic_dir    = base_dir+os.sep+'EPIC'+os.sep+project_name+os.sep+'Data'+os.sep+'LU'
+inp_dir     = base_dir+'Code'+os.sep+'Python'+os.sep+'open_lands_conversion'+os.sep
 out_dir     = base_dir+'output'+os.sep+TAG+os.sep
 shared_dir  = base_dir+'shared'+os.sep+TAG+os.sep
 
 # Directories of GIS input file 
-pad_dir     = base_dir+'Data\\GIS\\PAD_USA\\'
-bound_dir   = base_dir+'Data\\GIS\\State_Boundaries\\'
-lcc_dir     = base_dir+'Data\\GIS\\Land_Capability_Classes\\GIS_Files\\'
+pad_dir     = base_dir+'Data'+os.sep+'GIS'+os.sep+'PAD_USA'+os.sep
+bound_dir   = base_dir+'Data'+os.sep+'GIS'+os.sep+'State_Boundaries'+os.sep
+lcc_dir     = base_dir+'Data'+os.sep+'GIS'+os.sep+'Land_Capability_Classes'+os.sep+'GIS_Files'+os.sep
 
 # CONSTANTS
 M2_TO_HA    = parser.getfloat('CONSTANTS','M2_TO_HA')
@@ -94,6 +96,7 @@ def make_dir_if_missing(d):
 # make output dir
 make_dir_if_missing(out_dir)
 make_dir_if_missing(shared_dir)
+make_dir_if_missing(epic_dir)
 
 # logging
 LOG_FILENAME   = out_dir+os.sep+'Log_'+TAG+'.txt'
