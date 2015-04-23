@@ -96,7 +96,6 @@ def make_dir_if_missing(d):
 # make output dir
 make_dir_if_missing(out_dir)
 make_dir_if_missing(shared_dir)
-make_dir_if_missing(epic_dir)
 
 # logging
 LOG_FILENAME   = out_dir+os.sep+'Log_'+TAG+'.txt'

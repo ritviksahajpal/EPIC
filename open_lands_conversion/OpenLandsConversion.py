@@ -552,8 +552,9 @@ def create_zonal_state(state,ras,yr):
 ###############################################################################
 def reclassify_and_combine(state,state_lcc,state_cdl_files,range_of_yrs,replace):
     to_comb_rasters = []
-    end_open_ras    = constants.out_dir+os.sep+state+os.sep+'Open_'+str(constants.END_YEAR)+'_'+state # OPEN_20xx_<state_name>
-    start_open_ras  = constants.out_dir+os.sep+state+os.sep+'Open_'+str(constants.START_YEAR)+'_'+state # OPEN_20xx_<state_name>
+    end_open_ras    = constants.epic_dir+os.sep+state+os.sep+'Open_'+str(constants.END_YEAR)+'_'+state # OPEN_20xx_<state_name>
+    start_open_ras  = constants.epic_dir+os.sep+state+os.sep+'Open_'+str(constants.START_YEAR)+'_'+state # OPEN_20xx_<state_name>
+    constants.make_dir_if_missing(constants.epic_dir+os.sep+state)
 
     # Create output directory for each state
     state_dir  = constants.out_dir+os.sep+state+os.sep
