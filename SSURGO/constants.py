@@ -1,4 +1,4 @@
-import os, sys, logging, pdb, errno, multiprocessing
+import os, sys, logging, pdb, errno, multiprocessing, ast
 from ConfigParser import SafeConfigParser
 
 # Parse config file
@@ -11,11 +11,11 @@ parser.read('config_SSURGO.txt')
 #
 ###############################################################################
 TAG            = parser.get('PROJECT','TAG')          # Tag of SSURGO folder
-LIST_STATES    = parser.get('PROJECT','LIST_STATES')     # CSV containing list of states to process
 ZERO_LINES     = parser.getint('PARAMETERS','ZERO_LINES')
 SLLIST         = parser.get('PARAMETERS','SLLIST')
 CDL_STATE      = parser.get('PARAMETERS','CDL_STATE')
 cdl_res        = parser.getint('PARAMETERS','SIZE')  
+list_st        = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 
 ###############################################################################
 # Constants

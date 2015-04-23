@@ -58,25 +58,19 @@ def read_ssurgo_tables(soil_dir):
 
 def SSURGO_to_csv():
     sgo_data = pd.DataFrame()
-    # Read file containing list of states to process
-    fname = constants.base_dir+os.sep+'input'+os.sep+constants.LIST_STATES
 
-    with open(fname, 'rb') as f:
-        reader  = csv.reader(f)
-        list_st = list(reader)
-
-    for st in list_st:
-        logging.info(st[0])
+    for st in constants.list_st:
+        logging.info(st)
 
         # For each state, process the SSURGO tabular files
         for dir_name, subdir_list, file_list in os.walk(constants.data_dir):
-            if('_'+st[1]+'_' in dir_name and constants.TABULAR in subdir_list):
+            if('_'+st+'_' in dir_name and constants.TABULAR in subdir_list):
                 logging.info(dir_name[-3:]) # County FIPS code
 
                 tmp_df           = read_ssurgo_tables(dir_name+os.sep+constants.TABULAR)  
-                tmp_df['state']  = st[1]
+                tmp_df['state']  = st
                 tmp_df['county'] = dir_name[-3:]
-                tmp_df['FIPS']   = int(us.states.lookup(st[1]).fips+dir_name[-3:])
+                tmp_df['FIPS']   = int(us.states.lookup(st).fips+dir_name[-3:])
                 sgo_data         = pd.concat([tmp_df,sgo_data],ignore_index =True)                
 
     # Drop columns with all missing values

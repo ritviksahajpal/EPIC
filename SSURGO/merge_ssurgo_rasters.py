@@ -29,18 +29,18 @@ def merge_ssurgo_rasters(st):
     cdl_spatial_ref = arcpy.CreateSpatialReference_management(cdl_file, "", "", "", "", "", "0")
 
     # Iterate over all the states contained in the dictionary state_names
-    logging.info(st[1])
+    logging.info(st)
         
     # Output directory to store merged SSURGO files for each state
-    out_ssurgo_dir = constants.r_soil_dir+os.sep+constants.SOIL+os.sep+st[1] 
+    out_ssurgo_dir = constants.r_soil_dir+os.sep+constants.SOIL+os.sep+st 
 
     # For each state, process the SSURGO spatial files
     for dir_name, subdir_list, file_list in os.walk(constants.data_dir):
-        if('_'+st[1]+'_' in dir_name and constants.SPATIAL in subdir_list):
+        if('_'+st+'_' in dir_name and constants.SPATIAL in subdir_list):
             in_ssurgo_dir = dir_name+os.sep+constants.SPATIAL+os.sep
 
             # The reclassification is done to make the VALUE equal to the MUKEY
-            recl_ssurgo_csv = open(out_ssurgo_dir+os.sep+st[1]+'.csv', 'wb')
+            recl_ssurgo_csv = open(out_ssurgo_dir+os.sep+st+'.csv', 'wb')
             recl_ssurgo_csv.write('FROM, TO, VALUE\n')
             recl_ssurgo_csv.flush()   
 
@@ -61,7 +61,7 @@ def merge_ssurgo_rasters(st):
 
             # Append the files to the list of ssurgo files to be merged to form one raster 
             merged_soil_folder = out_ssurgo_dir
-            merged_soil_file   = st[1]+'_'+constants.SOIL
+            merged_soil_file   = st+'_'+constants.SOIL
             
             files_to_delete.append(out_ssurgo_file)
             files_to_delete.append(recl_ssurgo_file)
@@ -76,7 +76,7 @@ def merge_ssurgo_rasters(st):
                     arcpy.Project_management(in_ssurgo_file, reproj_file, cdl_spatial_ref)
                     arcpy.FeatureToRaster_conversion(reproj_file, constants.MUKEY, out_ssurgo_file, constants.cdl_res)
 
-                    recl_ssurgo_csv = open(out_ssurgo_dir+os.sep+st[1]+'.csv', 'a+')
+                    recl_ssurgo_csv = open(out_ssurgo_dir+os.sep+st+'.csv', 'a+')
                     cur = arcpy.SearchCursor(out_ssurgo_file)
                     row=cur.next()
 
@@ -85,7 +85,7 @@ def merge_ssurgo_rasters(st):
                         row = cur.next()
                     recl_ssurgo_csv.close()
 
-                    out_reclass = ReclassByTable(out_ssurgo_file,out_ssurgo_dir+os.sep+st[1]+'.csv', "FROM", "TO", "VALUE", "DATA")
+                    out_reclass = ReclassByTable(out_ssurgo_file,out_ssurgo_dir+os.sep+st+'.csv', "FROM", "TO", "VALUE", "DATA")
                     out_reclass.save(recl_ssurgo_file)
                 except:
                     logging.info(arcpy.GetMessages())
@@ -109,15 +109,8 @@ def merge_ssurgo_rasters(st):
     delete_temp_files(files_to_delete)
 
 def run_merge_ssurgo_rasters(): 
-    # Read file containing list of states to process
-    fname = constants.base_dir+os.sep+constants.INPUT+os.sep+constants.LIST_STATES
-    
-    with open(fname, 'rb') as f:
-        reader  = csv.reader(f)
-        list_st = list(reader)
-
     pool = multiprocessing.Pool(constants.max_threads)
-    pool.map(merge_ssurgo_rasters,list_st)
+    pool.map(merge_ssurgo_rasters,constants.list_st)
     pool.close()
     pool.join()    
 
