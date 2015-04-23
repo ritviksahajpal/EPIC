@@ -74,13 +74,11 @@ def merge_ssurgo_rasters(st):
                     arcpy.Project_management(in_ssurgo_file, reproj_file, cdl_spatial_ref)
                     arcpy.FeatureToRaster_conversion(reproj_file, constants.MUKEY, out_ssurgo_file, constants.cdl_res)
 
+                    # Create table for performing reclassification
                     recl_ssurgo_csv = open(out_ssurgo_dir+os.sep+st+'.csv', 'a+')
-                    cur = arcpy.SearchCursor(out_ssurgo_file)
-                    row=cur.next()
-
-                    while row:
-                        recl_ssurgo_csv.write(str(row.getValue("VALUE"))+', '+str(row.getValue("VALUE"))+', '+row.getValue(constants.MUKEY)+'\n')
-                        row = cur.next()
+                    with arcpy.da.SearchCursor(out_ssurgo_file, ['VALUE',constants.MUKEY]) as cursor:
+                        for row in cursor:
+                            recl_ssurgo_csv.write(str(row[0])+', '+str(row[0])+', '+str(row[1])+'\n')        
                     recl_ssurgo_csv.close()
 
                     out_reclass = ReclassByTable(out_ssurgo_file,out_ssurgo_dir+os.sep+st+'.csv', "FROM", "TO", "VALUE", "DATA")
@@ -111,6 +109,7 @@ def run_merge_ssurgo_rasters():
     pool.map(merge_ssurgo_rasters,constants.list_st)
     pool.close()
     pool.join()    
+    logging.info('Done!')
 
 if __name__ == "__main__":
     run_merge_ssurgo_rasters()
