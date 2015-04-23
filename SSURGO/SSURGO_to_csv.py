@@ -15,7 +15,7 @@ def component_aggregation(group):
     list_depths       = np.append(group['hzdepb_r'],group['hzdept_r'])
     num_layers        = len(np.unique(list_depths))-1 # Exclude 0    
     if(num_layers <= 0):
-        logging.info('Incorrect number of soil layers '+str(num_layers)+' '+str(group['cokey']))
+        logging.warn('Incorrect number of soil layers '+str(num_layers)+' '+str(group['cokey']))
         return
 
     return group
@@ -153,7 +153,7 @@ def write_epic_soil_file(group):
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in np.zeros(num_layers)])+'\n')      # Initial Org N concentration (g/T)   ---zeros---
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in group.ph1to1h2o_r])+'\n')         # Soil pH ()
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in group.sumbases_r])+'\n')          # Sum of bases (cmol/kg)
-        epic_file.write(''.join(['{:8.2f}'.format(n*constants.CONV_OM_TO_WOC) for n in group.om_r])+'\n') # Organic matter content (%)
+        epic_file.write(''.join(['{:8.2f}'.format(n*constants.OM_TO_WOC) for n in group.om_r])+'\n') # Organic matter content (%)
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in group.caco3_r])+'\n')             # CaCO3 content (%)
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in group.cec7_r])+'\n')              # Cation exchange capacity (cmol/kg)
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in group.Fragvol_r])+'\n')           # Coarse fragment content (% by vol)

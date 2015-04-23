@@ -17,6 +17,10 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SSURGO", "SSURGO\SSURGO.pyp
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SEIMF", "SEIMF\SEIMF.pyproj", "{5BDAEEB0-D09D-443B-88D8-211BD7F298F7}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "plot_LakeStates_soils", "plot_LakeStates_soils\plot_LakeStates_soils.pyproj", "{093D50C9-4224-4EA5-B6ED-A775DD61E4B8}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "read_EPIC_output", "read_EPIC_output\read_EPIC_output.pyproj", "{54A14BC7-CB97-467E-8ACE-07DD4F87A19F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,10 @@ Global
 		{64F816B5-0330-4CDE-A8A6-749CA123666F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BDAEEB0-D09D-443B-88D8-211BD7F298F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5BDAEEB0-D09D-443B-88D8-211BD7F298F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{093D50C9-4224-4EA5-B6ED-A775DD61E4B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{093D50C9-4224-4EA5-B6ED-A775DD61E4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54A14BC7-CB97-467E-8ACE-07DD4F87A19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54A14BC7-CB97-467E-8ACE-07DD4F87A19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

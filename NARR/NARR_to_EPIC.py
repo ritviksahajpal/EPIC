@@ -48,10 +48,10 @@ def NARR_to_EPIC(vals):
                     epic_max_tmp     = util.chunks(epic_vars,8,False)                    
 
                     tmp_df[cur_var] = pandas.Series(epic_min_tmp,index=cur_date_range)
-                    tmp_df[cur_var] = tmp_df[cur_var].map(lambda x:float(x)-273.15)
+                    tmp_df[cur_var] = tmp_df[cur_var].map(lambda x:float(x)+K_To_C)
 
                     tmp_df['tmax']  = pandas.Series(epic_max_tmp,index=cur_date_range)
-                    tmp_df['tmax']  = tmp_df['tmax'].map(lambda x:float(x)-273.15)
+                    tmp_df['tmax']  = tmp_df['tmax'].map(lambda x:float(x)+K_To_C)
                     tmp_df['tmin']  = tmp_df['air.2m'] 
                 else:
                     tmp_df[cur_var] = pandas.Series(epic_vars,index=cur_date_range)
@@ -70,9 +70,11 @@ def NARR_to_EPIC(vals):
             epic_df            = epic_df.combine_first(tmp_df)
         # Output dataframe to text file with right formatting
         for index, row in epic_df.iterrows():
-            out_str = '%6.0f%4.0f%4.0f%6.1f%6.1f%6.1f%6.1f%6.2f%6.1f' % \
-                        (row['year'],row['month'],row['day'],row['srad'],row['tmax'],row['tmin'],row['apcp'],row['rhum.2m'],row['wnd'])	
-            epic_out.write(out_str+'\n')
+            epic_out.write(('%6d%4d%4d')+(6*'%6.2f'+'\n') % 
+                        (row['year'],row['month'],row['day'],
+                         row['srad'],row['tmax'],row['tmin'],
+                         row['apcp'],row['rhum.2m'],row['wnd']))	
+            epic_out.write(out_str)
         epic_out.close()
     else:
         logging.info('File exists: '+out_fl) 

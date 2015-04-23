@@ -6,6 +6,11 @@
 import multiprocessing, constants, logging, arcpy, fnmatch, os, csv
 from arcpy.sa import *
 
+# ArcGIS initialization
+arcpy.CheckOutExtension("spatial")
+arcpy.env.overwriteOutput = True
+arcpy.env.extent = "MAXOF"
+
 def delete_temp_files(files_to_delete):
     for fl in files_to_delete:
         logging.info('Deleting: '+fl)
@@ -16,7 +21,8 @@ def delete_temp_files(files_to_delete):
 
 def merge_ssurgo_rasters(st):
     files_to_delete = [] # Temporary files which will be deleted at the end
-        
+    list_sgo_files  = [] # List of SSURGO files to merge
+          
     # We use the spatial reference information from the CDL to reproject (if needed) the other data layers
     cdl_file = constants.cdl_dir+os.sep+constants.CDL_STATE+os.sep+\
                 fnmatch.filter(os.listdir(constants.cdl_dir+os.sep+constants.CDL_STATE),'*.tif')[0]
@@ -27,7 +33,6 @@ def merge_ssurgo_rasters(st):
         
     # Output directory to store merged SSURGO files for each state
     out_ssurgo_dir = constants.r_soil_dir+os.sep+constants.SOIL+os.sep+st[1] 
-    constants.make_dir_if_missing(out_ssurgo_dir+os.sep+constants.CATALOG)
 
     # For each state, process the SSURGO spatial files
     for dir_name, subdir_list, file_list in os.walk(constants.data_dir):
@@ -51,13 +56,18 @@ def merge_ssurgo_rasters(st):
             out_ssurgo_file  = out_ssurgo_dir+os.sep+os.path.basename(in_ssurgo_file[:-4])[9:]
 
             # reclass_ssurgo_file has the MUKEY as the VALUE column
-            recl_ssurgo_file = out_ssurgo_dir+os.sep+constants.CATALOG+os.sep+\
-                               os.path.basename(in_ssurgo_file[:-4])[9:]+'_recl'
+            recl_ssurgo_file = out_ssurgo_dir+os.sep+os.path.basename(in_ssurgo_file[:-4])[9:]+'_recl'
+            list_sgo_files.append(recl_ssurgo_file)
 
             # Append the files to the list of ssurgo files to be merged to form one raster 
             merged_soil_folder = out_ssurgo_dir
             merged_soil_file   = st[1]+'_'+constants.SOIL
-            if(not(os.path.isfile(recl_ssurgo_file))):
+            
+            files_to_delete.append(out_ssurgo_file)
+            files_to_delete.append(recl_ssurgo_file)
+            files_to_delete.append(reproj_file)
+            
+            if(not(arcpy.Exists(recl_ssurgo_file))):
                 logging.info('Shapefile '+os.path.basename(in_ssurgo_file)+\
                             ' is being reprojected, reclassified and converted to raster '+\
                             os.path.basename(out_ssurgo_file))
@@ -77,43 +87,26 @@ def merge_ssurgo_rasters(st):
 
                     out_reclass = ReclassByTable(out_ssurgo_file,out_ssurgo_dir+os.sep+st[1]+'.csv', "FROM", "TO", "VALUE", "DATA")
                     out_reclass.save(recl_ssurgo_file)
-
-                    files_to_delete.append(out_ssurgo_file)
-                    files_to_delete.append(recl_ssurgo_file)
-                    files_to_delete.append(reproj_file)
                 except:
                     logging.info(arcpy.GetMessages())
                     delete_temp_files(files_to_delete)
             else:
                 logging.info('File present: '+recl_ssurgo_file)
 
-    if(not(os.path.isfile(merged_soil_folder+os.sep+merged_soil_file))):
-        # Create a raster catalog
-        logging.info('Creating and populating a raster catalog with SSURGO files')
-        try:
-            arcpy.CreateFileGDB_management(out_ssurgo_dir, st[1]+constants.SOIL+'.gdb')
-            arcpy.CreateRasterCatalog_management(out_ssurgo_dir+os.sep+st[1]+constants.SOIL+'.gdb',\
-                                                    st[1],"", "", "", "", "", "","", "")
-            arcpy.WorkspaceToRasterCatalog_management(out_ssurgo_dir+os.sep+constants.CATALOG,out_ssurgo_dir+\
-                                                        os.sep+st[1]+constants.SOIL+'.gdb'+os.sep+st[1],"","")
+    # Create new raster mosaic
+    if(not(arcpy.Exists(merged_soil_folder+os.sep+merged_soil_file))):
+        list_sgo_files = ';'.join(list_sgo_files)  
+        try:                  
+            arcpy.MosaicToNewRaster_management(list_sgo_files,merged_soil_folder,merged_soil_file, "",\
+                                                "32_BIT_SIGNED", "", "1", "LAST","FIRST")
+            arcpy.BuildRasterAttributeTable_management(merged_soil_folder+os.sep+merged_soil_file, "Overwrite")
+            logging.info('Created Mosaiced raster '+merged_soil_folder+os.sep+merged_soil_file)
         except:
             logging.info(arcpy.GetMessages())
             delete_temp_files(files_to_delete)
-
-        # Merge all reprojected and reclassified rasters into one
-        try:
-            logging.info('Merging...')
-            arcpy.RasterCatalogToRasterDataset_management(out_ssurgo_dir+os.sep+st[1]+constants.SOIL+'.gdb'+os.sep+st[1],
-                                                    merged_soil_folder+os.sep+merged_soil_file,
-                                                    "", "LAST", "FIRST", "", "", "", "", "", "", "")        
-        except:
-            logging.info(arcpy.GetMessages())
-            delete_temp_files(files_to_delete)
-            
-        delete_temp_files(files_to_delete)
-        logging.info('Finished processing '+st[0])
     else:
         logging.info('File present: '+merged_soil_folder+os.sep+merged_soil_file)
+    delete_temp_files(files_to_delete)
 
 def run_merge_ssurgo_rasters(): 
     # Read file containing list of states to process
@@ -130,3 +123,4 @@ def run_merge_ssurgo_rasters():
 
 if __name__ == "__main__":
     run_merge_ssurgo_rasters()
+    logging.info('Done!')

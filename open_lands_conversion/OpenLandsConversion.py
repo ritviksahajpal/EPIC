@@ -525,6 +525,27 @@ def erase_PAD(state,ras,replace):
     return extract_comb
 
 ###############################################################################
+# create_zonal_state
+#
+#
+#
+###############################################################################
+def create_zonal_state(state,ras,yr):
+    # Perform lookup on COUNT column, since we want to perform zonal stat on area/count
+    try:
+        lu_tmp = Lookup(ras,'COUNT')        
+        lu_tmp.save(constants.out_dir+os.sep+state+os.sep+'LupOp_'+str(yr)+'_'+state)
+
+        in_zone_data = constants.base_dir+'Data\\GIS\\UScounties\\LakeStateCounty.shp'        
+        out_zsat     = ZonalStatisticsAsTable(in_zone_data,'FIPS',constants.out_dir+os.sep+state+os.sep+'LupOp_'+str(yr)+'_'+state,\
+                                                constants.out_dir+os.sep+state+os.sep+'Open_'+str(yr)+'_'+state+'_zsat.dbf', "DATA", "SUM")              
+        dbf_to_csv(constants.out_dir+os.sep+state+os.sep+'Open_'+str(yr)+'_'+state+'_zsat.dbf')
+    except:
+        logging.info(arcpy.GetMessages())
+
+    logging.info('Zonal stat as table... '+constants.out_dir+os.sep+state+os.sep+'Open_'+str(yr)+'_'+state+'_zsat.dbf')
+
+###############################################################################
 # reclassify_and_combine
 #
 #
@@ -532,7 +553,8 @@ def erase_PAD(state,ras,replace):
 ###############################################################################
 def reclassify_and_combine(state,state_lcc,state_cdl_files,range_of_yrs,replace):
     to_comb_rasters = []
-    open_ras        = constants.out_dir+os.sep+state+os.sep+'Open_'+str(constants.END_YEAR)+'_'+state # OPEN_20xx_<state_name>
+    end_open_ras    = constants.out_dir+os.sep+state+os.sep+'Open_'+str(constants.END_YEAR)+'_'+state # OPEN_20xx_<state_name>
+    start_open_ras  = constants.out_dir+os.sep+state+os.sep+'Open_'+str(constants.START_YEAR)+'_'+state # OPEN_20xx_<state_name>
 
     # Create output directory for each state
     state_dir  = constants.out_dir+os.sep+state+os.sep
@@ -556,17 +578,33 @@ def reclassify_and_combine(state,state_lcc,state_cdl_files,range_of_yrs,replace)
         logging.info('\tReclassified...'+recl_raster)
         to_comb_rasters.append(recl_raster)
 
+        # Extract open land acreage in the last year
         if (yr == constants.END_YEAR): 
-            if arcpy.Exists(open_ras) and not(replace):
+            if arcpy.Exists(end_open_ras) and not(replace):
                 pass
             else:
                 where = "VALUE = "+str(constants.OPEN)
                 try:
                     att_extract = ExtractByAttributes(recl_raster,where) 
-                    att_extract.save(open_ras)                    
+                    att_extract.save(end_open_ras)     
+                    
+                    create_zonal_state(state,end_open_ras,constants.START_YEAR)               
                 except:
                     logging.info(arcpy.GetMessages())
-                logging.info('\tExtracted Open Lands...'+open_ras)
+                logging.info('\tExtracted Open Lands...'+end_open_ras)
+        elif(yr == constants.START_YEAR): # Extract open land acreage in the first year
+            if arcpy.Exists(start_open_ras) and not(replace):
+                pass
+            else:
+                where = "VALUE = "+str(constants.OPEN)
+                try:
+                    att_extract = ExtractByAttributes(recl_raster,where) 
+                    att_extract.save(start_open_ras)        
+                    
+                    create_zonal_state(state,start_open_ras,constants.END_YEAR)                        
+                except:
+                    logging.info(arcpy.GetMessages())
+                logging.info('\tExtracted Open Lands...'+start_open_ras)
 
     to_comb_rasters.append(state_lcc)
     
@@ -767,10 +805,10 @@ def lu_change_analysis(state,df):
 
 def open_lands_conv(st):
     state             = st[1]
-    # Loop across all states   
+    # Loop across all states  
+    fl                = '' 
     list_csv_files    = []
     list_filt_ras     = [] 
-    list_dbf_csv      = []
     region_csv_files  = []
     state_cdl_files   = []
     range_of_yrs      = numpy.arange(constants.START_YEAR,constants.END_YEAR+1)
@@ -878,21 +916,34 @@ def open_lands_conv(st):
             arcpy.MosaicToNewRaster_management(";".join(state_filt_ras),constants.out_dir,merg_ras,"","32_BIT_SIGNED","","1","LAST","FIRST")
             arcpy.BuildRasterAttributeTable_management(constants.out_dir+merg_ras, "Overwrite")
             logging.info('Mosaiced... '+constants.out_dir+merg_ras)
-                
-            # Zonal stat
-            in_zone_data = constants.base_dir+'Data\\GIS\\UScounties\\LakeStateCounty.shp'        
-            out_zsat     = ZonalStatisticsAsTable(in_zone_data,'FIPS',constants.out_dir+merg_ras,constants.out_dir+state+'_zsat.dbf', "DATA", "SUM")
-            logging.info('Zonal stat... '+constants.out_dir+merg_ras)   
-                
-            out_zonal_statistics = ZonalStatistics(in_zone_data,'FIPS',constants.out_dir+merg_ras,"SUM","DATA")
-            # Save the output 
-            out_zonal_statistics.save(constants.out_dir+state+'_zsat')         
-            fl = dbf_to_csv(constants.out_dir+state+'_zsat.dbf')
-            list_dbf_csv.append(fl)
+        except:
+            logging.info(arcpy.GetMessages())   
+            
+        try:             
+            # Perform lookup on COUNT column, since we want to perform zonal stat on area/count
+            lu_tmp = Lookup(constants.out_dir+merg_ras,'COUNT')        
+            lu_tmp.save(constants.out_dir+'lup_'+state+'_'+constants.METRIC)
         except:
             logging.info(arcpy.GetMessages())
 
-    return list_dbf_csv, region_csv_files
+            # Zonal stat
+        try:
+            in_zone_data = constants.base_dir+'Data\\GIS\\UScounties\\LakeStateCounty.shp'        
+            out_zsat     = ZonalStatisticsAsTable(in_zone_data,'FIPS',constants.out_dir+'lup_'+state+'_'+constants.METRIC,constants.out_dir+state+'_zsat.dbf', "DATA", "SUM")              
+            logging.info('Zonal stat as table... '+constants.out_dir+state+'_zsat.dbf')
+        except:
+            logging.info(arcpy.GetMessages())
+
+        try:
+            out_zonal_statistics = ZonalStatistics(in_zone_data,'FIPS',constants.out_dir+'lup_'+state+'_'+constants.METRIC,"SUM","DATA")
+            out_zonal_statistics.save(constants.out_dir+state+'_zsat')         
+            logging.info('Zonal stat... '+constants.out_dir+state+'_zsat')
+        except:
+            logging.info(arcpy.GetMessages())
+                     
+            fl = dbf_to_csv(constants.out_dir+state+'_zsat.dbf')
+
+    return fl
 
 ###############################################################################
 # main
@@ -918,13 +969,12 @@ if __name__ == "__main__":
         logging.info(arcpy.GetMessages())                
 
     pool = multiprocessing.Pool(constants.max_threads)
-    list_dbf_csv, region_csv_files = pool.map(open_lands_conv,list_st)
+    list_files = pool.map(open_lands_conv,list_st)
     pool.close()
     pool.join()
 
-    pdb.set_trace()    
-    #if(constants.DO_MOSAIC):
-    #    merge_csv_files(list_dbf_csv,'Zonal_'+constants.TAG)    
+    if(constants.DO_MOSAIC):
+        merge_csv_files(list_files,'Zonal_'+constants.TAG)    
     
     #merge_csv_files(region_csv_files,'Region_'+constants.TAG)    
     logging.info('Done!')

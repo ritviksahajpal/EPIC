@@ -1,0 +1,18 @@
+[PROJECT]
+project_name = OpenLands_LS                                       ; Name of project directory (to be created within out_dir)         
+
+[PATHS]
+base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\
+soil_dir   = EPIC\Data\Site\
+
+[PARAMETERS]
+SOIL_FILE       = Kcl-summary-allsites-fixed.xlsx
+SHEET_NAME      = allsites-summary
+DATA_COLS       = ['NO3','NH4']
+leg_labels      = ['control','poplar','willow']
+NUM_PLOTS_COLS  = 2
+NUM_XAXIS_TICKS = 6
+NUM_YAXIS_TICKS = 7
+FONT_SIZE       = 12
+DPI             = 400
+PLOT_HSEP       = 0.3     ; horizontal separation between plots

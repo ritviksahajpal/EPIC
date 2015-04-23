@@ -33,6 +33,7 @@ SITE_LON    = parser.getfloat('PARAMETERS','SITE_LON')                # If DO_SI
 BASE_CMD    = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/Dailies/monolevel/" # Obtain daily mean data
 TEMP_CMD    = "ftp://ftp.cdc.noaa.gov/Datasets/NARR/monolevel/"         # For temperature we extract 3 hourly data to get daily min and max
 WMsq_MjMsq  = 0.0864                                                    # Convert W m^-2 into Mj m^-2 http://www.fao.org/docrep/x0490e/x0490e0i.htm
+K_To_C      = -273.15
 
 # Variables
 vars_to_get = {'air.2m':'air','apcp':'apcp','rhum.2m':'rhum','uwnd.10m':'uwnd','vwnd.10m':'vwnd','dswrf':'dswrf','uswrf.sfc':'uswrf'}

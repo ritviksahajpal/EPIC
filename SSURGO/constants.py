@@ -1,14 +1,9 @@
-import os, sys, logging, pdb, arcpy, errno, multiprocessing
+import os, sys, logging, pdb, errno, multiprocessing
 from ConfigParser import SafeConfigParser
 
 # Parse config file
 parser = SafeConfigParser()
 parser.read('config_SSURGO.txt')
-
-# ArcGIS initialization
-arcpy.CheckOutExtension("spatial")
-arcpy.env.overwriteOutput = True
-arcpy.env.extent = "MAXOF"
 
 ###############################################################################
 # User modifiable values
@@ -38,10 +33,9 @@ TABULAR        = 'tabular'
 MUKEY          = 'MUKEY'
 CONV_DEPTH     = 0.01    # cm to m
 CONV_KSAT      = 3.6     # mm/sec to mm/h
-CONV_OM_TO_WOC = 0.58    # fraction
+OM_TO_WOC      = 0.58    # organic matter to C
 SOIL           = 'ssurgo'
 OUTPUT         = 'output'
-CATALOG        = 'catalog'
 LANDUSE        = 'cdl'
 INPUT          = 'input'
 
