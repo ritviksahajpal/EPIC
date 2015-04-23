@@ -1,4 +1,4 @@
-import os, multiprocessing, logging
+import os, multiprocessing, logging, ast
 from ConfigParser import SafeConfigParser
 
 # Parse config file
@@ -14,13 +14,13 @@ START_YEAR     = parser.getint('PARAMETERS','START_YEAR')
 END_YEAR       = parser.getint('PARAMETERS','END_YEAR') 
 METRIC         = parser.get('PROJECT','METRIC')
 TAG            = parser.get('PROJECT','TAG')+METRIC            #
-list_states    = parser.get('PROJECT','LIST_STATES')           # CSV containing list of states to process
 DO_WHEAT       = parser.getboolean('PARAMETERS','DO_WHEAT')
 SET_SNAP       = parser.getboolean('PARAMETERS','SET_SNAP')
 REPLACE        = parser.getboolean('PARAMETERS','REPLACE')
 USE_INTERIM    = parser.getboolean('PARAMETERS','USE_INTERIM')  
 DO_MOSAIC      = parser.getboolean('PARAMETERS','DO_MOSAIC')  
 FILTER_SIZE    = parser.getint('PARAMETERS','FILTER_SIZE')
+list_st        = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1

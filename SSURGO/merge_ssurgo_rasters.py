@@ -22,17 +22,15 @@ def delete_temp_files(files_to_delete):
 def merge_ssurgo_rasters(st):
     files_to_delete = [] # Temporary files which will be deleted at the end
     list_sgo_files  = [] # List of SSURGO files to merge
-          
-    # We use the spatial reference information from the CDL to reproject (if needed) the other data layers
-    cdl_file = constants.cdl_dir+os.sep+constants.CDL_STATE+os.sep+\
-                fnmatch.filter(os.listdir(constants.cdl_dir+os.sep+constants.CDL_STATE),'*.tif')[0]
-    cdl_spatial_ref = arcpy.CreateSpatialReference_management(cdl_file, "", "", "", "", "", "0")
-
+    
+    cdl_spatial_ref = arcpy.SpatialReference('NAD 1983 Contiguous USA Albers')
+    
     # Iterate over all the states contained in the dictionary state_names
     logging.info(st)
         
     # Output directory to store merged SSURGO files for each state
     out_ssurgo_dir = constants.r_soil_dir+os.sep+constants.SOIL+os.sep+st 
+    constants.make_dir_if_missing(out_ssurgo_dir)
 
     # For each state, process the SSURGO spatial files
     for dir_name, subdir_list, file_list in os.walk(constants.data_dir):

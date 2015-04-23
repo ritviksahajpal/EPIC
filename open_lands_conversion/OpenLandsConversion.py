@@ -803,8 +803,7 @@ def lu_change_analysis(state,df):
     
     merge_csv_files(non_region_csv_fl,'NonRegion_'+constants.TAG)
 
-def open_lands_conv(st):
-    state             = st[1]
+def open_lands_conv(state):
     # Loop across all states  
     fl                = '' 
     list_csv_files    = []
@@ -951,12 +950,7 @@ def open_lands_conv(st):
 #
 #
 ###############################################################################   
-if __name__ == "__main__":    
-    # Read in all state names  
-    with open(constants.inp_dir+os.sep+constants.list_states, 'rb') as f:
-        reader  = csv.reader(f)
-        list_st = list(reader)     
-
+if __name__ == "__main__":
     # Backup source code
     backup_source_code(constants.out_dir)
     
@@ -969,7 +963,7 @@ if __name__ == "__main__":
         logging.info(arcpy.GetMessages())                
 
     pool = multiprocessing.Pool(constants.max_threads)
-    list_files = pool.map(open_lands_conv,list_st)
+    list_files = pool.map(open_lands_conv,constants.list_st)
     pool.close()
     pool.join()
 

@@ -13,7 +13,6 @@ parser.read('config_SSURGO.txt')
 TAG            = parser.get('PROJECT','TAG')          # Tag of SSURGO folder
 ZERO_LINES     = parser.getint('PARAMETERS','ZERO_LINES')
 SLLIST         = parser.get('PARAMETERS','SLLIST')
-CDL_STATE      = parser.get('PARAMETERS','CDL_STATE')
 cdl_res        = parser.getint('PARAMETERS','SIZE')  
 list_st        = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 
@@ -59,7 +58,6 @@ muaggatt_vars  = {3:'slopegraddcp',4:'slopegradwta',5:'brockdepmin',6:'wtdepannm
 chfrags_vars   = {1:'Fragvol_r',10:'chkey'}
 
 base_dir   = parser.get('PATHS','base_dir')+os.sep
-cdl_dir    = parser.get('PATHS','cdl_dir')+os.sep
 data_dir   = parser.get('PATHS','data_dir')+os.sep
 out_dir    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep
 r_soil_dir = out_dir+os.sep+'Data'+os.sep
