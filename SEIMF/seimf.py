@@ -21,6 +21,7 @@ def seimf(state):
 
     sgo_dir = constants.epic_dir+os.sep+'Data'+os.sep+'ssurgo'+os.sep+state+os.sep
     lu_dir  = constants.epic_dir+os.sep+'Data'+os.sep+'LU'+os.sep+state+os.sep
+    cnt_dir = constants.base_dir+os.sep+'Data'+os.sep+'GIS'+os.sep+'county'+os.sep    
 
     out_dir = constants.epic_dir+os.sep+'SEIMF'+os.sep
     constants.make_dir_if_missing(out_dir)
@@ -40,20 +41,33 @@ def seimf(state):
         logging.info('File present: '+out_raster)
 
     # Compute centroid of each HSMU using zonal geometry
-    zgeom_dbf = out_dir+os.sep+state+'.dbf'
+    zgeom_dbf  = out_dir+os.sep+state+'.dbf'
+    reproj_ras = out_dir+os.sep+state+'_reproj'
     if(not(arcpy.Exists(zgeom_dbf))):
         try:
-            out_zgeom = ZonalGeometryAsTable(out_raster, 'VALUE', zgeom_dbf)
+            cdl_spatial_ref = arcpy.SpatialReference(4269)
+            arcpy.ProjectRaster_management(out_raster, reproj_ras, cdl_spatial_ref)
+
+            out_zgeom = ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
+            logging.info('Computed zonal geometry '+zgeom_dbf)
+
+            arcpy.JoinField_management(out_raster,"VALUE",zgeom_dbf,"VALUE","XCENTROID;YCENTROID")
+            logging.info('JoinField_management '+out_raster)
         except:
             logging.info(arcpy.GetMessages())
     else:
         logging.info('File present: '+zgeom_dbf)
 
+    # XCENTROID YCENTROID WI_SSURGO OPEN_2013_WI
     # Iterate through the zonal geometry dbf
     #with arcpy.da.SearchCursor(zgeom_dbf, ['VALUE',constants.MUKEY]) as cursor:
     #    for row in cursor:
-
-    
+    # Create EPIC site file
+    # Get closest NARR lat-lon
+    # Create EPICRUN.dat
+    # 
+    # 
+    # df.drop_duplicates(cols='mukey')    
 
 def parallelize_seimf():
     pool = multiprocessing.Pool(constants.max_threads)
@@ -65,16 +79,47 @@ def parallelize_seimf():
 if __name__ == '__main__':
     parallelize_seimf()
 
-def delete_temp_files(files_to_delete):
-    # Delete all the temporary files
-    for i in range(len(files_to_delete)):
-        # print 'Deleting: '+files_to_delete[i]
-        try:
-            arcpy.Delete_management(files_to_delete[i],"")
-        except:
-            print arcpy.GetMessages()
+#def delete_temp_files(files_to_delete):
+#    # Delete all the temporary files
+#    for i in range(len(files_to_delete)):
+#        # print 'Deleting: '+files_to_delete[i]
+#        try:
+#            arcpy.Delete_management(files_to_delete[i],"")
+#        except:
+#            print arcpy.GetMessages()
 
-    del(files_to_delete[:])
+#    del(files_to_delete[:])
+
+#cnt_fl     = cnt_dir+os.sep+state+'.shp'
+#reproj_fl  = out_dir+os.sep+state+'_reproj.shp'
+#mod_cnt_fl = out_dir+os.sep+state+'_mod.shp'
+#out_cnt_fl = out_dir+os.sep+state+'_out'
+#if(not(arcpy.Exists(out_cnt_fl))):
+#    try:
+#        cdl_spatial_ref = arcpy.SpatialReference(4269)
+#        arcpy.Project_management(cnt_fl, reproj_fl, cdl_spatial_ref)
+
+#        arcpy.CopyFeatures_management(reproj_fl, mod_cnt_fl)
+
+#        arcpy.AddField_management(mod_cnt_fl, "X", "FLOAT")
+#        arcpy.AddField_management(mod_cnt_fl, "Y", "FLOAT")
+#        logging.info('AddField_management '+mod_cnt_fl)
+        
+#        # Centroid property returns a string with x and y separated by a space
+#        x_exp = "float(!SHAPE.CENTROID@DECIMALDEGREES!.split()[0])"
+#        y_exp = "float(!SHAPE.CENTROID@DECIMALDEGREES!.split()[1])"
+
+#        arcpy.CalculateField_management(mod_cnt_fl, "X", x_exp, "PYTHON")
+#        arcpy.CalculateField_management(mod_cnt_fl, "Y", y_exp, "PYTHON")
+#        logging.info('CalculateField_management '+mod_cnt_fl)
+
+#        arcpy.FeatureToRaster_conversion(mod_cnt_fl, "FIPS", out_cnt_fl)
+#        arcpy.JoinField_management(out_cnt_fl, "FIPS", mod_cnt_fl, "FIPS", "")
+#        logging.info('JoinField_management '+out_cnt_fl)
+#    except:
+#        logging.info(arcpy.GetMessages())
+#else:
+#    logging.info('File present: '+out_cnt_fl)
 
 ## Create a dictionary containing the full state name as well as its abbreviation
 #state_names = {}
