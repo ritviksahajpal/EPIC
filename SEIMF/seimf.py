@@ -5,7 +5,9 @@
 # ndhd, dem and cdl based crop rotation data.
 # Uses dbfpy library from http://sourceforge.net/projects/dbfpy/files/
 ##################################################################
-import os, sys, logging, pdb, getopt, glob, zipfile, arcpy, csv, time, multiprocessing
+import os, sys, logging, pdb, getopt, glob, zipfile, arcpy, csv, time, multiprocessing, pandas
+from geopy.distance import vincenty
+from geopy.distance import great_circle
 from arcpy.sa import *
 from dbfpy import dbf
 import constants
@@ -45,23 +47,95 @@ def seimf(state):
     reproj_ras = out_dir+os.sep+state+'_reproj'
     if(not(arcpy.Exists(zgeom_dbf))):
         try:
+            # Spatial reference factory codes: 
+            # http://resources.arcgis.com/en/help/main/10.1/018z/pdf/geographic_coordinate_systems.pdf
+            # 4269: GCS_North_American_1983
             cdl_spatial_ref = arcpy.SpatialReference(4269)
             arcpy.ProjectRaster_management(out_raster, reproj_ras, cdl_spatial_ref)
 
             out_zgeom = ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
-            logging.info('Computed zonal geometry '+zgeom_dbf)
+            logging.info('Computed zonal geometry '+zgeom_dbf)       
+            
+            join_flds  = '"'
+            join_flds += state.upper()+'_SSURGO;OPEN_'+str(constants.year)+'_'+state.upper()+';XCENTROID;YCENTROID'+'"'    
 
-            arcpy.JoinField_management(out_raster,"VALUE",zgeom_dbf,"VALUE","XCENTROID;YCENTROID")
-            logging.info('JoinField_management '+out_raster)
+            arcpy.JoinField_management(out_raster,"VALUE",zgeom_dbf,"VALUE",join_flds)
+            logging.info('JoinField_management '+c)
         except:
             logging.info(arcpy.GetMessages())
     else:
         logging.info('File present: '+zgeom_dbf)
+    
+    site_dir = constants.epic_dir+os.sep+constants.SITES+os.sep
+    constants.make_dir_if_missing(site_dir)   
+    site_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'w')
 
-    # XCENTROID YCENTROID WI_SSURGO OPEN_2013_WI
+    # Read csv file containing soil information
+    soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+constants.SOIL_DATA,index_col=None)
+    print soil_df.head()
+    soil_df.drop_duplicates(subset='mukey',inplace=True)        
+    sdf_dict = soil_df.set_index('mukey').T.to_dict()
+    # sdf_dict.values()[0]['hzdepb_r']
+    pdb.set_trace()
+
     # Iterate through the zonal geometry dbf
-    #with arcpy.da.SearchCursor(zgeom_dbf, ['VALUE',constants.MUKEY]) as cursor:
-    #    for row in cursor:
+    site_dict = {}
+    fields = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
+    try:
+        with arcpy.da.SearchCursor(out_raster,fields) as cursor:
+            for row in cursor:
+                site_fl.write(('%5s     sites\\%s.sit\n')%(row[0],row[0]))
+                site_dict[int(row[0])] = (row[1],row[2],row[3],row[4],row[5])
+        site_fl.close()
+    except:
+        logging.info(arcpy.GetMessages())
+
+    # Read in Lat Lons from weather station list file    
+    site_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'r')
+
+    # Create EPICRUN.dat file
+    eprn_fl   = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')    
+    eprun_ln  = ()
+    soil_dict = {}
+    
+    with open(constants.epic_dir+constants.SLLIST) as f:
+        for line in f:
+            #Sample line from soil file:     1     Soils\1003958.sol
+            (key, val)     = int(line.split()[1].split(os.sep)[1][:-4]),int(line.split()[0])
+            soil_dict[key] = val
+
+    idx = 0
+    for srow in site_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
+        if(idx > 50):
+            break
+
+        min_sit_wth = constants.MAX
+        split_srow = srow.split()
+        lat_lon_sit = (float(site_dict[int(split_srow[0])][4]), float(site_dict[int(split_srow[0])][3]))
+             
+        wth_fl  = open(constants.epic_dir+os.sep+constants.EPIC_DLY,'r')
+        for wrow in wth_fl: #     1       0_0.txt    41.415    -97.932
+            split_wrow  = wrow.split()
+            lat_lon_wth = (float(split_wrow[2]), float(split_wrow[3]))            
+            sep         = great_circle(lat_lon_sit, lat_lon_wth).miles
+
+            if(sep < min_sit_wth):
+                min_sit_wth = sep
+                cur_site    = int(split_srow[0])
+                cur_wth     = int(split_wrow[0])
+                cur_soils   = site_dict[cur_site][1]
+                eprun_ln    = (cur_site,cur_wth,cur_soils)
+
+                # If separation < constants.NARR_RES/2.0 then we have found a weather station 
+                # which is close enough to the site
+                if(sep < constants.NARR_RES/2.0):
+                    break
+        
+        eprn_fl.write(str(idx)+' '+str(eprun_ln)+'\n')
+        idx += 1
+        print idx
+    eprn_fl.close()
+
     # Create EPIC site file
     # Get closest NARR lat-lon
     # Create EPICRUN.dat
@@ -77,7 +151,8 @@ def parallelize_seimf():
     logging.info('Done!')
 
 if __name__ == '__main__':
-    parallelize_seimf()
+    seimf('wi')
+    #parallelize_seimf()
 
 #def delete_temp_files(files_to_delete):
 #    # Delete all the temporary files
