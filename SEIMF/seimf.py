@@ -68,30 +68,42 @@ def seimf(state):
     
     site_dir = constants.epic_dir+os.sep+constants.SITES+os.sep
     constants.make_dir_if_missing(site_dir)   
-    site_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'w')
+    iesite_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'w')
 
     # Read csv file containing soil information
     soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+constants.SOIL_DATA,index_col=None)
-    print soil_df.head()
     soil_df.drop_duplicates(subset='mukey',inplace=True)        
     sdf_dict = soil_df.set_index('mukey').T.to_dict()
     # sdf_dict.values()[0]['hzdepb_r']
-    pdb.set_trace()
 
     # Iterate through the zonal geometry dbf
     site_dict = {}
-    fields = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
+    fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
+    cell_size = arcpy.GetRasterProperties_management(out_raster, "CELLSIZEX")
+    ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
+
     try:
         with arcpy.da.SearchCursor(out_raster,fields) as cursor:
             for row in cursor:
-                site_fl.write(('%5s     sites\\%s.sit\n')%(row[0],row[0]))
+                iesite_fl.write(('%5s     sites\\%s.sit\n')%(row[0],row[0]))
                 site_dict[int(row[0])] = (row[1],row[2],row[3],row[4],row[5])
-        site_fl.close()
+
+                # Write SITE file (.sit)
+                site_fl = open(site_dir+os.sep+str(row[0])+'.sit','w')
+                site_fl.write(constants.site_fl_line1+'\n')                    # Line 1
+                site_fl.write(state+'\n')                                      # Line 2
+                site_fl.write(constants.site_fl_line3+'\n')                    # Line 3
+
+                site_fl.write(('{:8.2f}'*10).format(row[5],row[4],*([0.0]*8))+'\n')
+                site_fl.write(('{:8.2f}'*10).format(*([0.0]*10))+'\n')
+                site_fl.write(('{:8d}'*7).format(*([0]*7))+'\n')
+                site_fl.close()
+        iesite_fl.close()
     except:
         logging.info(arcpy.GetMessages())
-
+    
     # Read in Lat Lons from weather station list file    
-    site_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'r')
+    iesite_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'r')
 
     # Create EPICRUN.dat file
     eprn_fl   = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')    
@@ -105,7 +117,7 @@ def seimf(state):
             soil_dict[key] = val
 
     idx = 0
-    for srow in site_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
+    for srow in iesite_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
         if(idx > 50):
             break
 

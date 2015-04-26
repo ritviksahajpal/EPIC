@@ -1,19 +1,20 @@
 [PROJECT]
-project_name = OpenLands_LS                                                               ; Name of project directory (to be created within out_dir)
-TAG          = SEIMF                                                                      ; A log file is created as Log_<TAG>.txt
-LIST_STATES  = ['wi','mn','mi']                                                           ; List of states to process               
+project_name  = OpenLands_LS                                                               ; Name of project directory (to be created within out_dir)
+TAG           = SEIMF                                                                      ; A log file is created as Log_<TAG>.txt
+LIST_STATES   = ['wi','mn','mi']                                                           ; List of states to process               
 
 [PATHS]
-base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ;
-data_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ; Contains SSURGO input data
-out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ;
+base_dir      = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ;
+data_dir      = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ; Contains SSURGO input data
+out_dir       = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ;
 
 [PARAMETERS]
-YEAR        = 2013
-SITES       = sites
-SITELIST    = ieSite.dat                                                                  ; Site list file for EPIC                                                                   
-EPIC_DLY    = iewedlst.dat
-SLLIST      = ieSlList.dat
-EPICRUN     = EPICRUN.dat
-SOIL_DATA   = dominant.csv
-  
+YEAR          = 2013
+SITES         = sites
+SITELIST      = ieSite.dat                                                                  ; Site list file for EPIC                                                                   
+EPIC_DLY      = iewedlst.dat
+SLLIST        = ieSlList.dat
+EPICRUN       = EPICRUN.dat
+SOIL_DATA     = dominant.csv
+site_fl_line1 = SRWC  
+site_fl_line3 = Sample:0000 Country:USA FIPS: 0000 MLRA:0 NRIPTR:0 HUC:0

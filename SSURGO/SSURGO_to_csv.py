@@ -132,11 +132,10 @@ def write_epic_soil_file(group):
         # Line 1
         epic_file.write(str(group.mukey.iloc[0])+' State: '+str(group.state.iloc[0])+' FIPS: '+str(group.FIPS.iloc[0])+'\n')
         # Line 2
-        epic_file.write('{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}\n'.format(\
-                        group.albedodry_r.iloc[0],group.hydgrp.iloc[0],0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0))
+        epic_file.write('{:8.2f}'*10+'\n'.format(group.albedodry_r.iloc[0],group.hydgrp.iloc[0],0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0))
         # Line 3
-        epic_file.write('{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}{:8.2f}\n'.format(\
-                        0.0,0.0,100.0,0.0,0.0,0.0,0.0,0.0,0.0))
+        epic_file.write('{:8.2f}'*9+'\n'.format(0.0,0.0,100.0,0.0,0.0,0.0,0.0,0.0,0.0))
+
         # Soil characteristics per soil layer
         epic_file.write(''.join(['{:8.2f}'.format(n*constants.CONV_DEPTH) for n in group.hzdepb_r])+'\n') # Depth to bottom of layer (m)
         epic_file.write(''.join(['{:8.2f}'.format(n) for n in group.dbthirdbar_r])+'\n')        # Bulk Density (T/m^3)
