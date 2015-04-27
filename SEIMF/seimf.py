@@ -38,12 +38,7 @@ def write_epicrun_fl(state,site_dict):
     for srow in iest_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
         min_sit_wth = constants.MAX
         split_srow = srow.split()
-        try:
-            lat_lon_sit = (float(site_dict[int(split_srow[0])][4]), float(site_dict[int(split_srow[0])][3]))
-        except:
-            print srow
-            print split_srow
-            pdb.set_trace()
+        lat_lon_sit = (float(site_dict[int(split_srow[0])][4]), float(site_dict[int(split_srow[0])][3]))
         
         wth_fl  = open(constants.epic_dir+os.sep+constants.EPIC_DLY,'r')
         for wrow in wth_fl: #     1       0_0.txt    41.415    -97.932
@@ -65,7 +60,6 @@ def write_epicrun_fl(state,site_dict):
         
         eprn_fl.write(str(idx)+' '+' '.join(str(e) for e in eprun_ln)+'\n')
         idx += 1
-        print idx    
 
 def write_epic_site_fl(state, out_raster):   
     global site_idx 
@@ -80,8 +74,6 @@ def write_epic_site_fl(state, out_raster):
         with arcpy.da.SearchCursor(out_raster,fields) as cursor:
             for row in cursor:
                 iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]))
-                if(site_idx%1000 == 0):
-                    print state,row[0],site_idx
                 site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
 
                 # Write SITE file (.sit)
@@ -157,28 +149,12 @@ def seimf(state):
     
     write_epicrun_fl(state,site_dict)
 
-
-    # Create EPIC site file
-    # Get closest NARR lat-lon
-    # Create EPICRUN.dat
-    # 
-    # 
-    # df.drop_duplicates(cols='mukey')    
-
-def parallelize_seimf():
-    pool = multiprocessing.Pool(constants.max_threads)
-    pool.map(seimf,constants.list_st)
-    pool.close()
-    pool.join()    
-    logging.info('Done!')
-
 if __name__ == '__main__':
     for st in constants.list_st:
         seimf(st)
 
     iesite_fl.close()
     eprn_fl.close()
-    #parallelize_seimf()
 
 #def delete_temp_files(files_to_delete):
 #    # Delete all the temporary files

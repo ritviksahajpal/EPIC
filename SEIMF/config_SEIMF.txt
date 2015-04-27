@@ -1,7 +1,7 @@
 [PROJECT]
 project_name  = OpenLands_LS                                                               ; Name of project directory (to be created within out_dir)
 TAG           = SEIMF                                                                      ; A log file is created as Log_<TAG>.txt
-LIST_STATES   = ['mn'] ; ['wi','mn','mi']                                                           ; List of states to process               
+LIST_STATES   = ['wi','mn','mi']                                                           ; List of states to process               
 
 [PATHS]
 base_dir      = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ;
