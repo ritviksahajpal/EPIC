@@ -1,4 +1,4 @@
-##################################################################
+open##################################################################
 # seimf.py July 2011
 # ritvik sahajpal (ritvik@umd.edu)
 # Creates a combined raster based on seimf approach from ssurgo, dem
@@ -17,8 +17,94 @@ arcpy.CheckOutExtension("spatial")
 arcpy.env.overwriteOutput = True
 arcpy.env.extent = "MAXOF"
 
+site_idx  = 1
+iesite_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'w+')
+eprn_fl   = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')
+
+# Read csv file containing soil information
+soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+constants.SOIL_DATA,index_col=None)
+soil_df.drop_duplicates(subset='mukey',inplace=True)        
+sdf_dict = soil_df.set_index('mukey').T.to_dict()
+
+def write_epicrun_fl(state,site_dict):
+    # Read in Lat Lons from weather station list file    
+    iest_fl  = open(constants.epic_dir+os.sep+constants.SITELIST,'r')
+
+    # Create EPICRUN.dat file
+    #eprn_fl   = open(constants.epic_dir+os.sep+state+'_'+constants.EPICRUN,'w+')    
+    eprun_ln  = []
+
+    idx = 0
+    for srow in iest_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
+        min_sit_wth = constants.MAX
+        split_srow = srow.split()
+        try:
+            lat_lon_sit = (float(site_dict[int(split_srow[0])][4]), float(site_dict[int(split_srow[0])][3]))
+        except:
+            print srow
+            print split_srow
+            pdb.set_trace()
+        
+        wth_fl  = open(constants.epic_dir+os.sep+constants.EPIC_DLY,'r')
+        for wrow in wth_fl: #     1       0_0.txt    41.415    -97.932
+            split_wrow  = wrow.split()
+            lat_lon_wth = (float(split_wrow[2]), float(split_wrow[3]))            
+            sep         = great_circle(lat_lon_sit, lat_lon_wth).miles
+
+            if(sep < min_sit_wth):
+                min_sit_wth = sep
+                cur_site    = int(split_srow[0])
+                cur_wth     = int(split_wrow[0])
+                cur_soils   = site_dict[cur_site][1]
+                eprun_ln    = [cur_site,cur_wth,cur_soils]
+
+                # If separation < constants.NARR_RES/2.0 then we have found a weather station 
+                # which is close enough to the site
+                if(sep < constants.NARR_RES/2.0):
+                    break
+        
+        eprn_fl.write(str(idx)+' '+' '.join(str(e) for e in eprun_ln)+'\n')
+        idx += 1
+        print idx    
+
+def write_epic_site_fl(state, out_raster):   
+    global site_idx 
+    site_dict = {}
+    fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
+
+    cell_size = float(arcpy.GetRasterProperties_management(out_raster, "CELLSIZEX").getOutput(0))
+    ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
+
+    add_val   = site_idx
+    try:        
+        with arcpy.da.SearchCursor(out_raster,fields) as cursor:
+            for row in cursor:
+                iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]))
+                if(site_idx%1000 == 0):
+                    print state,row[0],site_idx
+                site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
+
+                # Write SITE file (.sit)
+                site_fl = open(constants.site_dir+os.sep+state+'_'+str(row[0])+'.sit','w')
+                site_fl.write(constants.site_fl_line1+'\n')                    # Line 1
+                site_fl.write(state+'\n')                                      # Line 2
+                site_fl.write(constants.site_fl_line3+'\n')                    # Line 3
+
+                site_fl.write(('{:8.2f}'*10).format(row[5],row[4],sdf_dict.values()[0]['elev_r'],\
+                                0.0,0.0,0.0,0.0,0.0,0.0,sdf_dict.values()[0]['aspectrep'])+'\n')
+                site_fl.write(('{:8.2f}'*10).format(ras_area,0.0,0.0,0.0,0.0,0.0,\
+                                sdf_dict.values()[0]['slopelenusle_r'],\
+                                sdf_dict.values()[0]['slope_r'],0.0,1.0)+'\n')
+                site_fl.write(('{:8d}'*7).format(*([0]*7))+'\n')
+                site_fl.close()        
+                site_idx += 1
+    except:
+        logging.info(arcpy.GetMessages())
+    
+    logging.info('Wrote site files '+state)
+    return site_dict
+
 def seimf(state):
-    inp_rasters = '"' # contains the list of rasters which are to be merged together to create the SEIMF geodatabase
     logging.info(state)
 
     sgo_dir = constants.epic_dir+os.sep+'Data'+os.sep+'ssurgo'+os.sep+state+os.sep
@@ -30,6 +116,7 @@ def seimf(state):
 
     # Combine SSURGO and land use data
     out_raster = out_dir+os.sep+'SEIMF_'+state
+    inp_rasters = '"' # contains the list of rasters which are to be merged together to create the SEIMF geodatabase
     if(not(arcpy.Exists(out_raster))):
         inp_rasters += sgo_dir+os.sep+state+'_ssurgo'+'; '+lu_dir+\
                        os.sep+'open_'+str(constants.year)+'_'+state+'"'
@@ -65,88 +152,11 @@ def seimf(state):
             logging.info(arcpy.GetMessages())
     else:
         logging.info('File present: '+zgeom_dbf)
+
+    site_dict = write_epic_site_fl(state, out_raster)    
     
-    site_dir = constants.epic_dir+os.sep+constants.SITES+os.sep
-    constants.make_dir_if_missing(site_dir)   
-    iesite_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'w')
+    write_epicrun_fl(state,site_dict)
 
-    # Read csv file containing soil information
-    soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+constants.SOIL_DATA,index_col=None)
-    soil_df.drop_duplicates(subset='mukey',inplace=True)        
-    sdf_dict = soil_df.set_index('mukey').T.to_dict()
-    # sdf_dict.values()[0]['hzdepb_r']
-
-    # Iterate through the zonal geometry dbf
-    site_dict = {}
-    fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
-    cell_size = arcpy.GetRasterProperties_management(out_raster, "CELLSIZEX")
-    ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
-
-    try:
-        with arcpy.da.SearchCursor(out_raster,fields) as cursor:
-            for row in cursor:
-                iesite_fl.write(('%5s     sites\\%s.sit\n')%(row[0],row[0]))
-                site_dict[int(row[0])] = (row[1],row[2],row[3],row[4],row[5])
-
-                # Write SITE file (.sit)
-                site_fl = open(site_dir+os.sep+str(row[0])+'.sit','w')
-                site_fl.write(constants.site_fl_line1+'\n')                    # Line 1
-                site_fl.write(state+'\n')                                      # Line 2
-                site_fl.write(constants.site_fl_line3+'\n')                    # Line 3
-
-                site_fl.write(('{:8.2f}'*10).format(row[5],row[4],*([0.0]*8))+'\n')
-                site_fl.write(('{:8.2f}'*10).format(*([0.0]*10))+'\n')
-                site_fl.write(('{:8d}'*7).format(*([0]*7))+'\n')
-                site_fl.close()
-        iesite_fl.close()
-    except:
-        logging.info(arcpy.GetMessages())
-    
-    # Read in Lat Lons from weather station list file    
-    iesite_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'r')
-
-    # Create EPICRUN.dat file
-    eprn_fl   = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')    
-    eprun_ln  = ()
-    soil_dict = {}
-    
-    with open(constants.epic_dir+constants.SLLIST) as f:
-        for line in f:
-            #Sample line from soil file:     1     Soils\1003958.sol
-            (key, val)     = int(line.split()[1].split(os.sep)[1][:-4]),int(line.split()[0])
-            soil_dict[key] = val
-
-    idx = 0
-    for srow in iesite_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
-        if(idx > 50):
-            break
-
-        min_sit_wth = constants.MAX
-        split_srow = srow.split()
-        lat_lon_sit = (float(site_dict[int(split_srow[0])][4]), float(site_dict[int(split_srow[0])][3]))
-             
-        wth_fl  = open(constants.epic_dir+os.sep+constants.EPIC_DLY,'r')
-        for wrow in wth_fl: #     1       0_0.txt    41.415    -97.932
-            split_wrow  = wrow.split()
-            lat_lon_wth = (float(split_wrow[2]), float(split_wrow[3]))            
-            sep         = great_circle(lat_lon_sit, lat_lon_wth).miles
-
-            if(sep < min_sit_wth):
-                min_sit_wth = sep
-                cur_site    = int(split_srow[0])
-                cur_wth     = int(split_wrow[0])
-                cur_soils   = site_dict[cur_site][1]
-                eprun_ln    = (cur_site,cur_wth,cur_soils)
-
-                # If separation < constants.NARR_RES/2.0 then we have found a weather station 
-                # which is close enough to the site
-                if(sep < constants.NARR_RES/2.0):
-                    break
-        
-        eprn_fl.write(str(idx)+' '+str(eprun_ln)+'\n')
-        idx += 1
-        print idx
-    eprn_fl.close()
 
     # Create EPIC site file
     # Get closest NARR lat-lon
@@ -163,7 +173,11 @@ def parallelize_seimf():
     logging.info('Done!')
 
 if __name__ == '__main__':
-    seimf('wi')
+    for st in constants.list_st:
+        seimf(st)
+
+    iesite_fl.close()
+    eprn_fl.close()
     #parallelize_seimf()
 
 #def delete_temp_files(files_to_delete):

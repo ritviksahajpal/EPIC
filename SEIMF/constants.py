@@ -27,6 +27,7 @@ site_fl_line3 = parser.get('PARAMETERS','site_fl_line3')
 list_st       = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 base_dir      = parser.get('PATHS','base_dir')+os.sep
 epic_dir      = base_dir+os.sep+'EPIC'+os.sep+parser.get('PROJECT','project_name')+os.sep
+site_dir      = epic_dir+os.sep+SITES+os.sep
 
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1
@@ -45,6 +46,7 @@ def make_dir_if_missing(d):
 
 # Create directories
 make_dir_if_missing(epic_dir)
+make_dir_if_missing(site_dir)
 
 # Logging
 LOG_FILENAME   = epic_dir+os.sep+'Log_'+TAG+'.txt'
