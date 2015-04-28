@@ -23,6 +23,7 @@ SOIL_DATA     = parser.get('PARAMETERS','SOIL_DATA')
 SITES         = parser.get('PARAMETERS','SITES')
 site_fl_line1 = parser.get('PARAMETERS','site_fl_line1')
 site_fl_line3 = parser.get('PARAMETERS','site_fl_line3')
+missing_soils = parser.get('PARAMETERS','missing_soils')
 
 list_st       = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 base_dir      = parser.get('PATHS','base_dir')+os.sep

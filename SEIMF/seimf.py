@@ -17,9 +17,10 @@ arcpy.CheckOutExtension("spatial")
 arcpy.env.overwriteOutput = True
 arcpy.env.extent = "MAXOF"
 
-site_idx  = 1
-iesite_fl = open(constants.epic_dir+os.sep+constants.SITELIST,'w+')
-eprn_fl   = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')
+site_idx    = 0
+iesite_fl   = open(constants.epic_dir+os.sep+constants.SITELIST,'w+')
+eprn_fl     = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')
+no_soils_fl = open(constants.epic_dir+os.sep+constants.missing_soils,'w+')
 
 # Read csv file containing soil information
 soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+constants.SOIL_DATA,index_col=None)
@@ -27,19 +28,25 @@ soil_df.drop_duplicates(subset='mukey',inplace=True)
 sdf_dict = soil_df.set_index('mukey').T.to_dict()
 
 def write_epicrun_fl(state,site_dict):
-    # Read in Lat Lons from weather station list file    
-    iest_fl  = open(constants.epic_dir+os.sep+constants.SITELIST,'r')
-
-    # Create EPICRUN.dat file
-    #eprn_fl   = open(constants.epic_dir+os.sep+state+'_'+constants.EPICRUN,'w+')    
+    print state
     eprun_ln  = []
+    soil_dict = {}
+    with open(constants.epic_dir+constants.SLLIST) as f:
+        for line in f:
+            #Sample line from soil file:     1     Soils\1003958.sol
+            (key, val)     = int(line.split()[1].split(os.sep)[1][:-4]),int(line.split()[0])
+            soil_dict[key] = val
 
     idx = 0
-    for srow in iest_fl: # 1 107 1444414 500 -90.7574996948 46.4774017334
+    for key, val in site_dict.iteritems(): # key: 1 val: 107 1444414 500 -90.7574996948 46.4774017334
         min_sit_wth = constants.MAX
-        split_srow = srow.split()
-        lat_lon_sit = (float(site_dict[int(split_srow[0])][4]), float(site_dict[int(split_srow[0])][3]))
+        lat_lon_sit = (val[4],val[3])
         
+        # If soil is missing in soil_dict, then continue onto next site
+        if(not(val[1] in soil_dict)):
+           no_soils_fl.write(str(val[1])+'\n')
+           continue
+
         wth_fl  = open(constants.epic_dir+os.sep+constants.EPIC_DLY,'r')
         for wrow in wth_fl: #     1       0_0.txt    41.415    -97.932
             split_wrow  = wrow.split()
@@ -48,9 +55,9 @@ def write_epicrun_fl(state,site_dict):
 
             if(sep < min_sit_wth):
                 min_sit_wth = sep
-                cur_site    = int(split_srow[0])
+                cur_site    = key
                 cur_wth     = int(split_wrow[0])
-                cur_soils   = site_dict[cur_site][1]
+                cur_soils   = val[1]
                 eprun_ln    = [cur_site,cur_wth,cur_soils]
 
                 # If separation < constants.NARR_RES/2.0 then we have found a weather station 
@@ -58,7 +65,7 @@ def write_epicrun_fl(state,site_dict):
                 if(sep < constants.NARR_RES/2.0):
                     break
         
-        eprn_fl.write(str(idx)+' '+' '.join(str(e) for e in eprun_ln)+'\n')
+        eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],eprun_ln[1],eprun_ln[1],soil_dict[eprun_ln[2]],1,eprun_ln[1]))
         idx += 1
 
 def write_epic_site_fl(state, out_raster):   
@@ -72,8 +79,8 @@ def write_epic_site_fl(state, out_raster):
     add_val   = site_idx
     try:        
         with arcpy.da.SearchCursor(out_raster,fields) as cursor:
-            for row in cursor:
-                iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]))
+            for row in cursor:  
+                iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]+add_val))
                 site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
 
                 # Write SITE file (.sit)

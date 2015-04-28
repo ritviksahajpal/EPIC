@@ -15,6 +15,8 @@ ZERO_LINES     = parser.getint('PARAMETERS','ZERO_LINES')
 SLLIST         = parser.get('PARAMETERS','SLLIST')
 cdl_res        = parser.getint('PARAMETERS','SIZE')  
 list_st        = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
+all            = parser.get('PARAMETERS','all') 
+dominant       = parser.get('PARAMETERS','dominant') 
 
 ###############################################################################
 # Constants

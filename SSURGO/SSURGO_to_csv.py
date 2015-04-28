@@ -112,15 +112,15 @@ def SSURGO_to_csv():
     df3['niccdcd'] = df3['niccdcd'].astype(int)
 
     # Drop components with non zero initial depth
-    logging.info('Drop faulty components')
-    drop_df = df3.groupby('cokey').filter(lambda x: x['hzdept_r'].min() <= 0)
+    #logging.info('Drop faulty components')
+    #drop_df = df3.groupby('cokey').filter(lambda x: x['hzdept_r'].min() <= 0)
 
     logging.info('Select the dominant component')
-    dom_df = drop_df.reset_index().groupby('mukey').apply(lambda g: g[g['comppct_r']==g['comppct_r'].max()])
+    dom_df = df3.groupby('mukey').apply(lambda g: g[g['comppct_r']==g['comppct_r'].max()])
 
-    drop_df.to_csv(constants.out_dir+'drop.csv')
-    df3.to_csv(constants.out_dir+'all.csv')
-    dom_df.to_csv(constants.out_dir+'dominant.csv')
+    #drop_df.to_csv(constants.out_dir+'drop.csv')
+    df3.to_csv(constants.out_dir+constants.all)
+    dom_df.to_csv(constants.out_dir+constants.dominant)
     logging.info('Done!')
     return dom_df
 
@@ -132,9 +132,9 @@ def write_epic_soil_file(group):
         # Line 1
         epic_file.write(str(group.mukey.iloc[0])+' State: '+str(group.state.iloc[0])+' FIPS: '+str(group.FIPS.iloc[0])+'\n')
         # Line 2
-        epic_file.write('{:8.2f}'*10+'\n'.format(group.albedodry_r.iloc[0],group.hydgrp.iloc[0],0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0))
+        epic_file.write(('{:8.2f}'*10+'\n').format(group.albedodry_r.iloc[0],group.hydgrp.iloc[0],0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0))
         # Line 3
-        epic_file.write('{:8.2f}'*9+'\n'.format(0.0,0.0,100.0,0.0,0.0,0.0,0.0,0.0,0.0))
+        epic_file.write(('{:8.2f}'*9+'\n').format(0.0,0.0,100.0,0.0,0.0,0.0,0.0,0.0,0.0))
 
         # Soil characteristics per soil layer
         epic_file.write(''.join(['{:8.2f}'.format(n*constants.CONV_DEPTH) for n in group.hzdepb_r])+'\n') # Depth to bottom of layer (m)

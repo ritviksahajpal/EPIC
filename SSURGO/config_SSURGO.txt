@@ -12,3 +12,5 @@ out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC            
 ZERO_LINES  = 23                                                                          ; Number of lines with zero's
 SLLIST      = ieSlList.dat                                                                ;                                                                        ; 
 SIZE        = 56                                                                          ; Resolution of soil raster
+all         = All_SSURGO.csv
+dominant    = Dominant_SSURGO.csv
