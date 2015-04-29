@@ -23,10 +23,17 @@ eprn_fl     = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')
 no_soils_fl = open(constants.epic_dir+os.sep+constants.missing_soils,'w+')
 
 # Read csv file containing soil information
-soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+constants.SOIL_DATA,index_col=None)
-soil_df.drop_duplicates(subset='mukey',inplace=True)        
-sdf_dict = soil_df.set_index('mukey').T.to_dict()
+soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+\
+                                    constants.SOIL_DATA,index_col=None) 
+soil_df.drop_duplicates(subset='mukey',inplace=True)                    # Drop all duplicates of mukey
+sdf_dict = soil_df.set_index('mukey').T.to_dict()                       # Get transpose of dataframe and convert to dict
 
+##################################################################
+# write_epicrun_fl
+# Create EPICRUN.dat file
+#
+#
+##################################################################
 def write_epicrun_fl(state,site_dict):
     print state
     eprun_ln  = []
@@ -38,6 +45,7 @@ def write_epicrun_fl(state,site_dict):
             soil_dict[key] = val
 
     idx = 0
+    # Find the closest NARR station to each site
     for key, val in site_dict.iteritems(): # key: 1 val: 107 1444414 500 -90.7574996948 46.4774017334
         min_sit_wth = constants.MAX
         lat_lon_sit = (val[4],val[3])
@@ -68,6 +76,12 @@ def write_epicrun_fl(state,site_dict):
         eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],eprun_ln[1],eprun_ln[1],soil_dict[eprun_ln[2]],1,eprun_ln[1]))
         idx += 1
 
+##################################################################
+# write_epic_site_fl
+# Create EPIC sites
+#
+#
+##################################################################
 def write_epic_site_fl(state, out_raster):   
     global site_idx 
     site_dict = {}
@@ -103,6 +117,12 @@ def write_epic_site_fl(state, out_raster):
     logging.info('Wrote site files '+state)
     return site_dict
 
+##################################################################
+# seimf
+# 1. Combine soil and landuse data
+# 2. Invokes other functions to create sites and EPICRUN.dat
+#
+##################################################################
 def seimf(state):
     logging.info(state)
 

@@ -28,6 +28,11 @@
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="config_EPIC_output.txt">
+      <SubType>Code</SubType>
+    </Content>
+  </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
 </Project>

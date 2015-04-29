@@ -21,6 +21,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "plot_LakeStates_soils", "pl
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "read_EPIC_output", "read_EPIC_output\read_EPIC_output.pyproj", "{54A14BC7-CB97-467E-8ACE-07DD4F87A19F}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Plots", "Plots\Plots.pyproj", "{CC5813F4-E6AF-43A6-92D9-D74975B0E20B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,8 @@ Global
 		{093D50C9-4224-4EA5-B6ED-A775DD61E4B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54A14BC7-CB97-467E-8ACE-07DD4F87A19F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{54A14BC7-CB97-467E-8ACE-07DD4F87A19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC5813F4-E6AF-43A6-92D9-D74975B0E20B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC5813F4-E6AF-43A6-92D9-D74975B0E20B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
