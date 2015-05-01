@@ -1,4 +1,4 @@
-open##################################################################
+##################################################################
 # seimf.py July 2011
 # ritvik sahajpal (ritvik@umd.edu)
 # Creates a combined raster based on seimf approach from ssurgo, dem

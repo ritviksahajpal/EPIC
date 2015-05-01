@@ -21,7 +21,15 @@
     <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="constants.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="plot_calendar.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config_plots.txt">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
