@@ -168,3 +168,13 @@ obj/
 [Rr]elease*/
 [Tt]est[Rr]esult*
 Plots/94.DGN
+Plots/Data/cancer_survival_rate.csv
+Plots/Data/EU_GDP_2007_2013.csv
+Plots/Data/television.csv
+Plots/Output/cancer.png
+Plots/Output/cancer1.pdf
+Plots/Output/cancer1.png
+Plots/Output/test.png
+Plots/Output/testa.png
+Plots/plotSlope.py
+Plots/television.csv

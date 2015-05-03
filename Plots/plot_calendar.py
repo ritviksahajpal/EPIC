@@ -1,18 +1,26 @@
 import pandas, pdb, os, csv, datetime, numpy, brewer2mpl
 import matplotlib.pyplot as plt
 import matplotlib.colorbar as cbar
-import seaborn as sns
+from matplotlib import rcParams
+import palettable
 from dateutil import rrule
 import matplotlib
 import calendar
 
-def example_plot(ax):    
-    X   = numpy.linspace(-numpy.pi, numpy.pi, 256,endpoint=True)
-    C,S = numpy.cos(X), numpy.sin(X)
-    ax.plot(X, C, color="blue", linewidth=1.0, linestyle="-")
-    ax.axes.get_xaxis().set_ticks([])
-    ax.axes.get_yaxis().set_ticks([])
-
+def set_matplotlib_params():
+    """
+    Set matplotlib defaults to nicer values
+    """            
+    # rcParams dict
+    rcParams['mathtext.default'] ='regular'
+    rcParams['axes.labelsize']   = 11
+    rcParams['xtick.labelsize']  = 11
+    rcParams['ytick.labelsize']  = 11
+    rcParams['legend.fontsize']  = 11
+    rcParams['font.family']      = 'sans-serif'
+    rcParams['font.serif']       = ['Helvetica']
+    rcParams['figure.figsize']   = 7.3, 4.2
+   
 ###############################################################################
 #
 #
@@ -21,10 +29,9 @@ def example_plot(ax):
 ###############################################################################
 def get_colors():    
     """
-    Get colorbrewer colors, which are nicer
+    Get palettable colors, which are nicer
     """            
-    #bmap = brewer2mpl.get_map('YlGnBu','sequential',9) #.mpl_colors
-    bmap = sns.cubehelix_palette(8,start=1.0)
+    bmap=palettable.colorbrewer.sequential.BuPu_9.mpl_colors
     return bmap
 
 ###############################################################################
@@ -49,26 +56,41 @@ def draw_calendar(ax,df,horz):
             if(horz):
                 rect = matplotlib.patches.Rectangle((cur_wk,day_of_week), 1, 1, color = color_list[int(val*color_len)-1])                
             else:
-                rect = matplotlib.patches.Rectangle((day_of_week,cur_wk), 1, 1, color = color_list[int(val*color_len)-1])                
-            #print cur_wk,day_of_week
+                rect = matplotlib.patches.Rectangle((day_of_week,cur_wk), 1, 1, color = color_list[int(val*color_len)-1],label='a')                
+
             ax.add_patch(rect)
        
-
+###############################################################################
+#
+#
+#
+#
+###############################################################################
 def draw_daily_lines(ax,df,horz):
     clr = 'w'
+    wth = 0.5
+    stl = '-'
     # Draw calendar grid
     num_weeks  = numpy.ceil((sub_df.index[len(sub_df.index)-1]-sub_df.index[0])/(numpy.timedelta64(1,'W')))+2
 
     for i in range(int(num_weeks)):
-        ax.plot([0,7],[i,i],color=clr,linestyle='-',lw=1)
+        ax.plot([0,7],[i,i],color=clr,linestyle=stl,lw=wth)
     
     for j in range(7):
-        ax.plot([j,j],[0,num_weeks],color=clr,linestyle='-',lw=1)    
+        ax.plot([j,j],[0,num_weeks],color=clr,linestyle=stl,lw=wth)    
 
     pass
 
+###############################################################################
+#
+#
+#
+#
+###############################################################################
 def draw_month_boundary(ax,df,horz):
     clr = 'w'
+    wth = 1.25
+    stl = '-'
     month_seq = rrule.rrule(rrule.MONTHLY,dtstart=df.index[0],until=df.index[len(df.index)-1])
     for mon in month_seq:
         num_days = calendar.monthrange(mon.year,mon.month)[1]
@@ -78,17 +100,17 @@ def draw_month_boundary(ax,df,horz):
 
         if(cur_yr == mon.year and (mon.month <> 12)):               
             if(horz):
-                ax.plot([cur_wk+1,cur_wk+1],[0,day_of_week+1],color=clr,linestyle='-',lw=2)
+                ax.plot([cur_wk+1,cur_wk+1],[0,day_of_week+1],color=clr,linestyle=stl,lw=wth)
             else:
-                ax.plot([0,day_of_week+1],[cur_wk+1,cur_wk+1],color=clr,linestyle='-',lw=2)
+                ax.plot([0,day_of_week+1],[cur_wk+1,cur_wk+1],color=clr,linestyle=stl,lw=wth)
 
             if (day_of_week != 6):
                 if(horz):
-                    ax.plot([cur_wk+1,cur_wk],[day_of_week+1,day_of_week+1],color=clr,linestyle='-',lw=2) # Parallel to X-Axis
-                    ax.plot([cur_wk,cur_wk],[day_of_week+1,7],color=clr,linestyle='-',lw=2)
+                    ax.plot([cur_wk+1,cur_wk],[day_of_week+1,day_of_week+1],color=clr,linestyle=stl,lw=wth) # Parallel to X-Axis
+                    ax.plot([cur_wk,cur_wk],[day_of_week+1,7],color=clr,linestyle=stl,lw=wth)
                 else:
-                    ax.plot([day_of_week+1,day_of_week+1],[cur_wk+1,cur_wk],color=clr,linestyle='-',lw=2) # Parallel to Y-axis
-                    ax.plot([day_of_week+1,7],[cur_wk,cur_wk],color=clr,linestyle='-',lw=2)
+                    ax.plot([day_of_week+1,day_of_week+1],[cur_wk+1,cur_wk],color=clr,linestyle=stl,lw=wth) # Parallel to Y-axis
+                    ax.plot([day_of_week+1,7],[cur_wk,cur_wk],color=clr,linestyle=stl,lw=wth)
 
 if __name__ == '__main__':
     col_name       = 'NMN'   
@@ -107,9 +129,10 @@ if __name__ == '__main__':
     color_len  = len(color_list)
 
     # Draw blank figure
-    fig = plt.figure(dpi=900)
+    fig = plt.figure()
+    set_matplotlib_params()
     plt.subplots_adjust(hspace=0.3)
-    plt.axis('off')       
+    #plt.axis('off')       
     plt.axes().set_aspect('equal')
 
     idx = 0
@@ -123,7 +146,7 @@ if __name__ == '__main__':
         if(horz):
             ax  = plt.subplot2grid((num_yrs,3),(1,idx),colspan=2,rowspan=1)
         else:
-            ax  = plt.subplot2grid((3,num_yrs),(1,idx),rowspan=2,colspan=1)
+            ax  = plt.subplot2grid((3,num_yrs),(1,idx),rowspan=2,colspan=1)            
         ax.xaxis.tick_top()
 
         ax.axes.get_xaxis().set_ticks([])
@@ -156,9 +179,18 @@ if __name__ == '__main__':
         draw_month_boundary(ax,sub_df,horz)           
         print idx, i
         idx += 1
-
-    ax0 = plt.subplot2grid((3,num_yrs), (0,0),rowspan=1,colspan=num_yrs)
-    example_plot(ax0)    
+    plt.gca().legend(loc="upper right")
+    ax0     = plt.subplot2grid((3,num_yrs), (0,0),rowspan=1,colspan=num_yrs)
+    x_axis  = numpy.arange(0.325,num_yrs+1,1.1)
+    bar_val = df[col_name].groupby(df['YEAR']).mean()
+    err_val = df[col_name].groupby(df['YEAR']).std()
+    ax0.bar(x_axis,bar_val,yerr=err_val,linewidth=0,width=0.25,color='g',
+            error_kw=dict(ecolor='gray', lw=1))
+    ax0.axes.get_xaxis().set_ticks([])
+    ax0.spines['top'].set_visible(False)
+    ax0.spines['right'].set_visible(False)
+    plt.ylabel(col_name)
+    #ax0.axes.get_yaxis().set_ticks([])
     #plt.tight_layout()
-    plt.savefig('C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\aaa.png')
+    plt.savefig('aaa.png',dpi=900,frameon=False)
     plt.close()
