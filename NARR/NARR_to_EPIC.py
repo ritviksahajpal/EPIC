@@ -19,7 +19,7 @@ def NARR_to_EPIC(vals):
     # Output pandas frame into EPIC weather file
     out_fl   = constants.epic_dly+os.sep+str(lat)+'_'+str(lon)+'.txt'
 
-    if(not(os.path.isfile(out_fl))):
+    if not(os.path.isfile(out_fl)):
         logging.info(out_fl) 
         # List all years for which we will create EPIC file
         lst_yrs     = rrule(YEARLY, dtstart=constants.strt_date, until=constants.end_date)
@@ -43,15 +43,15 @@ def NARR_to_EPIC(vals):
                                       os.sep+str(lat)+'_'+str(lon)+'.txt')
                 epic_vars      = filter(None,e_fl.readlines()[0].strip().split("'"))
 
-                if(cur_var == 'air.2m'):
+                if cur_var == 'air.2m':
                     epic_min_tmp     = util.chunks(epic_vars,8,True)
                     epic_max_tmp     = util.chunks(epic_vars,8,False)                    
 
                     tmp_df[cur_var] = pandas.Series(epic_min_tmp,index=cur_date_range)
-                    tmp_df[cur_var] = tmp_df[cur_var].map(lambda x:float(x)+K_To_C)
+                    tmp_df[cur_var] = tmp_df[cur_var].map(lambda x:float(x)+constants.K_To_C)
 
                     tmp_df['tmax']  = pandas.Series(epic_max_tmp,index=cur_date_range)
-                    tmp_df['tmax']  = tmp_df['tmax'].map(lambda x:float(x)+K_To_C)
+                    tmp_df['tmax']  = tmp_df['tmax'].map(lambda x:float(x)+constants.K_To_C)
                     tmp_df['tmin']  = tmp_df['air.2m'] 
                 else:
                     tmp_df[cur_var] = pandas.Series(epic_vars,index=cur_date_range)
@@ -70,11 +70,10 @@ def NARR_to_EPIC(vals):
             epic_df            = epic_df.combine_first(tmp_df)
         # Output dataframe to text file with right formatting
         for index, row in epic_df.iterrows():
-            epic_out.write(('%6d%4d%4d')+(6*'%6.2f'+'\n') % 
+            epic_out.write(('%6d%4d%4d'+6*'%6.2f'+'\n') %
                         (row['year'],row['month'],row['day'],
                          row['srad'],row['tmax'],row['tmin'],
                          row['apcp'],row['rhum.2m'],row['wnd']))	
-            epic_out.write(out_str)
         epic_out.close()
     else:
         logging.info('File exists: '+out_fl) 
@@ -85,13 +84,10 @@ def NARR_to_EPIC(vals):
 #
 ###############################################################################
 def parallelize_NARR_to_EPIC():
-    pkg_num = 0
     # Read EPIC weather list file
     epic_wth_list = open(constants.out_dir+constants.EPIC_DLY,'r').readlines()
-    total_runs    = len(epic_wth_list)
-    threads = []
-    
-    if(constants.DO_PARALLEL): 
+
+    if constants.DO_PARALLEL:
         lat_vals = [int(ln.split()[1].split('.')[0].split('_')[0]) for ln in epic_wth_list]
         lon_vals = [int(ln.split()[1].split('.')[0].split('_')[1]) for ln in epic_wth_list]
 
@@ -103,7 +99,7 @@ def parallelize_NARR_to_EPIC():
         for line in epic_wth_list:
             lat_val = int(line.split()[1].split('.')[0].split('_')[0])
             lon_val = int(line.split()[1].split('.')[0].split('_')[1])
-            NARR_to_EPIC(lat_val,lon_val)
+            NARR_to_EPIC((lat_val,lon_val))
     logging.info('Done NARR_to_EPIC!')
 
 if __name__ == '__main__':

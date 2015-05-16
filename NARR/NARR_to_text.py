@@ -4,7 +4,7 @@
 #
 # Convert downloaded data to text
 ###############################################################################
-import constants, util, logging, os, subprocess,pdb, multiprocessing
+import constants, util, logging, os, subprocess, pdb, multiprocessing, sys
 import numpy as np
 
 ###############################################################################
@@ -35,14 +35,14 @@ def process_NARR_to_text(cur_var):
         unp_nc   = constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+cur_var+'.'+str(year)+'.nc' # Unpacked netcdf
 
         # In netcdf file is missing, bail
-        if(not(os.path.isfile(inp_nc))):
-            logging.info(nc_file+' not present. Exiting!')
+        if not(os.path.isfile(inp_nc)):
+            logging.info(inp_nc+' not present. Exiting!')
             sys.exit(0)
 
         # Create output directory by netcdf variable and by year
         util.make_dir_if_missing(constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+str(year))            
                 
-        if(not(os.path.isfile(unp_nc))):
+        if not(os.path.isfile(unp_nc)):
             # Subset netcdf file by lat and lon boundaries        
             logging.info('Subsetting '+var_name+' by lon and lat')        
             subst_str = subprocess.check_output((ncks_sub+' x,'+str(lonli)+','+str(lonui)+' -d y,'+str(latli)+','+str(latui)+' '+inp_nc +' '+unp_nc))
@@ -70,9 +70,9 @@ def process_NARR_to_text(cur_var):
                 for j in range(0,latui-latli):
                     lon_str = subprocess.check_output(ncks_get+'x,'+str(i)+','+str(i)+' -d '+'y,'+str(j)+','+str(j)+' -v lon '+unp_nc).strip("\r\n\t '")
                     lat_str = subprocess.check_output(ncks_get+'x,'+str(i)+','+str(i)+' -d '+'y,'+str(j)+','+str(j)+' -v lat '+unp_nc).strip("\r\n\t '")
-                    epic_wth.write(('%5s    %10s    %5.3f    %5.3f\n') % (idx,str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
-                    epic_mon.write(('%5s    %10s    %5.3f    %5.3f\n') % (idx,str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
-                    if(i==(lonui-lonli-1) and j==(latui-latli-1)):
+                    epic_wth.write('%5s    %10s    %5.3f    %5.3f\n' % (idx,str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
+                    epic_mon.write('%5s    %10s    %5.3f    %5.3f\n' % (idx,str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
+                    if i==(lonui-lonli-1) and j==(latui-latli-1):
                         wxrmrun.write(str(j)+'_'+str(i))
                     else:
                         wxrmrun.write(str(j)+'_'+str(i)+'\n')
