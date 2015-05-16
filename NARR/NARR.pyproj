@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8aa8bee7-4b33-4167-999f-c073004a9ce0}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>create_EPIC_weather_files.py</StartupFile>
+    <StartupFile>modify_wth.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -27,6 +27,9 @@
     </Compile>
     <Compile Include="create_EPIC_weather_files.py" />
     <Compile Include="EPIC_climatology.py" />
+    <Compile Include="modify_wth.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="util.py" />
     <Compile Include="wget_NARR.py" />
     <Compile Include="NARR_to_EPIC.py" />

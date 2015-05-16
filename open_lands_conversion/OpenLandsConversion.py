@@ -221,7 +221,7 @@ def output_raster_attribute_to_csv(reg,state,ras,TITL,replace):
             # Add region and state to header
             header +=  "{0},".format('REGION')
             header +=  "{0},".format('STATE')
-            
+
             if len(lst_flds) != 0:    
                 f = open(out_csv,'w')  
                   
@@ -254,10 +254,10 @@ def join_csv(reg,state,ras,out_csv,replace):
             arcpy.CopyRows_management(out_csv,out_CR)        
             arcpy.BuildRasterAttributeTable_management(ras, "Overwrite")
             arcpy.JoinField_management(ras,"VALUE",out_CR,"VALUE","")
+            logging.info('\tJoining region ' +reg+' for state '+state)
         except:
             logging.info(arcpy.GetMessages())
-        
-    logging.info('\tJoining region ' +reg+' for state '+state)
+            
     return ras
 
 ###############################################################################
@@ -278,7 +278,7 @@ def extract_by_mask(state,extract_comb,titl,replace):
             pass
         else:
             try:
-                arcpy.gp.ExtractByMask_sa(extract_comb,vec_mask,ext_ras)                
+                arcpy.gp.ExtractByMask_sa(extract_comb,vec_mask,ext_ras)
             except:
                 logging.info(arcpy.GetMessages())
         
@@ -685,11 +685,12 @@ def create_state_ssurgo(state,replace):
 ###############################################################################    
 def merge_csv_files(list_csv_files,fname):
     write_file = constants.out_dir+fname+'.csv'
-     
+
     with open(write_file,'w+b') as append_file:
         need_headers = True
         for input_file in list_csv_files:
-            with open(input_file,'rU') as read_file:
+            input_file = input_file.replace("\\", "\\\\")
+            with open(input_file,'r') as read_file:
                 headers = read_file.readline()
                 if need_headers:
                     # Write the headers only if we need them
@@ -877,7 +878,7 @@ def open_lands_conv(state):
         filtered_ras = filter_and_project_raster(reg,state,ras,False and constants.REPLACE)
                  
         # 7. Join back the csv
-        join_csv(reg,state,filtered_ras,out_csv,True and constants.REPLACE)
+        join_csv(reg,state,filtered_ras,out_csv,True)
         list_filt_ras.append(filtered_ras)
         state_filt_ras.append(filtered_ras)
          
@@ -898,8 +899,7 @@ def open_lands_conv(state):
     state_csv = merge_csv_files(state_csv_files,'append_'+state+'_'+constants.TAG)#+'_'+date)
     region_csv_files.append(state_csv)
     df   = pandas.DataFrame.from_csv(state_csv,index_col=False)
-    df['COUNT_1'] *= ras_area
-    df['COUNT'] *= ras_area
+    df['COUNT']   *= ras_area
 
     # Perform land use change analysis
     lu_change_analysis(state,df)        
@@ -940,8 +940,7 @@ def open_lands_conv(state):
         except:
             logging.info(arcpy.GetMessages())
                      
-            fl = dbf_to_csv(constants.out_dir+state+'_zsat.dbf')
-
+    fl = dbf_to_csv(constants.out_dir+state+'_zsat.dbf')
     return fl
 
 ###############################################################################

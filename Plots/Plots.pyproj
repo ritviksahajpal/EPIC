@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{cc5813f4-e6af-43a6-92d9-d74975b0e20b}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>plot_calendar.py</StartupFile>
+    <StartupFile>plot_s_curve_epic.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -25,6 +25,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="plot_calendar.py" />
+    <Compile Include="plot_s_curve_epic.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="config_plots.txt">
