@@ -202,6 +202,7 @@ def plot_epic_dgn():
     ax_colorbar = plt.subplot2grid((9,num_yrs+1), (8,1),rowspan=1,colspan=num_yrs-1)   
     mappableObject = matplotlib.cm.ScalarMappable(cmap = palettable.colorbrewer.sequential.BuPu_9.mpl_colormap)
     mappableObject.set_array(numpy.array(df[col_name]))
+
     col_bar = fig.colorbar(mappableObject,cax=ax_colorbar,orientation='horizontal',\
                            boundaries=numpy.arange(min_val,max_val,(max_val-min_val)/100))
     col_bar.ax.tick_params(labelsize=8) 
@@ -224,7 +225,7 @@ def plot_epic_dgn():
     ax0.spines['left'].set_visible(False)
     plt.gca().yaxis.grid(True)	
     plt.tight_layout(w_pad=0.0)
-    plt.savefig('C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\QZDN94.png',dpi=900,frameon=False)
+    plt.savefig('C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\ZZQZDN94.png',dpi=900,frameon=False)
     plt.close()
 
 if __name__ == '__main__':
