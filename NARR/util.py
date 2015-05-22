@@ -80,7 +80,7 @@ def get_boundary_region(nc_file):
 def chunks(lis, n, do_min):
     n = max(1, n)
 
-    if(do_min):
+    if do_min:
         return [min(lis[i:i + n]) for i in range(0, len(lis), n)]
     else:
         return [max(lis[i:i + n]) for i in range(0, len(lis), n)]

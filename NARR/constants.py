@@ -1,5 +1,4 @@
-import os, logging, datetime, util, multiprocessing, argparse, pdb, ast
-from datetime import date
+import os, logging, datetime, util, multiprocessing, pdb, ast
 from ConfigParser import SafeConfigParser
 
 # Parse config file
@@ -65,7 +64,7 @@ logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO,\
                     datefmt="%m-%d %H:%M") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL
 
 # Check if we want to do just a single site
-if(DO_SITE):
+if DO_SITE:
     LAT_BOUNDS[0] = LAT_BOUNDS[1] = SITE_LAT
     LON_BOUNDS[0] = LON_BOUNDS[1] = SITE_LON
 

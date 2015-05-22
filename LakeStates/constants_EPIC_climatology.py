@@ -1,13 +1,29 @@
-import os, sys, logging, errno, multiprocessing, ast
+import os, sys, logging, errno, ast
 from ConfigParser import SafeConfigParser
 
 # Parse config file
 parser = SafeConfigParser()
-parser.read('config_locate_nearest.txt')
+parser.read('config_EPIC_climatology.txt')
 
-MAX           = 100000.0                             # Maximum distance between any two points
 TAG           = parser.get('PROJECT','TAG')          # Tag of SEIMF folder
-EPIC_DLY      = parser.get('PARAMETERS','EPIC_DLY')
+start_yr      = parser.getint('PARAMETERS','START_YR')
+until_yr      = parser.getint('PARAMETERS','UNTIL_YR')
+
 base_dir      = parser.get('PATHS','base_dir')+os.sep
 epic_dir      = base_dir+os.sep+'EPIC'+os.sep+parser.get('PROJECT','project_name')+os.sep
-site_lat_lon  = ast.literal_eval(parser.get('PARAMETERS','site_loc'))
+wth_dir       = epic_dir+os.sep+'daily'
+out_dir       = epic_dir+os.sep+'climatology_'+str(start_yr)+'_'+str(end_yr)
+
+###############################################################################
+#
+#
+#
+###############################################################################
+def make_dir_if_missing(d):
+    try:
+        os.makedirs(d)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
+
+make_dir_if_missing(out_dir)

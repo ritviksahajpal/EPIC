@@ -15,8 +15,8 @@ def download_NARR(cur_var):
     for year in range(constants.START_YR,constants.END_YR+1):        
         util.make_dir_if_missing(constants.data_dir+cur_var)
  
-        if(not os.path.exists(constants.data_dir+cur_var+os.sep+cur_var+'.'+str(year)+'.nc')):
-            if(cur_var == "air.2m"):
+        if not os.path.exists(constants.data_dir+cur_var+os.sep+cur_var+'.'+str(year)+'.nc'):
+            if cur_var == "air.2m":
                 url    = constants.TEMP_CMD+cur_var+'.'+str(year)+'.nc'
             else:
                 url    = constants.BASE_CMD+cur_var+'.'+str(year)+'.nc'
@@ -34,12 +34,7 @@ def download_NARR(cur_var):
 #
 ###############################################################################
 def parallelize_download_NARR():
-    
-    pkg_num = 0
-    total_runs = len(constants.vars_to_get) # Find total number of runs based on number of NARR elements to extract
-    threads = []
-
-    if(constants.DO_PARALLEL):
+    if constants.DO_PARALLEL:
         pool = multiprocessing.Pool(constants.max_threads)
         pool.map(download_NARR, constants.vars_to_get.keys())
         pool.close()

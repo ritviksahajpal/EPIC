@@ -13,5 +13,5 @@ for r in rng:
     epic_out = open(out_fl,'w')
     for index, row in df.iterrows():
         tmp = float(row[6])*float(r)
-        epic_out.write(('%6d%4d%4d%6.2f%6.2f%6.2f%6.2f%6.2f%6.2f\n') % (row[0],row[1],row[2],row[3],row[4],row[5],tmp,row[7],row[8]))	
+        epic_out.write('%6d%4d%4d%6.2f%6.2f%6.2f%6.2f%6.2f%6.2f\n' % (row[0],row[1],row[2],row[3],row[4],row[5],tmp,row[7],row[8]))
     epic_out.close()

@@ -9,7 +9,6 @@ import os, sys, logging, pdb, getopt, glob, zipfile, arcpy, csv, time, multiproc
 from geopy.distance import vincenty
 from geopy.distance import great_circle
 from arcpy.sa import *
-from dbfpy import dbf
 import constants
 
 # ArcGIS constants
@@ -51,7 +50,7 @@ def write_epicrun_fl(state,site_dict):
         lat_lon_sit = (val[4],val[3])
         
         # If soil is missing in soil_dict, then continue onto next site
-        if(not(val[1] in soil_dict)):
+        if not(val[1] in soil_dict):
            no_soils_fl.write(str(val[1])+'\n')
            continue
 
@@ -61,7 +60,7 @@ def write_epicrun_fl(state,site_dict):
             lat_lon_wth = (float(split_wrow[2]), float(split_wrow[3]))            
             sep         = great_circle(lat_lon_sit, lat_lon_wth).miles
 
-            if(sep < min_sit_wth):
+            if sep < min_sit_wth:
                 min_sit_wth = sep
                 cur_site    = key
                 cur_wth     = int(split_wrow[0])
@@ -70,10 +69,10 @@ def write_epicrun_fl(state,site_dict):
 
                 # If separation < constants.NARR_RES/2.0 then we have found a weather station 
                 # which is close enough to the site
-                if(sep < constants.NARR_RES/2.0):
+                if sep < constants.NARR_RES/2.0:
                     break
-        
-        eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],eprun_ln[1],eprun_ln[1],soil_dict[eprun_ln[2]],1,eprun_ln[1]))
+        #                                               Sitename,Site#, Monthly#,   0,Wind#,Soil#,             Ops#,Daily#
+        eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],0,1,soil_dict[eprun_ln[2]],1,eprun_ln[1]))
         idx += 1
 
 ##################################################################
@@ -128,7 +127,6 @@ def seimf(state):
 
     sgo_dir = constants.epic_dir+os.sep+'Data'+os.sep+'ssurgo'+os.sep+state+os.sep
     lu_dir  = constants.epic_dir+os.sep+'Data'+os.sep+'LU'+os.sep+state+os.sep
-    cnt_dir = constants.base_dir+os.sep+'Data'+os.sep+'GIS'+os.sep+'county'+os.sep    
 
     out_dir = constants.epic_dir+os.sep+'SEIMF'+os.sep
     constants.make_dir_if_missing(out_dir)
@@ -136,7 +134,7 @@ def seimf(state):
     # Combine SSURGO and land use data
     out_raster = out_dir+os.sep+'SEIMF_'+state
     inp_rasters = '"' # contains the list of rasters which are to be merged together to create the SEIMF geodatabase
-    if(not(arcpy.Exists(out_raster))):
+    if not(arcpy.Exists(out_raster)):
         inp_rasters += sgo_dir+os.sep+state+'_ssurgo'+'; '+lu_dir+\
                        os.sep+'open_'+str(constants.year)+'_'+state+'"'
         try:
@@ -151,7 +149,7 @@ def seimf(state):
     # Compute centroid of each HSMU using zonal geometry
     zgeom_dbf  = out_dir+os.sep+state+'.dbf'
     reproj_ras = out_dir+os.sep+state+'_reproj'
-    if(not(arcpy.Exists(zgeom_dbf))):
+    if not(arcpy.Exists(zgeom_dbf)):
         try:
             # Spatial reference factory codes: 
             # http://resources.arcgis.com/en/help/main/10.1/018z/pdf/geographic_coordinate_systems.pdf

@@ -1,11 +1,11 @@
 [PROJECT]
 project_name  = OpenLands_LS                                                               ; Name of project directory (to be created within out_dir)
-TAG           = SEIMF                                                                      ; A log file is created as Log_<TAG>.txt
+TAG           = SEIMF
 
 [PATHS]
 base_dir      = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\                          ;
 out_dir       = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ;
 
 [PARAMETERS]
-EPIC_DLY      = iewedlst.dat
-site_loc      = [45.77,-87.20]                                                      ;ES 45.77,-87.20;RH 45.67,-89.21
+START_YR      = 2015
+UNTIL_YR      = 2100

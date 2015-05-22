@@ -34,7 +34,7 @@ def merge_ssurgo_rasters(st):
 
     # For each state, process the SSURGO spatial files
     for dir_name, subdir_list, file_list in os.walk(constants.data_dir):
-        if('_'+st+'_' in dir_name and constants.SPATIAL in subdir_list):
+        if '_'+st+'_' in dir_name and constants.SPATIAL in subdir_list:
             in_ssurgo_dir = dir_name+os.sep+constants.SPATIAL+os.sep
 
             # The reclassification is done to make the VALUE equal to the MUKEY
@@ -65,7 +65,7 @@ def merge_ssurgo_rasters(st):
             files_to_delete.append(recl_ssurgo_file)
             files_to_delete.append(reproj_file)
             
-            if(not(arcpy.Exists(recl_ssurgo_file))):
+            if not(arcpy.Exists(recl_ssurgo_file)):
                 logging.info('Shapefile '+os.path.basename(in_ssurgo_file)+\
                             ' is being reprojected, reclassified and converted to raster '+\
                             os.path.basename(out_ssurgo_file))
@@ -90,7 +90,7 @@ def merge_ssurgo_rasters(st):
                 logging.info('File present: '+recl_ssurgo_file)
 
     # Create new raster mosaic
-    if(not(arcpy.Exists(merged_soil_folder+os.sep+merged_soil_file))):
+    if not(arcpy.Exists(merged_soil_folder+os.sep+merged_soil_file)):
         list_sgo_files = ';'.join(list_sgo_files)  
         try:                  
             arcpy.MosaicToNewRaster_management(list_sgo_files,merged_soil_folder,merged_soil_file, "",\
