@@ -8,6 +8,13 @@ def parse_ACY(list_fls):
         time_df = df[(df.YR>=constants.START_YR) & (df.YR<=constants.END_YR)]
         time_df.groupby(lambda x: xrange.year).sum()
 
+def parse_ANN(list_fls):
+    for fl in list_fls:
+        df      = pandas.read_csv(fl,skiprows=constants.SKIP,skipinitialspace=True,\
+                                  usecols=constants.ANN_PARAMS,sep=' ')
+        time_df = df[(df.YR>=constants.START_YR) & (df.YR<=constants.END_YR)]
+        time_df.groupby(lambda x: xrange.year).sum()
+
 def parse_DGN(list_fls):
     for fl in list_fls:
         df      = pandas.read_csv(fl,skiprows=constants.SKIP,delim_whitespace=True,usecols=constants.DGN_PARAMS,
