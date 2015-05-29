@@ -11,5 +11,5 @@ def parse_ANN(list_fls):
         #time_df.groupby(lambda x: xrange.year).sum()
 
 if __name__ == '__main__':
-    list_fls = fnmatch.filter(os.listdir(base_dir),'*.ANN')
-    parse_ANN(list_fls)
+    fls = fnmatch.filter(os.listdir(base_dir),'*.ANN')
+    parse_ANN(fls)

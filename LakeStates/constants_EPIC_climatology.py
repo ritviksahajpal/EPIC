@@ -1,4 +1,4 @@
-import os, sys, logging, errno, ast
+import os, errno
 from ConfigParser import SafeConfigParser
 
 # Parse config file
@@ -12,7 +12,7 @@ until_yr      = parser.getint('PARAMETERS','UNTIL_YR')
 base_dir      = parser.get('PATHS','base_dir')+os.sep
 epic_dir      = base_dir+os.sep+'EPIC'+os.sep+parser.get('PROJECT','project_name')+os.sep
 wth_dir       = epic_dir+os.sep+'daily'
-out_dir       = epic_dir+os.sep+'climatology_'+str(start_yr)+'_'+str(end_yr)
+out_dir       = epic_dir+os.sep+'climatology_'+str(start_yr)+'_'+str(until_yr)
 
 ###############################################################################
 #
