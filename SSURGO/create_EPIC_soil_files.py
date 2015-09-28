@@ -5,7 +5,7 @@
 #
 #
 ###############################################################################
-import os,pdb,merge_ssurgo_rasters,constants,SSURGO_to_csv
+import os, pdb, merge_ssurgo_rasters, SSURGO_to_csv
 
 if __name__ == '__main__':
     # Create EPIC soil text files

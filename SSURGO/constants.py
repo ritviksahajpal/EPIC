@@ -64,7 +64,7 @@ base_dir   = parser.get('PATHS','base_dir')+os.sep
 data_dir   = parser.get('PATHS','data_dir')+os.sep
 out_dir    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep
 r_soil_dir = out_dir+os.sep+'Data'+os.sep
-t_soil_dir = out_dir+os.sep+'soils'+os.sep
+t_soil_dir = out_dir+os.sep+'management/soils'+os.sep
 
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1
