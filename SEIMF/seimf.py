@@ -164,7 +164,7 @@ def seimf(state):
             join_flds += state.upper()+'_SSURGO;OPEN_'+str(constants.year)+'_'+state.upper()+';XCENTROID;YCENTROID'+'"'    
 
             arcpy.JoinField_management(out_raster,"VALUE",zgeom_dbf,"VALUE",join_flds)
-            logging.info('JoinField_management '+c)
+            logging.info('JoinField_management ')
         except:
             logging.info(arcpy.GetMessages())
     else:
