@@ -23,8 +23,9 @@ no_soils_fl = open(constants.epic_dir + os.sep + constants.missing_soils, 'w+')
 
 # Read csv file containing soil information
 soil_df = pandas.DataFrame.from_csv(constants.epic_dir + os.sep + constants.SOIL_DATA, index_col=None)
-soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of mukey
-sdf_dict = soil_df.set_index('mukey').T.to_dict()    # Get transpose of dataframe and convert to dict
+soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of mukey, duplicates exist because each mukey
+                                                      # can correspond to multiple cokey's
+sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
 
 ##################################################################
 # write_epicrun_fl
@@ -32,11 +33,11 @@ sdf_dict = soil_df.set_index('mukey').T.to_dict()    # Get transpose of datafram
 #
 #
 ##################################################################
-def write_epicrun_fl(state,site_dict):
+def write_epicrun_fl(state, site_dict):
     print state
     eprun_ln  = []
     soil_dict = {}
-    with open(constants.epic_dir+constants.SLLIST) as f:
+    with open(constants.epic_dir + constants.SLLIST) as f:
         for line in f:
             #Sample line from soil file:     1     Soils\1003958.sol
             (key, val)     = int(line.split()[1].split(os.sep)[1][:-4]),int(line.split()[0])
@@ -70,17 +71,17 @@ def write_epicrun_fl(state,site_dict):
                 # which is close enough to the site
                 if sep < constants.NARR_RES/2.0:
                     break
-        #                                               Sitename,Site#, Monthly#,   0,Wind#,Soil#,             Ops#,Daily#
+        # Sample output: Sitename,Site#, Monthly#,0,Wind#,Soil#,Ops#,Daily#
         eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],0,1,soil_dict[eprun_ln[2]],1,eprun_ln[1]))
         idx += 1
 
-##################################################################
-# write_epic_site_fl
-# Create EPIC sites
-#
-#
-##################################################################
-def write_epic_site_fl(state, out_raster):   
+def write_epic_site_fl(state, out_raster):
+    """
+    Create EPIC files for each sites
+    :param state: Name of US state
+    :param out_raster: SEIMF raster: Combines SSURGO and land-use rasters
+    :return: Dictionary containing for each site key, info to fill in site file. Side-effect: Creates EPIC file for each site
+    """
     global site_idx 
     site_dict = {}
     fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
@@ -90,7 +91,7 @@ def write_epic_site_fl(state, out_raster):
 
     add_val   = site_idx
     try:        
-        with arcpy.da.SearchCursor(out_raster,fields) as cursor:
+        with arcpy.da.SearchCursor(out_raster, fields) as cursor:
             for row in cursor:  
                 iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]+add_val))
                 site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
@@ -115,39 +116,38 @@ def write_epic_site_fl(state, out_raster):
     logging.info('Wrote site files '+state)
     return site_dict
 
-##################################################################
-# seimf
-# 1. Combine soil and landuse data
-# 2. Invokes other functions to create sites and EPICRUN.dat
-#
-##################################################################
 def seimf(state):
+    """
+    1. Combine soil and landuse data
+    2. Invokes other functions to create sites (write_epic_site_fl) and EPICRUN.dat (write_epicrun_fl)
+    :param state:
+    :return:
+    """
     logging.info(state)
 
-    sgo_dir = constants.epic_dir+os.sep+'Data'+os.sep+'ssurgo'+os.sep+state+os.sep
-    lu_dir  = constants.epic_dir+os.sep+'Data'+os.sep+'LU'+os.sep+state+os.sep
+    sgo_dir = constants.epic_dir + os.sep + 'Data' + os.sep + 'ssurgo' + os.sep + state + os.sep
+    lu_dir  = constants.epic_dir + os.sep + 'Data' + os.sep + 'LU' + os.sep + state + os.sep
 
-    out_dir = constants.epic_dir+os.sep+'SEIMF'+os.sep
+    out_dir = constants.epic_dir + os.sep + 'SEIMF' + os.sep
     constants.make_dir_if_missing(out_dir)
 
     # Combine SSURGO and land use data
-    out_raster = out_dir+os.sep+'SEIMF_'+state
+    out_raster = out_dir + os.sep + 'SEIMF_' + state
     inp_rasters = '"' # contains the list of rasters which are to be merged together to create the SEIMF geodatabase
     if not(arcpy.Exists(out_raster)):
-        inp_rasters += sgo_dir+os.sep+state+'_ssurgo'+'; '+lu_dir+\
-                       os.sep+'open_'+str(constants.year)+'_'+state+'"'
+        inp_rasters += sgo_dir + os.sep + state + '_ssurgo' + '; ' + lu_dir + os.sep + 'open_' + str(constants.year) + '_' + state + '"'
         try:
-            out_combine  = Combine(inp_rasters)
+            out_combine = Combine(inp_rasters)
             out_combine.save(out_raster)
-            logging.info('Combined rasters to SEIMF raster '+out_raster)
+            logging.info('Combined rasters to SEIMF raster ' + out_raster)
         except:
             logging.info(arcpy.GetMessages())
     else:
-        logging.info('File present: '+out_raster)
+        logging.info('File present: ' + out_raster)
 
     # Compute centroid of each HSMU using zonal geometry
-    zgeom_dbf  = out_dir+os.sep+state+'.dbf'
-    reproj_ras = out_dir+os.sep+state+'_reproj'
+    zgeom_dbf  = out_dir + os.sep + state+'.dbf'
+    reproj_ras = out_dir + os.sep + state + '_reproj'
     if not(arcpy.Exists(zgeom_dbf)):
         try:
             # Spatial reference factory codes: 
