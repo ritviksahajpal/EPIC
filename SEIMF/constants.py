@@ -30,6 +30,13 @@ base_dir      = parser.get('PATHS','base_dir')+os.sep
 epic_dir      = base_dir+os.sep+'EPIC'+os.sep+parser.get('PROJECT','project_name')+os.sep
 site_dir      = epic_dir+os.sep+SITES+os.sep
 
+# EPIC simulation specific values
+opt_rundir  = parser.get('RUN_EPIC', 'opt_rundir')
+opt_epicrun = parser.get('RUN_EPIC', 'opt_epicrun')
+opt_tag     = parser.get('RUN_EPIC', 'opt_tag')
+opt_numpkgs = parser.getint('RUN_EPIC', 'opt_numpkgs')
+opt_outdir  = parser.get('RUN_EPIC', 'opt_outdir')
+
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1
 

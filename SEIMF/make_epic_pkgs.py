@@ -1,22 +1,4 @@
-import sys,os,string,shutil,logging,subprocess,pdb,multiprocessing,math,operator,pexpect,time, glob
-from epic_pkg_cmdline import *  # Command line processing 
-
-# Log everything, and send it to stderr. (http://docs.python.org/library/logging.html)
-if sys.version_info < (2, 4):
-    # v2.3 .basicConfig doesn't take arguments.  Python 2.3 is on OIC
-    logging.basicConfig()
-    logger = logging.getLogger("make_pkg")
-    logger.setLevel(logging.DEBUG)
-else:
-    logging.basicConfig(filename = 'make_epic_pkgs_errs.log', level=logging.DEBUG)
-    # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL
-    logger = logging
-    
-logger.info ("sys.argv:")
-argc = 0
-for arg in sys.argv:
-    logger.info ("\targv [%d] = %s", argc, sys.argv [argc])
-    argc += 1
+import sys, os, shutil, logging, subprocess, pdb, multiprocessing, pexpect, time, glob, constants
 
 #######################################################################
 # USER SPECIFIED PARAMETERS
@@ -31,17 +13,15 @@ outFileName      = os.getcwd() + os.sep + 'Output_AutomateScript.txt'
 # terminatorStr denotes 'XXXX' to demarcate EPIC runs
 terminatorStr = 'XXXX'
 
-# Get commandline arguments.  These are not optional.
-opt_rundir, opt_epicrun, opt_tag, opt_numpkgs, opt_outdir = getargs()
-    ## "run_pkgs_directory is the directory where the Run programs and data are located."
-    ## opt_testdb will return false if not on command line
-    ## opt_updatedb will return true if old records are to be replaced by the updated records
+## "run_pkgs_directory is the directory where the Run programs and data are located."
+## opt_testdb will return false if not on command line
+## opt_updatedb will return true if old records are to be replaced by the updated records
 
-logger.info ('opt_rundir = %s', opt_rundir)
-logger.info ('opt_epicrun = %s', opt_epicrun)
-logger.info ('opt_tag = %s', opt_tag)
-logger.info ('opt_numpkgs = %d', opt_numpkgs)
-logger.info ('opt_outdir = %s', opt_outdir)
+logging.info ('opt_rundir = %s', constants.opt_rundir)
+logging.info ('opt_epicrun = %s', constants.opt_epicrun)
+logging.info ('opt_tag = %s', constants.opt_tag)
+logging.info ('opt_numpkgs = %d', constants.opt_numpkgs)
+logging.info ('opt_outdir = %s', constants.opt_outdir)
 
 # Outline:
 # Read EPICRUN all lines into memory
