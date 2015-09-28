@@ -17,15 +17,14 @@ arcpy.env.overwriteOutput = True
 arcpy.env.extent = "MAXOF"
 
 site_idx    = 0
-iesite_fl   = open(constants.epic_dir+os.sep+constants.SITELIST,'w+')
-eprn_fl     = open(constants.epic_dir+os.sep+constants.EPICRUN,'w+')
-no_soils_fl = open(constants.epic_dir+os.sep+constants.missing_soils,'w+')
+iesite_fl   = open(constants.epic_dir + os.sep + constants.SITELIST, 'w+')
+eprn_fl     = open(constants.epic_dir + os.sep + constants.EPICRUN, 'w+')
+no_soils_fl = open(constants.epic_dir + os.sep + constants.missing_soils, 'w+')
 
 # Read csv file containing soil information
-soil_df = pandas.DataFrame.from_csv(constants.epic_dir+os.sep+\
-                                    constants.SOIL_DATA,index_col=None) 
-soil_df.drop_duplicates(subset='mukey',inplace=True)                    # Drop all duplicates of mukey
-sdf_dict = soil_df.set_index('mukey').T.to_dict()                       # Get transpose of dataframe and convert to dict
+soil_df = pandas.DataFrame.from_csv(constants.epic_dir + os.sep + constants.SOIL_DATA, index_col=None)
+soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of mukey
+sdf_dict = soil_df.set_index('mukey').T.to_dict()    # Get transpose of dataframe and convert to dict
 
 ##################################################################
 # write_epicrun_fl
