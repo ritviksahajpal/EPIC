@@ -26,9 +26,9 @@ site_fl_line3 = parser.get('PARAMETERS','site_fl_line3')
 missing_soils = parser.get('PARAMETERS','missing_soils')
 
 list_st       = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
-base_dir      = parser.get('PATHS','base_dir')+os.sep
-epic_dir      = base_dir+os.sep+'EPIC'+os.sep+parser.get('PROJECT','project_name')+os.sep
-site_dir      = epic_dir+os.sep+SITES+os.sep
+base_dir      = parser.get('PATHS','base_dir') + os.sep
+epic_dir      = base_dir + os.sep + 'EPIC' + os.sep + parser.get('PROJECT','project_name') + os.sep
+site_dir      = epic_dir + os.sep + 'management' + os.sep + SITES + os.sep
 
 # EPIC simulation specific values
 opt_rundir  = parser.get('RUN_EPIC', 'opt_rundir')
