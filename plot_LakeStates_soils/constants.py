@@ -1,3 +1,4 @@
+import ast
 from ConfigParser import SafeConfigParser
 
 # Parse config file
