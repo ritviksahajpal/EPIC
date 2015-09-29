@@ -10,7 +10,7 @@ parser.read('config_EPIC_output.txt')
 #
 #
 ###############################################################################
-SKIP          = 10
+SKIP = 10
 
 ###############################################################################
 # User modifiable values
@@ -28,9 +28,10 @@ ACY_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACY_PARAMS'))
 DGN_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','DGN_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','GET_PARAMS'))
 
-base_dir      = parser.get('PATHS','base_dir')+os.sep
-epic_dir      = base_dir+os.sep+'EPIC'+os.sep+PROJECT_NAME+os.sep
-sims_dir      = epic_dir+os.sep+SIMULATIONS+os.sep+EPIC_OUTPUT
+base_dir = parser.get('PATHS','base_dir') + os.sep
+epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
+sims_dir = epic_dir + os.sep + SIMULATIONS + os.sep + EPIC_OUTPUT
+anly_dir = epic_dir + os.sep + 'analysis' + os.sep
 
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1
@@ -50,6 +51,7 @@ def make_dir_if_missing(d):
 # Create directories
 make_dir_if_missing(epic_dir)
 make_dir_if_missing(sims_dir)
+make_dir_if_missing(anly_dir)
 
 # Logging
 LOG_FILENAME   = epic_dir+os.sep+'Log_'+TAG+'.txt'

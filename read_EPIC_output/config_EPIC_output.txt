@@ -7,10 +7,10 @@ base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States
 
 [PARAMETERS]
 GET_PARAMS  = ['DGN']
-ACM_PARAMS  = ['YR','PET','ET']
-ACY_PARAMS  = ['YR','CPNM','YLDF','YLN','WUEF','WS','NS']
-DGN_PARAMS  = ['Y','M','D','BIOM','RW','NMN']
-START_YR    = 2012           ; Starting year of weather data
-END_YR      = 2020           ; Ending year of weather data
+ACM_PARAMS  = ['YR', 'PET', 'ET']
+ACY_PARAMS  = ['YR', 'CPNM', 'YLDF', 'YLN', 'WUEF', 'WS', 'NS']
+DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'RW', 'NMN']
+START_YR    = 2012 ; Starting year of weather data
+END_YR      = 2020 ; Ending year of weather data
 SIMULATIONS = simulations
 EPIC_OUTPUT = Poplar_simulations

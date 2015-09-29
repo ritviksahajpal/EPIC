@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 
 def parse_ACY(list_fls):
     for fl in list_fls:
-        df      = pandas.read_csv(fl,skiprows=constants.SKIP,skipinitialspace=True,\
-                                  usecols=constants.ACY_PARAMS,sep=' ')    
-        time_df = df[(df.YR>=constants.START_YR) & (df.YR<=constants.END_YR)]
+        df      = pandas.read_csv(fl, skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
+        time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
         time_df.groupby(lambda x: xrange.year).sum()
 
 def parse_ANN(list_fls):
