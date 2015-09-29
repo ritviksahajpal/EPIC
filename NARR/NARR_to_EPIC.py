@@ -73,7 +73,7 @@ def NARR_to_EPIC(vals):
             epic_out.write(('%6d%4d%4d'+6*'%6.2f'+'\n') %
                         (row['year'],row['month'],row['day'],
                          row['srad'],row['tmax'],row['tmin'],
-                         row['apcp'],row['rhum.2m'],row['wnd']))	
+                         row['apcp'],row['rhum.2m'],row['wnd']))
         epic_out.close()
     else:
         logging.info('File exists: '+out_fl) 
