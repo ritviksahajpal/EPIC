@@ -4,6 +4,14 @@
 # 
 ##################################################################
 import multiprocessing, constants, logging, arcpy, fnmatch, os, csv
+
+try:
+    import archook
+    archook.get_arcpy()
+    import arcpy
+except ImportError:
+    logging.info('Missing ArcPY')
+
 from arcpy.sa import *
 
 # ArcGIS initialization
