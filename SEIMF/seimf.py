@@ -46,8 +46,8 @@ def write_epicrun_fl(state, site_dict):
     soil_dict = {}
     with open(constants.epic_dir + constants.SLLIST) as f:
         for line in f:
-            #Sample line from soil file:     1     Soils\1003958.sol
-            (key, val)     = int(line.split()[1].split(os.sep)[1][:-4]),int(line.split()[0])
+            #Sample line from soil file:     1     "Soils//1003958.sol"
+            (key, val)     = int(line.split('//')[1].split('.')[0]),int(line.split()[0])
             soil_dict[key] = val
 
     idx = 0
@@ -100,7 +100,7 @@ def write_epic_site_fl(state, out_raster):
     try:        
         with arcpy.da.SearchCursor(out_raster, fields) as cursor:
             for row in cursor:  
-                iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]+add_val))
+                iesite_fl.write(('%5s     "sites//%s_%s.sit"\n')%(int(row[0])+add_val,state,row[0]+add_val))
                 site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
 
                 # Write SITE file (.sit)
