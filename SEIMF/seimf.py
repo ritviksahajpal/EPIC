@@ -100,7 +100,7 @@ def write_epic_site_fl(state, out_raster):
     try:        
         with arcpy.da.SearchCursor(out_raster, fields) as cursor:
             for row in cursor:  
-                iesite_fl.write(('%5s     sites\\%s_%s.sit\n')%(int(row[0])+add_val,state,row[0]+add_val))
+                iesite_fl.write(('%5s     "sites//%s_%s.sit"\n')%(int(row[0])+add_val,state,row[0]+add_val))
                 site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
 
                 # Write SITE file (.sit)

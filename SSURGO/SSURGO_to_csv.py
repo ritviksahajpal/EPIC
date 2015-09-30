@@ -180,7 +180,7 @@ def csv_to_EPIC(df):
 
     idx = 1
     for filename in glob.iglob(os.path.join(constants.t_soil_dir, '*.sol')):
-        epic_SlList_file.write(('%5s     soils\\%-20s\n')%(idx,os.path.basename(filename)))
+        epic_SlList_file.write(('%5s     "soils//%-20s"\n')%(idx,os.path.basename(filename)))
         idx += 1
     epic_SlList_file.close()
 
