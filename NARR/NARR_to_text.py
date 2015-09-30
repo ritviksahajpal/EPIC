@@ -105,7 +105,7 @@ def parallelize_NARR_to_text():
     threads = []
     total_runs = len(constants.vars_to_get) # Find total number of runs based on number of NARR elements to extract    
 
-    if(constants.DO_PARALLEL):    
+    if(constants.DO_PARALLEL):
         pool = multiprocessing.Pool(constants.max_threads)
         pool.map(process_NARR_to_text, constants.vars_to_get.keys())
         pool.close()
