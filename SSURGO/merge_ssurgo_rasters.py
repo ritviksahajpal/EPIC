@@ -3,7 +3,7 @@
 # ritvik sahajpal (ritvik@umd.edu)
 # 
 ##################################################################
-import multiprocessing, constants, logging, arcpy, fnmatch, os, csv
+import multiprocessing, constants, logging, fnmatch, os, csv
 
 try:
     import archook
