@@ -46,8 +46,8 @@ def write_epicrun_fl(state, site_dict):
     soil_dict = {}
     with open(constants.epic_dir + constants.SLLIST) as f:
         for line in f:
-            #Sample line from soil file:     1     Soils\1003958.sol
-            (key, val)     = int(line.split()[1].split(os.sep)[1][:-4]),int(line.split()[0])
+            #Sample line from soil file:     1     "Soils//1003958.sol"
+            (key, val)     = int(line.split('//')[1].split('.')[0]),int(line.split()[0])
             soil_dict[key] = val
 
     idx = 0
