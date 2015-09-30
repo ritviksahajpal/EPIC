@@ -70,8 +70,8 @@ def process_NARR_to_text(cur_var):
                 for j in range(0,latui-latli):
                     lon_str = subprocess.check_output(ncks_get+'x,'+str(i)+','+str(i)+' -d '+'y,'+str(j)+','+str(j)+' -v lon '+unp_nc).strip("\r\n\t '")
                     lat_str = subprocess.check_output(ncks_get+'x,'+str(i)+','+str(i)+' -d '+'y,'+str(j)+','+str(j)+' -v lat '+unp_nc).strip("\r\n\t '")
-                    epic_wth.write('%5s    %10s    %5.3f    %5.3f\n' % (idx,'daily/'+str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
-                    epic_mon.write('%5s    %10s    %5.3f    %5.3f\n' % (idx,'monthly/'+str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
+                    epic_wth.write('%5s    "%10s"    %5.3f    %5.3f\n' % (idx,'daily//'+str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
+                    epic_mon.write('%5s    "%10s"    %5.3f    %5.3f\n' % (idx,'monthly//'+str(j)+'_'+str(i)+'.txt',np.float(lat_str),np.float(lon_str)))
                     if i==(lonui-lonli-1) and j==(latui-latli-1):
                         wxrmrun.write(str(j)+'_'+str(i))
                     else:

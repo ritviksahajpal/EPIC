@@ -5,7 +5,7 @@
 # ndhd, dem and cdl based crop rotation data.
 # Uses dbfpy library from http://sourceforge.net/projects/dbfpy/files/
 ##################################################################
-import os, sys, logging, pdb, getopt, glob, zipfile, csv, time, multiprocessing, pandas
+import os, sys, logging, pdb, getopt, glob, pandas
 from geopy.distance import vincenty
 from geopy.distance import great_circle
 try:

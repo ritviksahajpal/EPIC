@@ -88,8 +88,10 @@ def parallelize_NARR_to_EPIC():
     epic_wth_list = open(constants.out_dir+constants.EPIC_DLY,'r').readlines()
 
     if constants.DO_PARALLEL:
-        lat_vals = [int(ln.split('/')[1].split('.')[0].split('_')[0]) for ln in epic_wth_list]
-        lon_vals = [int(ln.split('/')[1].split('.')[0].split('_')[1]) for ln in epic_wth_list]
+        # Example: Split 441     "daily//20_15.txt"    46.405    -90.606
+        # to get lat_vals = 20, lon_vals = 15
+        lat_vals = [int(ln.split('//')[1].split('.')[0].split('_')[0]) for ln in epic_wth_list]
+        lon_vals = [int(ln.split('//')[1].split('.')[0].split('_')[1]) for ln in epic_wth_list]
 
         pool = multiprocessing.Pool(constants.max_threads)
         pool.map(NARR_to_EPIC,zip(lat_vals,lon_vals))
