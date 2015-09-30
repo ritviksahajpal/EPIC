@@ -31,6 +31,8 @@ epic_dir      = base_dir + os.sep + 'EPIC' + os.sep + parser.get('PROJECT','proj
 site_dir      = epic_dir + os.sep + 'management' + os.sep + SITES + os.sep
 
 # EPIC simulation specific values
+EPIC_EXE    = parser.get('RUN_EPIC', 'EPIC_EXE')
+EPICOUT_FLS = ast.literal_eval(parser.get('RUN_EPIC', 'EPICOUT_FLS'))
 opt_rundir  = parser.get('RUN_EPIC', 'opt_rundir')
 opt_epicrun = parser.get('RUN_EPIC', 'opt_epicrun')
 opt_tag     = parser.get('RUN_EPIC', 'opt_tag')
@@ -51,6 +53,8 @@ def make_dir_if_missing(d):
     except OSError as exception:
         if exception.errno != errno.EEXIST:
             raise
+
+    return d
 
 # Create directories
 make_dir_if_missing(epic_dir)
