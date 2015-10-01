@@ -29,6 +29,7 @@ list_st       = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 base_dir      = parser.get('PATHS','base_dir') + os.sep
 epic_dir      = base_dir + os.sep + 'EPIC' + os.sep + parser.get('PROJECT','project_name') + os.sep
 site_dir      = epic_dir + os.sep + 'management' + os.sep + SITES + os.sep
+mgt_dir       = epic_dir + os.sep + 'management'
 
 # EPIC simulation specific values
 EPIC_EXE    = parser.get('RUN_EPIC', 'EPIC_EXE')
