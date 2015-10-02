@@ -20,8 +20,7 @@ SKIP = 10
 PROJECT_NAME  = parser.get('PROJECT','project_name')
 TAG           = parser.get('PROJECT','TAG')
 START_YR      = parser.get('PARAMETERS','START_YR')                
-END_YR        = parser.get('PARAMETERS','END_YR')                 
-SIMULATIONS   = parser.get('PARAMETERS','SIMULATIONS')
+END_YR        = parser.get('PARAMETERS','END_YR')
 EPIC_OUTPUT   = parser.get('PARAMETERS','EPIC_OUTPUT')
 ACM_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACM_PARAMS'))
 ACY_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACY_PARAMS'))
@@ -30,7 +29,7 @@ GET_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','GET_PARAMS'))
 
 base_dir = parser.get('PATHS','base_dir') + os.sep
 epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
-sims_dir = epic_dir + os.sep + SIMULATIONS + os.sep + EPIC_OUTPUT
+sims_dir = epic_dir + os.sep + EPIC_OUTPUT
 anly_dir = epic_dir + os.sep + 'analysis' + os.sep
 
 # Maximum number of cpus to use at a time
