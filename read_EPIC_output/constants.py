@@ -1,4 +1,4 @@
-import os, sys, logging, errno, multiprocessing, ast
+import os, sys, logging, errno, ast, psutil
 from ConfigParser import SafeConfigParser
 
 # Parse config file
@@ -34,7 +34,7 @@ sims_dir = epic_dir + os.sep + SIMULATIONS + os.sep + EPIC_OUTPUT
 anly_dir = epic_dir + os.sep + 'analysis' + os.sep
 
 # Maximum number of cpus to use at a time
-max_threads = multiprocessing.cpu_count() - 1
+max_threads = psutil.cpu_count() - 1
 
 ###############################################################################
 #
