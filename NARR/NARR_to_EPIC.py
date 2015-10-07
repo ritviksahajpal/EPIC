@@ -39,7 +39,7 @@ def NARR_to_EPIC(vals):
             tmp_df.fillna(0.0,inplace=True)
             # Loop across variables
             for cur_var in constants.vars_to_get.keys():
-                e_fl           = open(constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+str(lst_yrs[idx_yr].year)+\
+                e_fl           = open(os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+str(lst_yrs[idx_yr].year)+\
                                       os.sep+str(lat)+'_'+str(lon)+'.txt')
                 epic_vars      = filter(None,e_fl.readlines()[0].strip().split("'"))
 
@@ -85,7 +85,7 @@ def NARR_to_EPIC(vals):
 ###############################################################################
 def parallelize_NARR_to_EPIC():
     # Read EPIC weather list file
-    epic_wth_list = open(constants.out_dir+constants.EPIC_DLY,'r').readlines()
+    epic_wth_list = open(constants.out_dir+os.sep+constants.EPIC_DLY,'r').readlines()
 
     if constants.DO_PARALLEL:
         # Example: Split 441     "daily//20_15.txt"    46.405    -90.606
@@ -99,8 +99,8 @@ def parallelize_NARR_to_EPIC():
         pool.join()
     else:
         for line in epic_wth_list:
-            lat_val = int(line.split('/')[1].split('.')[0].split('_')[0])
-            lon_val = int(line.split('/')[1].split('.')[0].split('_')[1])
+            lat_val = int(line.split('//')[1].split('.')[0].split('_')[0])
+            lon_val = int(line.split('//')[1].split('.')[0].split('_')[1])
             NARR_to_EPIC((lat_val,lon_val))
     logging.info('Done NARR_to_EPIC!')
 
