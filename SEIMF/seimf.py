@@ -24,8 +24,8 @@ arcpy.env.overwriteOutput = True
 arcpy.env.extent = "MAXOF"
 
 site_idx    = 0
-iesite_fl   = open(constants.epic_dir + os.sep + constants.SITELIST, 'w+')
-eprn_fl     = open(constants.epic_dir + os.sep + constants.EPICRUN, 'w+')
+iesite_fl   = open(constants.epic_dir + os.sep + 'EPIC_files' + os.sep + constants.SITELIST, 'w+')
+eprn_fl     = open(constants.epic_dir + os.sep + 'EPIC_files' + os.sep + constants.EPICRUN, 'w+')
 no_soils_fl = open(constants.epic_dir + os.sep + constants.missing_soils, 'w+')
 
 # Read csv file containing soil information
