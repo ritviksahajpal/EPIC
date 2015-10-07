@@ -46,9 +46,9 @@ end_date    = datetime.date(END_YR,12,31)
 # Directories
 meta_dir    = parser.get('PATHS','meta_dir')+os.sep
 data_dir    = parser.get('PATHS','data_dir')+os.sep
-out_dir     = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep
-epic_dly    = out_dir+os.sep+'management/daily'+os.sep
-epic_mon    = out_dir+os.sep+'management/monthly'+os.sep
+out_dir     = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+parser.get('PATHS', 'sims_dir')
+epic_dly    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/daily'+os.sep
+epic_mon    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/monthly'+os.sep
 
 # Create directories
 util.make_dir_if_missing(meta_dir)
@@ -58,7 +58,7 @@ util.make_dir_if_missing(epic_dly)
 util.make_dir_if_missing(epic_mon)
 
 # Logging
-LOG_FILENAME   = out_dir+os.sep+'Log_'+TAG+'.txt'
+LOG_FILENAME   = os.path.dirname(out_dir)+os.sep+'Log_'+TAG+'.txt'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO,\
                     format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%m-%d %H:%M") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

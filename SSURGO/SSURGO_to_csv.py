@@ -119,8 +119,10 @@ def SSURGO_to_csv():
     dom_df = df3.groupby('mukey').apply(lambda g: g[g['comppct_r']==g['comppct_r'].max()])
 
     #drop_df.to_csv(constants.out_dir+'drop.csv')
-    df3.to_csv(constants.out_dir+constants.all)
-    dom_df.to_csv(constants.out_dir+constants.dominant)
+    out_ssurgo_dir = constants.r_soil_dir+os.sep+constants.SOIL+os.sep
+    constants.make_dir_if_missing(out_ssurgo_dir)
+    df3.to_csv(out_ssurgo_dir+os.sep+constants.all)
+    dom_df.to_csv(out_ssurgo_dir+os.sep+constants.dominant)
     logging.info('Done!')
     return dom_df
 

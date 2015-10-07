@@ -32,7 +32,7 @@ def process_NARR_to_text(cur_var):
 
     for year in range(constants.START_YR,constants.END_YR+1):
         inp_nc   = constants.data_dir+cur_var+os.sep+cur_var+'.'+str(year)+'.nc'       # Input netcdf
-        unp_nc   = constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+cur_var+'.'+str(year)+'.nc' # Unpacked netcdf
+        unp_nc   = os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+cur_var+'.'+str(year)+'.nc' # Unpacked netcdf
 
         # In netcdf file is missing, bail
         if not(os.path.isfile(inp_nc)):
@@ -40,7 +40,7 @@ def process_NARR_to_text(cur_var):
             sys.exit(0)
 
         # Create output directory by netcdf variable and by year
-        util.make_dir_if_missing(constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+str(year))            
+        util.make_dir_if_missing(os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+str(year))
                 
         if not(os.path.isfile(unp_nc)):
             # Subset netcdf file by lat and lon boundaries        
@@ -86,14 +86,14 @@ def process_NARR_to_text(cur_var):
         logging.info('Extracting '+var_name+' variable for '+str(year))
         for i in range(0,lonui-lonli):
             for j in range(0,latui-latli):
-                if(not(os.path.isfile(constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+str(year)+os.sep+str(j)+'_'+str(i)+'.txt'))):
+                if(not(os.path.isfile(os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+str(year)+os.sep+str(j)+'_'+str(i)+'.txt'))):
                     exec_str = ncks_get+\
                                 'x,'+str(i)+','+str(i)+' -d '+'y,'+str(j)+','+str(j)+\
                                 ' -v '+var_name+' '+unp_nc+\
-                                ' > ' + constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+str(year)+os.sep+str(j)+'_'+str(i)+'.txt'
+                                ' > ' + os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+str(year)+os.sep+str(j)+'_'+str(i)+'.txt'
                     os.system(exec_str)
                 else:
-                    logging.info('File exists: '+constants.out_dir+os.sep+'Data'+os.sep+cur_var+os.sep+str(year)+os.sep+str(j)+'_'+str(i)+'.txt')
+                    logging.info('File exists: '+os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+str(year)+os.sep+str(j)+'_'+str(i)+'.txt')
 
 ###############################################################################
 # parallelize_NARR_to_text

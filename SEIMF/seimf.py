@@ -24,8 +24,8 @@ arcpy.env.overwriteOutput = True
 arcpy.env.extent = "MAXOF"
 
 site_idx    = 0
-iesite_fl   = open(constants.epic_dir + os.sep + 'EPIC_files' + os.sep + constants.SITELIST, 'w+')
-eprn_fl     = open(constants.epic_dir + os.sep + 'EPIC_files' + os.sep + constants.EPICRUN, 'w+')
+iesite_fl   = open(constants.sims_dir + os.sep + constants.SITELIST, 'w+')
+eprn_fl     = open(constants.sims_dir + os.sep + constants.EPICRUN, 'w+')
 no_soils_fl = open(constants.epic_dir + os.sep + constants.missing_soils, 'w+')
 
 # Read csv file containing soil information
@@ -44,7 +44,7 @@ def write_epicrun_fl(state, site_dict):
     print state
     eprun_ln  = []
     soil_dict = {}
-    with open(constants.epic_dir + constants.SLLIST) as f:
+    with open(constants.sims_dir + constants.SLLIST) as f:
         for line in f:
             #Sample line from soil file:     1     "Soils//1003958.sol"
             (key, val)     = int(line.split('//')[1].split('.')[0]),int(line.split()[0])
@@ -55,13 +55,13 @@ def write_epicrun_fl(state, site_dict):
     for key, val in site_dict.iteritems(): # key: 1 val: 107 1444414 500 -90.7574996948 46.4774017334
         min_sit_wth = constants.MAX
         lat_lon_sit = (val[4],val[3])
-        
+
         # If soil is missing in soil_dict, then continue onto next site
         if not(val[1] in soil_dict):
            no_soils_fl.write(str(val[1])+'\n')
            continue
 
-        wth_fl  = open(constants.epic_dir+os.sep+constants.EPIC_DLY,'r')
+        wth_fl  = open(constants.sims_dir+os.sep+constants.EPIC_DLY,'r')
         for wrow in wth_fl: #     1       0_0.txt    41.415    -97.932
             split_wrow  = wrow.split()
             lat_lon_wth = (float(split_wrow[2]), float(split_wrow[3]))            

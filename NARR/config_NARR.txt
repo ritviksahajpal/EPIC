@@ -6,6 +6,7 @@ TAG          = NARR                                                  ; A log fil
 meta_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Meta                      ; Contains WXPM3020.exe 
 data_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\NETCDF\narr_download ; Directory for NETCDF NARR files
 out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ; Output directory
+sims_dir   = EPIC_files
 
 [PARAMETERS]
 START_YR    = 1979           ; Starting year of weather data
