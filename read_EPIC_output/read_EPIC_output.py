@@ -1,4 +1,4 @@
-import constants, pandas, pdb, os, fnmatch, logging, pdb
+import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy
 from sqlalchemy import create_engine
 from multiprocessing.dummy import Pool
 
@@ -42,12 +42,15 @@ class EPIC_Output_File():
         time_df.to_sql(self.db_name, self.engine, if_exists='append')
 
     def parse_ATG(self, fl):
-        df      = pandas.read_csv(constants.sims_dir + os.sep + fl, skiprows=constants.SKIP, skipinitialspace=True,
+        df      = pandas.read_csv(constants.sims_dir + os.sep + constants.GET_PARAMS[0] + os.sep + fl, skiprows=constants.SKIP, skipinitialspace=True,
                                   usecols=constants.ATG_PARAMS, sep=' ')
-        time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-        time_df.groupby(lambda x: xrange.year).sum()
+        time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
+        #time_df.groupby(lambda x: xrange.year).sum()
         time_df['site'] = fl[:-4]
-        time_df.to_sql(self.db_name, self.engine, if_exists='append')
+
+        return fl[:-4], time_df.BIOM.max() - time_df.RWT.max()
+        #pdb.set_trace()
+        #time_df.to_sql(self.db_name, self.engine, if_exists='append')
 
     def collect_epic_output(self, fls):
         pool = Pool(constants.max_threads)
@@ -58,7 +61,14 @@ class EPIC_Output_File():
         elif(self.ftype == 'ANN'):
             pool.map(self.parse_ANN, fls)
         elif(self.ftype == 'ATG'):
-            pool.map(self.parse_ANN, fls)
+            dfs = pandas.DataFrame(index=numpy.arange(0, len(fls)), columns=['site','biom_rwt'])
+
+            for idx, f in enumerate(fls):
+                st, val = self.parse_ATG(f)
+                dfs.loc[idx] = [st, val]
+            dfs.to_csv('C:\\Users\\ritvik\\Documents\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\out_wi.csv')
+
+            #pool.map(self.parse_ATG, fls)
         else:
             logging.info( 'Wrong file type')
 
@@ -66,7 +76,7 @@ if __name__ == '__main__':
     epic_fl_types = constants.GET_PARAMS
 
     for fl_name in epic_fl_types:
-        list_fls = fnmatch.filter(os.listdir(constants.sims_dir + os.sep), '*.' + fl_name)
+        list_fls = fnmatch.filter(os.listdir(constants.sims_dir + os.sep + constants.GET_PARAMS[0] + os.sep), '*.' + fl_name)
 
         obj = EPIC_Output_File(ftype = fl_name, tag = constants.TAG)
         obj.collect_epic_output(list_fls)

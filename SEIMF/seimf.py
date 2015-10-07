@@ -29,7 +29,7 @@ eprn_fl     = open(constants.sims_dir + os.sep + constants.EPICRUN, 'w+')
 no_soils_fl = open(constants.epic_dir + os.sep + constants.missing_soils, 'w+')
 
 # Read csv file containing soil information
-soil_df = pandas.DataFrame.from_csv(constants.epic_dir + os.sep + constants.SOIL_DATA, index_col=None)
+soil_df = pandas.DataFrame.from_csv(constants.epic_dir + os.sep + 'Data/ssurgo'+ os.sep + constants.SOIL_DATA, index_col=None)
 soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of mukey, duplicates exist because each mukey
                                                       # can correspond to multiple cokey's
 sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
@@ -44,7 +44,7 @@ def write_epicrun_fl(state, site_dict):
     print state
     eprun_ln  = []
     soil_dict = {}
-    with open(constants.sims_dir + constants.SLLIST) as f:
+    with open(constants.sims_dir + os.sep + constants.SLLIST) as f:
         for line in f:
             #Sample line from soil file:     1     "Soils//1003958.sol"
             (key, val)     = int(line.split('//')[1].split('.')[0]),int(line.split()[0])

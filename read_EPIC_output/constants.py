@@ -25,6 +25,7 @@ EPIC_OUTPUT   = parser.get('PARAMETERS','EPIC_OUTPUT')
 ACM_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACM_PARAMS'))
 ACY_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACY_PARAMS'))
 DGN_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','DGN_PARAMS'))
+ATG_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ATG_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','GET_PARAMS'))
 
 base_dir = parser.get('PATHS','base_dir') + os.sep
