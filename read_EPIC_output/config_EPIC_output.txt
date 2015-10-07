@@ -10,6 +10,7 @@ GET_PARAMS  = ['DGN']
 ACM_PARAMS  = ['YR', 'PET', 'ET']
 ACY_PARAMS  = ['YR', 'CPNM', 'YLDF', 'YLN', 'WUEF', 'WS', 'NS']
 DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'RW', 'NMN']
+ATG_PARAMS  = ['Y', 'BIOM', 'RWT']
 START_YR    = 2012 ; Starting year of weather data
 END_YR      = 2020 ; Ending year of weather data
 EPIC_OUTPUT = simulations\Poplar_simulations

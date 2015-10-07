@@ -41,6 +41,14 @@ class EPIC_Output_File():
         time_df['site'] = fl[:-4]
         time_df.to_sql(self.db_name, self.engine, if_exists='append')
 
+    def parse_ATG(self, fl):
+        df      = pandas.read_csv(constants.sims_dir + os.sep + fl, skiprows=constants.SKIP, skipinitialspace=True,
+                                  usecols=constants.ATG_PARAMS, sep=' ')
+        time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
+        time_df.groupby(lambda x: xrange.year).sum()
+        time_df['site'] = fl[:-4]
+        time_df.to_sql(self.db_name, self.engine, if_exists='append')
+
     def collect_epic_output(self, fls):
         pool = Pool(constants.max_threads)
         if(self.ftype == 'DGN'):
@@ -48,6 +56,8 @@ class EPIC_Output_File():
         elif(self.ftype == 'ACY'):
             pool.map(self.parse_ACY, fls)
         elif(self.ftype == 'ANN'):
+            pool.map(self.parse_ANN, fls)
+        elif(self.ftype == 'ATG'):
             pool.map(self.parse_ANN, fls)
         else:
             logging.info( 'Wrong file type')
