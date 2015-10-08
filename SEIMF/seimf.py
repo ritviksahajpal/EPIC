@@ -34,6 +34,40 @@ soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of m
                                                       # can correspond to multiple cokey's
 sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
 
+
+def output_raster_attribute_to_csv(ras, incr_val=0):
+    out_csv = constants.sims_dir + os.sep + 'recl_state.txt'
+    max_val = 0 # Maximum VALUE in raster attribute table
+
+    try:
+        fields = 'VALUE'
+        f = open(out_csv,'w')
+
+        with arcpy.da.SearchCursor(ras, fields) as cursor:
+            for row in cursor:
+                max_val = row[0]
+                f.write(str(max_val) + ' : ' + str(max_val + incr_val) + '\n')
+        f.close()
+    except:
+        logging.info('Error in outputting raster VAT ' + ras)
+
+    logging.info('Created reclass file ' + out_csv)
+
+    # Now reclassify raster so that each value is modified by incr_val
+    try:
+        recl_ras = ReclassByASCIIFile(ras, out_csv)
+        # Save the output by overwriting original raster
+        recl_ras.save(ras)
+    except:
+        logging.info('Error in reclassifying raster ' + ras)
+
+    return max_val
+
+def increment_VALUE_ras(ras, incr_val):
+    # Output raster attribute table to text file
+    pass
+    # Create a rast
+
 ##################################################################
 # write_epicrun_fl
 # Create EPICRUN.dat file
@@ -123,7 +157,7 @@ def write_epic_site_fl(state, out_raster):
     logging.info('Wrote site files '+state)
     return site_dict
 
-def seimf(state):
+def seimf(state, init_site=0):
     """
     1. Combine soil and landuse data
     2. Invokes other functions to create sites (write_epic_site_fl) and EPICRUN.dat (write_epicrun_fl)
@@ -131,6 +165,8 @@ def seimf(state):
     :return:
     """
     logging.info(state)
+
+    # Reclassify the SEIMF dataset so that VALUES from different states do not overlap
 
     sgo_dir = constants.epic_dir + os.sep + 'Data' + os.sep + 'ssurgo' + os.sep + state + os.sep
     lu_dir  = constants.epic_dir + os.sep + 'Data' + os.sep + 'LU' + os.sep + state + os.sep
@@ -151,6 +187,8 @@ def seimf(state):
             logging.info(arcpy.GetMessages())
     else:
         logging.info('File present: ' + out_raster)
+
+    max_site = output_raster_attribute_to_csv(out_raster, incr_val=init_site)
 
     # Compute centroid of each HSMU using zonal geometry
     zgeom_dbf  = out_dir + os.sep + state+'.dbf'
@@ -180,9 +218,15 @@ def seimf(state):
     
     write_epicrun_fl(state,site_dict)
 
+    return max_site
+
 if __name__ == '__main__':
+    site_num = 0
+
     for st in constants.list_st:
-        seimf(st)
+        val = seimf(st, site_num)
+        site_num += val
+        print str(st) + ' ' + str(site_num)
 
     iesite_fl.close()
     eprn_fl.close()

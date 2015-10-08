@@ -3,7 +3,7 @@ from ConfigParser import SafeConfigParser
 
 # Parse config file
 parser = SafeConfigParser()
-parser.read('config_NARR.txt')
+parser.read('../config_EPIC.txt')
 
 ###############################################################################
 # User modifiable values
@@ -14,7 +14,7 @@ START_YR    = parser.getint('PARAMETERS','START_YR')                  # Starting
 END_YR      = parser.getint('PARAMETERS','END_YR')                    # Ending year of weather data
 LAT_BOUNDS  = ast.literal_eval(parser.get('PARAMETERS','LAT_BOUNDS')) # Lat boundary of study region  
 LON_BOUNDS  = ast.literal_eval(parser.get('PARAMETERS','LON_BOUNDS')) # Lon boundary of study region
-TAG         = parser.get('PROJECT','TAG')                             # Tag of NARR folder
+TAG         = parser.get('PROJECT','NARR_TAG')                        # Tag of NARR folder
 EPIC_DLY    = parser.get('PARAMETERS','EPIC_DLY')                     # Name of EPIC daily weather station list file
 EPIC_MON    = parser.get('PARAMETERS','EPIC_MON')                     # Name of EPIC monthly weather station list file
 WXPMRUN     = parser.get('PARAMETERS','WXPMRUN')
@@ -45,14 +45,14 @@ end_date    = datetime.date(END_YR,12,31)
 
 # Directories
 meta_dir    = parser.get('PATHS','meta_dir')+os.sep
-data_dir    = parser.get('PATHS','data_dir')+os.sep
+narr_dir    = parser.get('PATHS','narr_dir')+os.sep
 out_dir     = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+parser.get('PATHS', 'sims_dir')
 epic_dly    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/daily'+os.sep
 epic_mon    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/monthly'+os.sep
 
 # Create directories
 util.make_dir_if_missing(meta_dir)
-util.make_dir_if_missing(data_dir)
+util.make_dir_if_missing(narr_dir)
 util.make_dir_if_missing(out_dir)
 util.make_dir_if_missing(epic_dly)
 util.make_dir_if_missing(epic_mon)

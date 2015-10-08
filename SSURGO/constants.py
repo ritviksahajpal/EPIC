@@ -3,7 +3,7 @@ from ConfigParser import SafeConfigParser
 
 # Parse config file
 parser = SafeConfigParser()
-parser.read('config_SSURGO.txt')
+parser.read('../config_EPIC.txt')
 
 ###############################################################################
 # User modifiable values
@@ -61,7 +61,7 @@ muaggatt_vars  = {3:'slopegraddcp',4:'slopegradwta',5:'brockdepmin',6:'wtdepannm
 chfrags_vars   = {1:'Fragvol_r',10:'chkey'}
 
 base_dir   = parser.get('PATHS','base_dir')+os.sep
-data_dir   = parser.get('PATHS','data_dir')+os.sep
+data_dir   = parser.get('PATHS','srgo_dir')+os.sep
 out_dir    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+parser.get('PATHS', 'sims_dir')
 r_soil_dir = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'Data'+os.sep
 t_soil_dir = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/soils'+os.sep

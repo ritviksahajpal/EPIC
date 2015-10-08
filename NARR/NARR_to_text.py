@@ -28,10 +28,10 @@ def process_NARR_to_text(cur_var):
 
     # Extract Lon and Lat boundaries
     logging.info('Extracting boundary by lon and lat')        
-    latli,latui,lonli,lonui = util.get_boundary_region(constants.data_dir+cur_var+os.sep+cur_var+'.'+str(constants.START_YR)+'.nc')
+    latli,latui,lonli,lonui = util.get_boundary_region(constants.narr_dir+os.sep+cur_var+os.sep+cur_var+'.'+str(constants.START_YR)+'.nc')
 
     for year in range(constants.START_YR,constants.END_YR+1):
-        inp_nc   = constants.data_dir+cur_var+os.sep+cur_var+'.'+str(year)+'.nc'       # Input netcdf
+        inp_nc   = constants.narr_dir+os.sep+cur_var+os.sep+cur_var+'.'+str(year)+'.nc'       # Input netcdf
         unp_nc   = os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+cur_var+'.'+str(year)+'.nc' # Unpacked netcdf
 
         # In netcdf file is missing, bail
@@ -105,7 +105,7 @@ def parallelize_NARR_to_text():
     threads = []
     total_runs = len(constants.vars_to_get) # Find total number of runs based on number of NARR elements to extract    
 
-    if(constants.DO_PARALLEL):
+    if(constants.NARR_PARLEL):
         pool = multiprocessing.Pool(constants.max_threads)
         pool.map(process_NARR_to_text, constants.vars_to_get.keys())
         pool.close()

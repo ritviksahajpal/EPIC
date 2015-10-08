@@ -25,7 +25,7 @@ def log_constants():
     logging.info('End year: '+str(constants.END_YR))
     logging.info('Lat boundary: '+str(constants.LAT_BOUNDS[0])+' '+str(constants.LAT_BOUNDS[1]))
     logging.info('Lon boundary: '+str(constants.LON_BOUNDS[0])+' '+str(constants.LON_BOUNDS[1]))
-    logging.info('Input dir: '+constants.data_dir)
+    logging.info('Input dir: '+constants.narr_dir)
     logging.info('Output dir: '+constants.out_dir)
     logging.info('DO_PARALLEL: '+str(constants.DO_PARALLEL))
     logging.info('*****************************************************************') 

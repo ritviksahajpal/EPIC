@@ -3,7 +3,7 @@ from ConfigParser import SafeConfigParser
 
 # Parse config file
 parser = SafeConfigParser()
-parser.read('config_EPIC_output.txt')
+parser.read('../config_EPIC.txt')
 
 ###############################################################################
 # Constants
@@ -19,14 +19,14 @@ SKIP = 10
 ###############################################################################
 PROJECT_NAME  = parser.get('PROJECT','project_name')
 TAG           = parser.get('PROJECT','TAG')
-START_YR      = parser.get('PARAMETERS','START_YR')                
-END_YR        = parser.get('PARAMETERS','END_YR')
-EPIC_OUTPUT   = parser.get('PARAMETERS','EPIC_OUTPUT')
-ACM_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACM_PARAMS'))
-ACY_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ACY_PARAMS'))
-DGN_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','DGN_PARAMS'))
-ATG_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','ATG_PARAMS'))
-GET_PARAMS    = ast.literal_eval(parser.get('PARAMETERS','GET_PARAMS'))
+START_YR      = parser.get('GET_OUTPUT','START_YR')
+END_YR        = parser.get('GET_OUTPUT','END_YR')
+EPIC_OUTPUT   = parser.get('GET_OUTPUT','EPIC_OUTPUT')
+ACM_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACM_PARAMS'))
+ACY_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACY_PARAMS'))
+DGN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','DGN_PARAMS'))
+ATG_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ATG_PARAMS'))
+GET_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','GET_PARAMS'))
 
 base_dir = parser.get('PATHS','base_dir') + os.sep
 epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep

@@ -1,0 +1,64 @@
+[PROJECT]
+project_name = OpenLands_LS                                          ; Name of project directory (to be created within out_dir)
+NARR_TAG     = NARR                                                  ; A log file is created as Log_<NARR_TAG>.txt
+SRGO_TAG     = SSURGO
+SEMF_TAG     = SEIMF
+LIST_STATES  = ['mi','mn','wi']                                                           ; List of states to process
+
+[PATHS]
+meta_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Meta                      ; Contains WXPM3020.exe 
+narr_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\NETCDF\narr_download ; Directory for NETCDF NARR files
+out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ; Output directory
+sims_dir   = EPIC_files
+;;; SSURGO
+srgo_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ; Contains SSURGO input data
+
+[PARAMETERS]
+START_YR    = 1979           ; Starting year of weather data
+END_YR      = 2014           ; Ending year of weather data
+LAT_BOUNDS  = [41.5,49.5]    ; Lat boundary of study region  
+LON_BOUNDS  = [-98.0,-81.0]  ; Lon boundary of study region
+EPIC_DLY    = iewedlst.dat   ; Name of EPIC daily weather station list file
+EPIC_MON    = iewealst.dat   ; Name of EPIC monthly weather station list file
+WXPMRUN     = WXPMRUN.DAT    ; 
+WXPM_EXE    = WXPM3020.exe
+NARR_PARLEL = True           ; Use multiprocessing or not?
+DO_SITE     = False          ; Run for single site (True) or not (False)
+SITE_LAT    = 42.0           ; If DO_SITE is True, then lat
+SITE_LON    = 86.0           ; If DO_SITE is True, then lon
+;;; SSURGO
+ZERO_LINES  = 23                                                                          ; Number of lines with zero's
+SLLIST      = ieSlList.dat                                                                ;                                                                        ;
+SIZE        = 56                                                                          ; Resolution of soil raster
+all         = All_SSURGO.csv
+dominant    = Dominant_SSURGO.csv
+;;; SEIMF
+YEAR          = 2013 ; Which year LU data are we using (related to open lands project)
+SITES         = sites
+SITELIST      = ieSite.dat                                                                  ; Site list file for EPIC
+EPIC_DLY      = iewedlst.dat
+SLLIST        = ieSlList.dat
+EPICRUN       = EPICRUN.dat
+SOIL_DATA     = Dominant_SSURGO.csv
+missing_soils = missing_soils.csv
+site_fl_line1 = SRWC
+site_fl_line3 = Sample:0000 Country:USA FIPS: 0000 MLRA:0 NRIPTR:0 HUC:0
+
+[RUN_EPIC]
+EPICOUT_FLS = ['ATG']
+EPIC_EXE    = epic1102.exe
+opt_rundir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\
+opt_epicrun = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\EPICRUN.dat
+opt_tag     = test
+opt_numpkgs = 10
+opt_outdir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\output\
+
+[GET_OUTPUT]
+GET_PARAMS  = ['ATG']
+ACM_PARAMS  = ['YR', 'PET', 'ET']
+ACY_PARAMS  = ['YR', 'CPNM', 'YLDF', 'YLN', 'WUEF', 'WS', 'NS']
+DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'RW', 'NMN']
+ATG_PARAMS  = ['Y', 'BIOM', 'RWT']
+START_YR    = 2008 ; Starting year of weather data
+END_YR      = 2013 ; Ending year of weather data
+EPIC_OUTPUT = EPIC_files\output

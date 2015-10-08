@@ -3,7 +3,7 @@ from ConfigParser import SafeConfigParser
 
 # Parse config file
 parser = SafeConfigParser()
-parser.read('config_SEIMF.txt')
+parser.read('../config_EPIC.txt')
 
 ###############################################################################
 # User modifiable values
@@ -13,7 +13,7 @@ parser.read('config_SEIMF.txt')
 MAX           = 100000.0                             # Maximum distance between any two points
 NARR_RES      = 20.0                                 # NARR resolution (approx) at higher latitudes
 M2_TO_HA      = 0.0001
-TAG           = parser.get('PROJECT','TAG')          # Tag of SEIMF folder
+TAG           = parser.get('PROJECT','SEMF_TAG')     # Tag of SEIMF folder
 SITELIST      = parser.get('PARAMETERS','SITELIST')
 year          = parser.getint('PARAMETERS','YEAR')  
 EPIC_DLY      = parser.get('PARAMETERS','EPIC_DLY')
