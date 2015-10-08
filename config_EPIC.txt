@@ -6,6 +6,7 @@ SEMF_TAG     = SEIMF
 LIST_STATES  = ['mi','mn','wi']                                                           ; List of states to process
 
 [PATHS]
+base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\
 meta_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Meta                      ; Contains WXPM3020.exe 
 narr_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\NETCDF\narr_download ; Directory for NETCDF NARR files
 out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ; Output directory

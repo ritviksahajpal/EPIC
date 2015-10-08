@@ -34,7 +34,7 @@ def download_NARR(cur_var):
 #
 ###############################################################################
 def parallelize_download_NARR():
-    if constants.NARR_PARLEL:
+    if constants.DO_PARALLEL:
         pool = multiprocessing.Pool(constants.max_threads)
         pool.map(download_NARR, constants.vars_to_get.keys())
         pool.close()

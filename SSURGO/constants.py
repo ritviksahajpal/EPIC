@@ -10,7 +10,7 @@ parser.read('../config_EPIC.txt')
 #
 #
 ###############################################################################
-TAG            = parser.get('PROJECT','TAG')          # Tag of SSURGO folder
+TAG            = parser.get('PROJECT','SRGO_TAG')          # Tag of SSURGO folder
 ZERO_LINES     = parser.getint('PARAMETERS','ZERO_LINES')
 SLLIST         = parser.get('PARAMETERS','SLLIST')
 cdl_res        = parser.getint('PARAMETERS','SIZE')  

@@ -87,7 +87,7 @@ def parallelize_NARR_to_EPIC():
     # Read EPIC weather list file
     epic_wth_list = open(constants.out_dir+os.sep+constants.EPIC_DLY,'r').readlines()
 
-    if constants.NARR_PARLEL:
+    if constants.DO_PARALLEL:
         # Example: Split 441     "daily//20_15.txt"    46.405    -90.606
         # to get lat_vals = 20, lon_vals = 15
         lat_vals = [int(ln.split('//')[1].split('.')[0].split('_')[0]) for ln in epic_wth_list]
