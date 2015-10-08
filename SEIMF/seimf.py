@@ -61,11 +61,6 @@ def increment_raster_VAT(state, ras='', incr_val=0):
 
     return max_val
 
-def increment_VALUE_ras(ras, incr_val):
-    # Output raster attribute table to text file
-    pass
-    # Create a rast
-
 ##################################################################
 # write_epicrun_fl
 # Create EPICRUN.dat file
