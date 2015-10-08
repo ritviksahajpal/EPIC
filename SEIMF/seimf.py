@@ -35,8 +35,8 @@ soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of m
 sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
 
 
-def output_raster_attribute_to_csv(ras, incr_val=0):
-    out_csv = constants.sims_dir + os.sep + 'recl_state.txt'
+def output_raster_attribute_to_csv(state, ras='', incr_val=0):
+    out_csv = constants.epic_dir + os.sep + 'recl_' + state + '.txt'
     max_val = 0 # Maximum VALUE in raster attribute table
 
     try:
@@ -188,7 +188,7 @@ def seimf(state, init_site=0):
     else:
         logging.info('File present: ' + out_raster)
 
-    max_site = output_raster_attribute_to_csv(out_raster, incr_val=init_site)
+    max_site = output_raster_attribute_to_csv(state, ras = out_raster, incr_val=init_site)
 
     # Compute centroid of each HSMU using zonal geometry
     zgeom_dbf  = out_dir + os.sep + state+'.dbf'
@@ -226,7 +226,6 @@ if __name__ == '__main__':
     for st in constants.list_st:
         val = seimf(st, site_num)
         site_num += val
-        print str(st) + ' ' + str(site_num)
 
     iesite_fl.close()
     eprn_fl.close()
