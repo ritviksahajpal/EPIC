@@ -35,31 +35,29 @@ soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of m
 sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
 
 
-def output_raster_attribute_to_csv(state, ras='', incr_val=0):
+def increment_raster_VAT(state, ras='', incr_val=0):
     out_csv = constants.epic_dir + os.sep + 'recl_' + state + '.txt'
     max_val = 0 # Maximum VALUE in raster attribute table
 
     try:
         fields = 'VALUE'
-        f = open(out_csv,'w')
 
         with arcpy.da.SearchCursor(ras, fields) as cursor:
             for row in cursor:
                 max_val = row[0]
-                f.write(str(max_val) + ' : ' + str(max_val + incr_val) + '\n')
-        f.close()
     except:
-        logging.info('Error in outputting raster VAT ' + ras)
-
-    logging.info('Created reclass file ' + out_csv)
+        logging.info('Error in iterating through raster VAT ' + ras)
 
     # Now reclassify raster so that each value is modified by incr_val
     try:
-        recl_ras = ReclassByASCIIFile(ras, out_csv)
-        # Save the output by overwriting original raster
-        recl_ras.save(ras)
+        out_plus = Plus(ras, incr_val)
+
+        # Save the output
+        out_plus.save(ras)
     except:
         logging.info('Error in reclassifying raster ' + ras)
+
+    logging.info('Incremented raster ', ras)
 
     return max_val
 
@@ -126,7 +124,7 @@ def write_epic_site_fl(state, out_raster):
     global site_idx 
     site_dict = {}
     fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
-
+    pdb.set_trace()
     cell_size = float(arcpy.GetRasterProperties_management(out_raster, "CELLSIZEX").getOutput(0))
     ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
 
@@ -138,6 +136,7 @@ def write_epic_site_fl(state, out_raster):
                 site_dict[int(row[0])+add_val] = (row[1],row[2],row[3],row[4],row[5])
 
                 # Write SITE file (.sit)
+                logging.info('Creating site file ' + str(row[0])+'.sit')
                 site_fl = open(constants.site_dir+os.sep+state+'_'+str(row[0])+'.sit','w')
                 site_fl.write(constants.site_fl_line1+'\n')                    # Line 1
                 site_fl.write(state+'\n')                                      # Line 2
@@ -188,7 +187,7 @@ def seimf(state, init_site=0):
     else:
         logging.info('File present: ' + out_raster)
 
-    max_site = output_raster_attribute_to_csv(state, ras = out_raster, incr_val=init_site)
+    max_site = increment_raster_VAT(state, ras = out_raster, incr_val=init_site)
 
     # Compute centroid of each HSMU using zonal geometry
     zgeom_dbf  = out_dir + os.sep + state+'.dbf'
