@@ -34,9 +34,8 @@ soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of m
                                                       # can correspond to multiple cokey's
 sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
 
-
-def increment_raster_VAT(state, ras='', incr_val=0):
-    out_csv = constants.epic_dir + os.sep + 'recl_' + state + '.txt'
+def increment_raster_VAT(ras, incr_val=0, state=''):
+    out_ras = os.path.dirname(ras) + os.sep + 'new_' + os.path.basename(ras)
     max_val = 0 # Maximum VALUE in raster attribute table
 
     try:
@@ -46,18 +45,16 @@ def increment_raster_VAT(state, ras='', incr_val=0):
             for row in cursor:
                 max_val = row[0]
     except:
-        logging.info('Error in iterating through raster VAT ' + ras)
+        logging.info('Error in outputting raster VAT ' + ras)
 
-    # Now reclassify raster so that each value is modified by incr_val
+    # Now increment  raster so that each value is modified by incr_val
     try:
-        out_plus = Plus(ras, incr_val)
+        oras = Plus(ras, incr_val)
 
-        # Save the output
-        out_plus.save(ras)
+        # Save the output by overwriting original raster
+        oras.save(out_ras)
     except:
-        logging.info('Error in reclassifying raster ' + ras)
-
-    logging.info('Incremented raster ', ras)
+        logging.info('Error in incrementing raster ' + ras)
 
     return max_val
 
@@ -119,7 +116,7 @@ def write_epic_site_fl(state, out_raster):
     global site_idx 
     site_dict = {}
     fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
-    pdb.set_trace()
+
     cell_size = float(arcpy.GetRasterProperties_management(out_raster, "CELLSIZEX").getOutput(0))
     ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
 
@@ -171,6 +168,7 @@ def seimf(state, init_site=0):
     # Combine SSURGO and land use data
     out_raster = out_dir + os.sep + 'SEIMF_' + state
     inp_rasters = '"' # contains the list of rasters which are to be merged together to create the SEIMF geodatabase
+
     if not(arcpy.Exists(out_raster)):
         inp_rasters += sgo_dir + os.sep + state + '_ssurgo' + '; ' + lu_dir + os.sep + 'open_' + str(constants.year) + '_' + state + '"'
         try:
@@ -182,31 +180,29 @@ def seimf(state, init_site=0):
     else:
         logging.info('File present: ' + out_raster)
 
-    max_site = increment_raster_VAT(state, ras = out_raster, incr_val=init_site)
+    max_site = increment_raster_VAT(state=state, ras=out_raster, incr_val=init_site)
 
     # Compute centroid of each HSMU using zonal geometry
     zgeom_dbf  = out_dir + os.sep + state+'.dbf'
     reproj_ras = out_dir + os.sep + state + '_reproj'
-    if not(arcpy.Exists(zgeom_dbf)):
-        try:
-            # Spatial reference factory codes: 
-            # http://resources.arcgis.com/en/help/main/10.1/018z/pdf/geographic_coordinate_systems.pdf
-            # 4269: GCS_North_American_1983
-            cdl_spatial_ref = arcpy.SpatialReference(4269)
-            arcpy.ProjectRaster_management(out_raster, reproj_ras, cdl_spatial_ref)
 
-            out_zgeom = ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
-            logging.info('Computed zonal geometry '+zgeom_dbf)       
-            
-            join_flds  = '"'
-            join_flds += state.upper()+'_SSURGO;OPEN_'+str(constants.year)+'_'+state.upper()+';XCENTROID;YCENTROID'+'"'    
+    try:
+        # Spatial reference factory codes:
+        # http://resources.arcgis.com/en/help/main/10.1/018z/pdf/geographic_coordinate_systems.pdf
+        # 4269: GCS_North_American_1983
+        cdl_spatial_ref = arcpy.SpatialReference(4269)
+        arcpy.ProjectRaster_management(out_raster, reproj_ras, cdl_spatial_ref)
 
-            arcpy.JoinField_management(out_raster,"VALUE",zgeom_dbf,"VALUE",join_flds)
-            logging.info('JoinField_management ')
-        except:
-            logging.info(arcpy.GetMessages())
-    else:
-        logging.info('File present: '+zgeom_dbf)
+        out_zgeom = ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
+        logging.info('Computed zonal geometry '+zgeom_dbf)
+
+        join_flds  = '"'
+        join_flds += state.upper()+'_SSURGO;OPEN_'+str(constants.year)+'_'+state.upper()+';XCENTROID;YCENTROID'+'"'
+
+        arcpy.JoinField_management(out_raster,"VALUE",zgeom_dbf,"VALUE",join_flds)
+        logging.info('JoinField_management ')
+    except:
+        logging.info(arcpy.GetMessages())
 
     site_dict = write_epic_site_fl(state, out_raster)    
     
