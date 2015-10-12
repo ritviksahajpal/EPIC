@@ -7,13 +7,13 @@ OUT_TAG      = EPIC
 LIST_STATES  = ['mi','mn','wi']                                                           ; List of states to process
 
 [PATHS]
-base_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\
-meta_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Meta                      ; Contains WXPM3020.exe 
-narr_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\NETCDF\narr_download ; Directory for NETCDF NARR files
-out_dir    = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC                      ; Output directory
+base_dir   = C:/Users/ritvik/Documents/PhD/Projects/Lake_States/
+meta_dir   = C:/Users/ritvik/Documents/PhD/Projects/Lake_States/Meta                      ; Contains WXPM3020.exe
+narr_dir   = C:/Users/ritvik/Documents/PhD/Projects/Lake_States/Data/NETCDF/narr_download ; Directory for NETCDF NARR files
+out_dir    = C:/Users/ritvik/Documents/PhD/Projects/Lake_States/EPIC                      ; Output directory
 sims_dir   = EPIC_files
 ;;; SSURGO
-srgo_dir   = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\Data\GIS\SSURGO           ; Contains SSURGO input data
+srgo_dir   = C:/Users/ritvik/Documents/PhD/Projects/Lake_States/Data/GIS/SSURGO           ; Contains SSURGO input data
 
 [PARAMETERS]
 START_YR    = 1979           ; Starting year of weather data

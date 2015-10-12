@@ -17,13 +17,13 @@ class EPIC_Output_File():
         self.epic_out_dir = constants.epic_dir + os.sep + 'output' + os.sep + self.ldir # Latest output directory
 
         # Create a sqlite database in the analysis directory
-        self.db_name = 'sqlite:///' + constants.anly_dir + os.sep + ftype + '_' + tag + '_' + self.ldir + '.db'
+        self.db_name = 'sqlite:///' + constants.anly_dir + '/' + ftype + '_' + tag + '_' + self.ldir + '.db'
         self.engine  = create_engine(self.db_name)
         self.ftype   = ftype
         self.tag     = tag
 
     def parse_ACY(self, fl):
-        pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
+        df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
                         skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
         time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
         time_df['site'] = fl[:-4]
@@ -88,9 +88,9 @@ class EPIC_Output_File():
             print fl_name
             # Read in epic files
             if fl_name == 'ANN':
-                os.chdir(constants.anly_dir)
-                df = pandas.read_sql_query('SELECT * from ' + fl_name + '_' + 'EPIC' + '_' + str(self.ldir), self.engine)
-                #df = pandas.read_sql_table(self.db_name, 'sqlite:///')
+
+                #df = pandas.read_sql_table(table_name=self.db_name, con=self.engine)
+                df = pandas.read_sql_table(self.db_name, self.engine)
                 pdb.set_trace()
         pass
         fls = ''

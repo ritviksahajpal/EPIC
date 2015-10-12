@@ -29,10 +29,10 @@ ATG_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ATG_PARAMS'))
 ANN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ANN_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 
-base_dir = parser.get('PATHS','base_dir') + os.sep
-epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
-sims_dir = epic_dir + os.sep + EPIC_OUTPUT
-anly_dir = epic_dir + os.sep + 'analysis' + os.sep
+base_dir = parser.get('PATHS','base_dir') + '/'
+epic_dir = base_dir + '/' + 'EPIC' + '/' + PROJECT_NAME + '/'
+sims_dir = epic_dir + '/' + EPIC_OUTPUT
+anly_dir = epic_dir + '/' + 'analysis' + '/'
 
 # Maximum number of cpus to use at a time
 max_threads = psutil.cpu_count() - 1
