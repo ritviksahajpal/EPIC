@@ -1,16 +1,17 @@
-import constants, subprocess, logging, os, glob, shutil, pdb
+import constants, subprocess, logging, os, glob, shutil, pdb, time
 
 def run_EPIC_store_output():
     # Change directory to where EPIC sims will take place
     cur_dir = os.getcwd()
-    os.chdir(constants.opt_rundir)
+    os.chdir(constants.sims_dir)
 
     # Create symlinks to all folders in the management
     sub_dirs = os.listdir(constants.mgt_dir)
 
     for dir in sub_dirs:
-        link = constants.opt_rundir + os.sep + dir + os.sep
+        link = constants.sims_dir + os.sep + dir + os.sep
         trgt = constants.mgt_dir + os.sep + dir + os.sep
+
         # Windows
         if os.name == 'nt':
             subprocess.call('mklink /J "%s" "%s"' % (link, trgt), shell=True)
@@ -23,9 +24,10 @@ def run_EPIC_store_output():
         logging.info('Error in running '+constants.EPIC_EXE)
 
     # Create output directory
-    out_dir = constants.make_dir_if_missing(constants.opt_rundir + os.sep + 'output')
+    out_dir = constants.make_dir_if_missing(constants.opt_rundir + os.sep + 'output' + os.sep +
+                                            time.strftime('%m_%d_%Y_%Hh_%Mm'))
 
-    # Loop over all EPIC output files
+    # Loop over all EPIC output files and move them to separate subfolders in the output directory
     for fl_type in constants.EPICOUT_FLS:
         fl_dir = constants.make_dir_if_missing(out_dir + os.sep + fl_type)
         for file_name in glob.iglob(os.path.join(constants.opt_rundir, '*.'+fl_type)):

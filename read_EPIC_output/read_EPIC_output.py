@@ -6,7 +6,7 @@ class EPIC_Output_File():
     """
     Class to read EPIC Output files
     """
-    def __init__(self, ftype = '', tag = ''):
+    def __init__(self, ftype='', tag=''):
         """
         Constructor
         """
@@ -45,7 +45,8 @@ class EPIC_Output_File():
         df      = pandas.read_csv(constants.sims_dir + os.sep + constants.GET_PARAMS[0] + os.sep + fl, skiprows=constants.SKIP, skipinitialspace=True,
                                   usecols=constants.ATG_PARAMS, sep=' ')
         time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
-        #time_df.groupby(lambda x: xrange.year).sum()
+        pdb.set_trace()
+        time_df.groupby(lambda x: xrange.Y).sum()
         time_df['site'] = fl[:-4]
 
         return fl[:-4], time_df.BIOM.max() - time_df.RWT.max()
@@ -61,16 +62,19 @@ class EPIC_Output_File():
         elif(self.ftype == 'ANN'):
             pool.map(self.parse_ANN, fls)
         elif(self.ftype == 'ATG'):
-            dfs = pandas.DataFrame(index=numpy.arange(0, len(fls)), columns=['site','biom_rwt'])
-
-            for idx, f in enumerate(fls):
-                st, val = self.parse_ATG(f)
-                dfs.loc[idx] = [st, val]
-            dfs.to_csv('C:\\Users\\ritvik\\Documents\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\out_wi.csv')
-
+            self.parse_ATG(fls[0])
             #pool.map(self.parse_ATG, fls)
         else:
             logging.info( 'Wrong file type')
+
+    def sql_to_csv(self):
+        fls = ''
+        dfs = pandas.DataFrame(index=numpy.arange(0, len(fls)), columns=['site','biom_rwt'])
+
+        for idx, f in enumerate(fls):
+            st, val = self.parse_ATG(f)
+            dfs.loc[idx] = [st, val]
+        dfs.to_csv('C:\\Users\\ritvik\\Documents\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\out_wi.csv')
 
 if __name__ == '__main__':
     epic_fl_types = constants.GET_PARAMS
@@ -78,5 +82,5 @@ if __name__ == '__main__':
     for fl_name in epic_fl_types:
         list_fls = fnmatch.filter(os.listdir(constants.sims_dir + os.sep + constants.GET_PARAMS[0] + os.sep), '*.' + fl_name)
 
-        obj = EPIC_Output_File(ftype = fl_name, tag = constants.TAG)
+        obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         obj.collect_epic_output(list_fls)

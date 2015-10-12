@@ -18,7 +18,7 @@ SKIP = 10
 #
 ###############################################################################
 PROJECT_NAME  = parser.get('PROJECT','project_name')
-TAG           = parser.get('PROJECT','TAG')
+TAG           = parser.get('PROJECT','OUT_TAG')
 START_YR      = parser.get('GET_OUTPUT','START_YR')
 END_YR        = parser.get('GET_OUTPUT','END_YR')
 EPIC_OUTPUT   = parser.get('GET_OUTPUT','EPIC_OUTPUT')

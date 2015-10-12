@@ -3,6 +3,7 @@ project_name = OpenLands_LS                                          ; Name of p
 NARR_TAG     = NARR                                                  ; A log file is created as Log_<NARR_TAG>.txt
 SRGO_TAG     = SSURGO
 SEMF_TAG     = SEIMF
+OUT_TAG      = EPIC
 LIST_STATES  = ['mi','mn','wi']                                                           ; List of states to process
 
 [PATHS]
@@ -48,7 +49,7 @@ site_fl_line3 = Sample:0000 Country:USA FIPS: 0000 MLRA:0 NRIPTR:0 HUC:0
 [RUN_EPIC]
 EPICOUT_FLS = ['ATG']
 EPIC_EXE    = epic1102.exe
-opt_rundir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\
+opt_rundir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\
 opt_epicrun = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\EPICRUN.dat
 opt_tag     = test
 opt_numpkgs = 10
