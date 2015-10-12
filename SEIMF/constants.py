@@ -25,12 +25,13 @@ site_fl_line1 = parser.get('PARAMETERS','site_fl_line1')
 site_fl_line3 = parser.get('PARAMETERS','site_fl_line3')
 missing_soils = parser.get('PARAMETERS','missing_soils')
 
-list_st       = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
-base_dir      = parser.get('PATHS','base_dir') + os.sep
-epic_dir      = base_dir + os.sep + 'EPIC' + os.sep + parser.get('PROJECT','project_name') + os.sep
-sims_dir      = epic_dir + os.sep + parser.get('PATHS', 'sims_dir')
-site_dir      = epic_dir + os.sep + 'inputs' + os.sep + SITES + os.sep
-mgt_dir       = epic_dir + os.sep + 'inputs'
+list_st  = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
+base_dir = parser.get('PATHS','base_dir') + os.sep
+epic_dir = base_dir + os.sep + 'EPIC' + os.sep + parser.get('PROJECT','project_name') + os.sep
+sims_dir = epic_dir + os.sep + parser.get('PATHS', 'sims_dir')
+site_dir = epic_dir + os.sep + 'inputs' + os.sep + SITES + os.sep
+mgt_dir  = epic_dir + os.sep + 'inputs' # Directory in which EPIC inputs (mgt, soils, weather etc.) are kept
+run_dir  = epic_dir + os.sep + parser.get('PROJECT', 'OUT_TAG') # Directory in which epic.exe is run
 
 # EPIC simulation specific values
 EPIC_EXE    = parser.get('RUN_EPIC', 'EPIC_EXE')

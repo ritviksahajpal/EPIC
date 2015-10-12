@@ -66,7 +66,6 @@ class EPIC_Output_File():
 
     def parse_ATG(self, fls):
         for fl in fls:
-            print fl
             df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
                                       skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
             time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
@@ -75,6 +74,7 @@ class EPIC_Output_File():
 
     def collect_epic_output(self, fls):
         if(self.ftype == 'DGN'):
+            return
             self.parse_DGN(fls)
         elif(self.ftype == 'ACY'):
             self.parse_ACY(fls)
@@ -83,7 +83,7 @@ class EPIC_Output_File():
         elif(self.ftype == 'ATG'):
             self.parse_ATG(fls)
         else:
-            logging.info( 'Wrong file type')
+            logging.info('Wrong file type')
 
     def sql_to_csv(self):
         epic_fl_types = constants.GET_PARAMS
