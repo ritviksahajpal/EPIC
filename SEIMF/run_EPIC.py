@@ -24,13 +24,13 @@ def run_EPIC_store_output():
         logging.info('Error in running '+constants.EPIC_EXE)
 
     # Create output directory
-    out_dir = constants.make_dir_if_missing(constants.opt_rundir + os.sep + 'output' + os.sep +
+    out_dir = constants.make_dir_if_missing(constants.epic_dir + os.sep + 'output' + os.sep +
                                             time.strftime('%m_%d_%Y_%Hh_%Mm'))
 
     # Loop over all EPIC output files and move them to separate subfolders in the output directory
     for fl_type in constants.EPICOUT_FLS:
         fl_dir = constants.make_dir_if_missing(out_dir + os.sep + fl_type)
-        for file_name in glob.iglob(os.path.join(constants.opt_rundir, '*.'+fl_type)):
+        for file_name in glob.iglob(os.path.join(constants.sims_dir, '*.'+fl_type)):
             shutil.move(file_name, fl_dir + os.sep + os.path.basename(file_name))
 
     # Change directory back to original

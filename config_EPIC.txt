@@ -47,7 +47,7 @@ site_fl_line1 = SRWC
 site_fl_line3 = Sample:0000 Country:USA FIPS: 0000 MLRA:0 NRIPTR:0 HUC:0
 
 [RUN_EPIC]
-EPICOUT_FLS = ['ATG']
+EPICOUT_FLS = ['ATG','ANN','DGN']
 EPIC_EXE    = epic1102.exe
 opt_rundir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\
 opt_epicrun = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\EPICRUN.dat
@@ -56,11 +56,11 @@ opt_numpkgs = 10
 opt_outdir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\output\
 
 [GET_OUTPUT]
-GET_PARAMS  = ['ATG']
 ACM_PARAMS  = ['YR', 'PET', 'ET']
 ACY_PARAMS  = ['YR', 'CPNM', 'YLDF', 'YLN', 'WUEF', 'WS', 'NS']
 DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'RW', 'NMN']
 ATG_PARAMS  = ['Y', 'BIOM', 'RWT']
+ANN_PARAMS  = ['YR', 'DN']
 START_YR    = 2008 ; Starting year of weather data
 END_YR      = 2013 ; Ending year of weather data
 EPIC_OUTPUT = EPIC_files\output

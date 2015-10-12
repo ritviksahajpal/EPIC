@@ -26,7 +26,8 @@ ACM_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACM_PARAMS'))
 ACY_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACY_PARAMS'))
 DGN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','DGN_PARAMS'))
 ATG_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ATG_PARAMS'))
-GET_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','GET_PARAMS'))
+ANN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ANN_PARAMS'))
+GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 
 base_dir = parser.get('PATHS','base_dir') + os.sep
 epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
