@@ -1,4 +1,4 @@
-import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy
+import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime
 from sqlalchemy import create_engine
 from multiprocessing.dummy import Pool
 
@@ -23,10 +23,10 @@ class EPIC_Output_File():
                             sorted(dirs, key=lambda x: os.path.getmtime(x), reverse=True)[:1][0] # Latest output directory
 
     def parse_ACY(self, fl):
+        pdb.set_trace()
         df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
                                   skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
         time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-        time_df.groupby(lambda x: xrange.year).sum()
         time_df['site'] = fl[:-4]
         time_df.to_sql(self.db_name, self.engine, if_exists='append')
 
@@ -35,7 +35,6 @@ class EPIC_Output_File():
                              usecols=constants.ANN_PARAMS, sep=' ')
         pdb.set_trace()
         time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-        time_df.groupby(lambda x: xrange.year).sum()
         time_df['site'] = fl[:-4]
         time_df.to_sql(self.db_name, self.engine, if_exists='append')
 
@@ -43,7 +42,10 @@ class EPIC_Output_File():
         df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, delim_whitespace=True,
                                   usecols=constants.DGN_PARAMS, parse_dates={"datetime": [0,1,2]}, index_col="datetime",
                                   date_parser=lambda x: pandas.datetime.strptime(x, '%Y %m %d'))
-        time_df = df.ix[constants.START_YR:constants.END_YR]
+        start = df.index.searchsorted(datetime.datetime(constants.START_YR, 1, 1))
+        end = df.index.searchsorted(datetime.datetime(constants.END_YR, 12, 31))
+        time_df = df.ix[start:end]
+
         time_df = time_df.groupby(time_df.index.map(lambda x: x.year)).max()
         time_df['site'] = fl[:-4]
         time_df.to_sql(self.db_name, self.engine, if_exists='append')
@@ -52,7 +54,6 @@ class EPIC_Output_File():
         df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + constants.GET_PARAMS[0] + os.sep + fl,
                                   skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
         time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
-        time_df.groupby(lambda x: xrange.Y).sum()
         time_df['site'] = fl[:-4]
 
         return fl[:-4], time_df.BIOM.max() - time_df.RWT.max()
@@ -62,12 +63,14 @@ class EPIC_Output_File():
     def collect_epic_output(self, fls):
         pool = Pool(constants.max_threads)
         if(self.ftype == 'DGN'):
-            pool.map(self.parse_DGN, fls)
+            self.parse_DGN(fls[0])
+            pass #pool.map(self.parse_DGN, fls)
         elif(self.ftype == 'ACY'):
-            pool.map(self.parse_ACY, fls)
+            #pool.map(self.parse_ACY, fls)
+            self.parse_ACY(fls[0])
         elif(self.ftype == 'ANN'):
             #pool.map(self.parse_ANN, fls)
-            self.parse_ANN(fls[0])
+            pass #self.parse_ANN(fls[0])
         elif(self.ftype == 'ATG'):
             pass #self.parse_ATG(fls[0])
             #pool.map(self.parse_ATG, fls)
