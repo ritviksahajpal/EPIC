@@ -1,4 +1,4 @@
-import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime
+import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, sqlite3
 from sqlalchemy import create_engine
 from multiprocessing.dummy import Pool
 
@@ -85,16 +85,21 @@ class EPIC_Output_File():
         epic_fl_types = constants.GET_PARAMS
 
         for idx, fl_name in enumerate(epic_fl_types):
+            print fl_name
             # Read in epic files
-            df = pandas.read_sql_table(self.db_name)
-            pass
-            fls = ''
-            dfs = pandas.DataFrame(index=numpy.arange(0, len(fls)), columns=['site','biom_rwt'])
+            if fl_name == 'ANN':
+                os.chdir(constants.anly_dir)
+                df = pandas.read_sql_query('SELECT * from ' + fl_name + '_' + 'EPIC' + '_' + str(self.ldir), self.engine)
+                #df = pandas.read_sql_table(self.db_name, 'sqlite:///')
+                pdb.set_trace()
+        pass
+        fls = ''
+        dfs = pandas.DataFrame(index=numpy.arange(0, len(fls)), columns=['site','biom_rwt'])
 
-            for idx, f in enumerate(fls):
-                st, val = self.parse_ATG(f)
-                dfs.loc[idx] = [st, val]
-            dfs.to_csv('C:\\Users\\ritvik\\Documents\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\out_wi.csv')
+        for idx, f in enumerate(fls):
+            st, val = self.parse_ATG(f)
+            dfs.loc[idx] = [st, val]
+        dfs.to_csv('C:\\Users\\ritvik\\Documents\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\out_wi.csv')
 
 if __name__ == '__main__':
     epic_fl_types = constants.GET_PARAMS
@@ -103,3 +108,5 @@ if __name__ == '__main__':
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
         obj.collect_epic_output(list_fls)
+
+    obj.sql_to_csv()
