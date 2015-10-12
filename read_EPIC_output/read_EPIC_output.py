@@ -1,6 +1,5 @@
 import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, sqlite3
 from sqlalchemy import create_engine
-from multiprocessing.dummy import Pool
 
 class EPIC_Output_File():
     """
@@ -18,66 +17,71 @@ class EPIC_Output_File():
 
         # Create a sqlite database in the analysis directory
         self.db_name = 'sqlite:///' + constants.anly_dir + '/' + ftype + '_' + tag + '_' + self.ldir + '.db'
+        # If database already exists, delete it
+        try:
+            os.remove(self.db_name)
+        except OSError:
+            pass
         self.engine  = create_engine(self.db_name)
         self.ftype   = ftype
         self.tag     = tag
+        self.ifexist = 'append'
 
-    def parse_ACY(self, fl):
-        df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
-                        skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
-        time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-        time_df['site'] = fl[:-4]
-        time_df.to_sql(self.db_name, self.engine, if_exists='append')
+    def parse_ACY(self, fls):
+        for fl in fls:
+            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
+                            skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
+            time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
+            time_df['site'] = fl[:-4]
+            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
-    def parse_ANN(self, fl):
-        # Get column widths
-        cols_df  = pandas.read_table(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
-                                     sep=' ', skipinitialspace=True)
-        widths = [5,4]
-        for i in range(len(cols_df.columns.values)-2):
-            widths.append(8)
+    def parse_ANN(self, fls):
+        for fl in fls:
+            # Get column widths
+            cols_df  = pandas.read_table(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
+                                         sep=' ', skipinitialspace=True)
+            widths = [5,4]
+            for i in range(len(cols_df.columns.values)-2):
+                widths.append(8)
 
-        df = pandas.read_fwf(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, sep=' ',
-                             skipinitialspace=True, widths=widths)
+            df = pandas.read_fwf(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, sep=' ',
+                                 skipinitialspace=True, widths=widths)
 
-        time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-        time_df['site'] = fl[:-4]
-        time_df.to_sql(self.db_name, self.engine, if_exists='append')
+            time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
+            time_df['site'] = fl[:-4]
+            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
-    def parse_DGN(self, fl):
-        df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, delim_whitespace=True,
-                                  usecols=constants.DGN_PARAMS, parse_dates={"datetime": [0,1,2]}, index_col="datetime",
-                                  date_parser=lambda x: pandas.datetime.strptime(x, '%Y %m %d'))
-        start = df.index.searchsorted(datetime.datetime(constants.START_YR, 1, 1))
-        end = df.index.searchsorted(datetime.datetime(constants.END_YR, 12, 31))
-        time_df = df.ix[start:end]
+    def parse_DGN(self, fls):
+        for fl in fls:
+            df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, delim_whitespace=True,
+                                      usecols=constants.DGN_PARAMS, parse_dates={"datetime": [0,1,2]}, index_col="datetime",
+                                      date_parser=lambda x: pandas.datetime.strptime(x, '%Y %m %d'))
+            start = df.index.searchsorted(datetime.datetime(constants.START_YR, 1, 1))
+            end = df.index.searchsorted(datetime.datetime(constants.END_YR, 12, 31))
+            time_df = df.ix[start:end]
 
-        time_df = time_df.groupby(time_df.index.map(lambda x: x.year)).max()
-        time_df['site'] = fl[:-4]
-        time_df.to_sql(self.db_name, self.engine, if_exists='append')
+            time_df = time_df.groupby(time_df.index.map(lambda x: x.year)).max()
+            time_df['site'] = fl[:-4]
+            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
-    def parse_ATG(self, fl):
-        df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + constants.GET_PARAMS[0] + os.sep + fl,
-                                  skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
-        time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
-        time_df['site'] = fl[:-4]
-        time_df.to_sql(self.db_name, self.engine, if_exists='append')
-        #return fl[:-4], time_df.BIOM.max() - time_df.RWT.max()
+    def parse_ATG(self, fls):
+        for fl in fls:
+            print fl
+            df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
+                                      skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
+            time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
+            time_df['site'] = fl[:-4]
+            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
     def collect_epic_output(self, fls):
-        pool = Pool(constants.max_threads)
         if(self.ftype == 'DGN'):
-            #self.parse_DGN(fls[0])
-            pass #pool.map(self.parse_DGN, fls)
+            self.parse_DGN(fls)
         elif(self.ftype == 'ACY'):
-            #pool.map(self.parse_ACY, fls)
-            pass #self.parse_ACY(fls[0])
+            self.parse_ACY(fls)
         elif(self.ftype == 'ANN'):
-            #pool.map(self.parse_ANN, fls)
-            self.parse_ANN(fls[0])
+            self.parse_ANN(fls)
         elif(self.ftype == 'ATG'):
-            pass #self.parse_ATG(fls[0])
-            #pool.map(self.parse_ATG, fls)
+            self.parse_ATG(fls)
         else:
             logging.info( 'Wrong file type')
 
@@ -85,21 +89,12 @@ class EPIC_Output_File():
         epic_fl_types = constants.GET_PARAMS
 
         for idx, fl_name in enumerate(epic_fl_types):
-            print fl_name
-            # Read in epic files
-            if fl_name == 'ANN':
-
-                #df = pandas.read_sql_table(table_name=self.db_name, con=self.engine)
+            try:
                 df = pandas.read_sql_table(self.db_name, self.engine)
-                pdb.set_trace()
-        pass
-        fls = ''
-        dfs = pandas.DataFrame(index=numpy.arange(0, len(fls)), columns=['site','biom_rwt'])
+                #df.to_csv()
+            except:
+                logging.info('table not found: ' + self.db_name)
 
-        for idx, f in enumerate(fls):
-            st, val = self.parse_ATG(f)
-            dfs.loc[idx] = [st, val]
-        dfs.to_csv('C:\\Users\\ritvik\\Documents\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\out_wi.csv')
 
 if __name__ == '__main__':
     epic_fl_types = constants.GET_PARAMS
@@ -108,5 +103,4 @@ if __name__ == '__main__':
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
         obj.collect_epic_output(list_fls)
-
-    obj.sql_to_csv()
+        obj.sql_to_csv()
