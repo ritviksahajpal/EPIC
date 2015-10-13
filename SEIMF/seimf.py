@@ -183,7 +183,7 @@ def seimf(state, init_site=0):
     max_site = increment_raster_VAT(state=state, ras=out_raster, incr_val=init_site)
 
     # Compute centroid of each HSMU using zonal geometry
-    zgeom_dbf  = out_dir + os.sep + state+'.dbf'
+    zgeom_dbf  = out_dir + os.sep + state + '.dbf'
     reproj_ras = out_dir + os.sep + state + '_reproj'
 
     try:
@@ -192,6 +192,7 @@ def seimf(state, init_site=0):
         # 4269: GCS_North_American_1983
         cdl_spatial_ref = arcpy.SpatialReference(4269)
         arcpy.ProjectRaster_management(out_raster, reproj_ras, cdl_spatial_ref)
+        logging.info('Reprojected: ' + reproj_ras)
 
         out_zgeom = ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
         logging.info('Computed zonal geometry '+zgeom_dbf)
