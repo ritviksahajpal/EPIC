@@ -64,8 +64,8 @@ def increment_raster_VAT(ras, incr_val=0, state=''):
 #
 #
 ##################################################################
-def write_epicrun_fl(state, site_dict):
-    print state
+def write_epicrun_fl(state, site_dict, site_num=0):
+    print state + ' site file ' + str(site_num)
     eprun_ln  = []
     soil_dict = {}
     with open(constants.sims_dir + os.sep + constants.SLLIST) as f:
@@ -74,7 +74,7 @@ def write_epicrun_fl(state, site_dict):
             (key, val)     = int(line.split('//')[1].split('.')[0]),int(line.split()[0])
             soil_dict[key] = val
 
-    idx = 0
+    idx = site_num
     # Find the closest NARR station to each site
     for key, val in site_dict.iteritems(): # key: 1 val: 107 1444414 500 -90.7574996948 46.4774017334
         min_sit_wth = constants.MAX
@@ -106,21 +106,21 @@ def write_epicrun_fl(state, site_dict):
         eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],0,1,soil_dict[eprun_ln[2]],1,eprun_ln[1]))
         idx += 1
 
-def write_epic_site_fl(state, out_raster):
+def write_epic_site_fl(state, out_raster, site_num=0):
     """
     Create EPIC files for each sites
     :param state: Name of US state
     :param out_raster: SEIMF raster: Combines SSURGO and land-use rasters
     :return: Dictionary containing for each site key, info to fill in site file. Side-effect: Creates EPIC file for each site
     """
-    global site_idx 
+    print state + ' site file ' + str(site_num)
     site_dict = {}
     fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
 
     cell_size = float(arcpy.GetRasterProperties_management(out_raster, "CELLSIZEX").getOutput(0))
     ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
 
-    add_val   = site_idx
+    add_val = site_num
     try:        
         with arcpy.da.SearchCursor(out_raster, fields) as cursor:
             for row in cursor:  
@@ -140,8 +140,7 @@ def write_epic_site_fl(state, out_raster):
                                 sdf_dict.values()[0]['slopelenusle_r'],\
                                 sdf_dict.values()[0]['slope_r'],0.0,1.0)+'\n')
                 site_fl.write(('{:8d}'*7).format(*([0]*7))+'\n')
-                site_fl.close()        
-                site_idx += 1
+                site_fl.close()
     except:
         logging.info(arcpy.GetMessages())
     
@@ -205,9 +204,9 @@ def seimf(state, init_site=0):
     except:
         logging.info(arcpy.GetMessages())
 
-    site_dict = write_epic_site_fl(state, out_raster)    
+    site_dict = write_epic_site_fl(state, out_raster, site_num=init_site)
     
-    write_epicrun_fl(state,site_dict)
+    write_epicrun_fl(state, site_dict, site_num=init_site)
 
     return max_site
 
