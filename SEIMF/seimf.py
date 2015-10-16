@@ -65,7 +65,6 @@ def increment_raster_VAT(ras, incr_val=0, state=''):
 #
 ##################################################################
 def write_epicrun_fl(state, site_dict, site_num=0):
-    print state + ' site file ' + str(site_num)
     eprun_ln  = []
     soil_dict = {}
     with open(constants.sims_dir + os.sep + constants.SLLIST) as f:
@@ -113,7 +112,6 @@ def write_epic_site_fl(state, out_raster, site_num=0):
     :param out_raster: SEIMF raster: Combines SSURGO and land-use rasters
     :return: Dictionary containing for each site key, info to fill in site file. Side-effect: Creates EPIC file for each site
     """
-    print state + ' site file ' + str(site_num)
     site_dict = {}
     fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
 
@@ -193,8 +191,12 @@ def seimf(state, init_site=0):
         arcpy.ProjectRaster_management(out_raster, reproj_ras, cdl_spatial_ref)
         logging.info('Reprojected: ' + reproj_ras)
 
-        out_zgeom = ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
-        logging.info('Computed zonal geometry '+zgeom_dbf)
+        if not(arcpy.Exists(zgeom_dbf)):
+            # Zonal geometry is time consuming, so cache the operation
+            ZonalGeometryAsTable(reproj_ras, 'VALUE', zgeom_dbf)
+            logging.info('Computed zonal geometry '+zgeom_dbf)
+        else:
+            logging.info('File present: ' + zgeom_dbf)
 
         join_flds  = '"'
         join_flds += state.upper()+'_SSURGO;OPEN_'+str(constants.year)+'_'+state.upper()+';XCENTROID;YCENTROID'+'"'
@@ -214,6 +216,7 @@ if __name__ == '__main__':
     site_num = 0
 
     for st in constants.list_st:
+        print st
         val = seimf(st, site_num)
         site_num += val
 
