@@ -43,16 +43,16 @@ def read_ssurgo_tables(soil_dir):
     chorizon_agg = pd_chorizon.groupby('cokey').apply(component_aggregation)    
 
     # Join chfrags and chorizon_agg data
-    chfrags_chor = chorizon_agg.merge(pd_chfrags,left_on='chkey',right_on='chkey')
+    chfrags_chor = chorizon_agg.merge(pd_chfrags,left_on='chkey',right_on='chkey', how='outer')
 
     # Join chfrags_chor data to the component table
-    ccomp = chfrags_chor.merge(pd_component,left_on='cokey',right_on='cokey')
+    ccomp = chfrags_chor.merge(pd_component,left_on='cokey',right_on='cokey', how='outer')
 
     # Join the chor_comp data to pd_muaggatt table
-    muag_ccomp = ccomp.merge(pd_muaggatt,left_on='mukey',right_on='mukey')
+    muag_ccomp = ccomp.merge(pd_muaggatt,left_on='mukey',right_on='mukey', how='outer')
 
     # Join muag_ccomp to mapunit data
-    map_data   = muag_ccomp.merge(pd_mapunit,left_on='mukey',right_on='mukey')
+    map_data   = muag_ccomp.merge(pd_mapunit,left_on='mukey',right_on='mukey', how='outer')
 
     return map_data
 
@@ -67,11 +67,13 @@ def SSURGO_to_csv():
             if('_'+st+'_' in dir_name and constants.TABULAR in subdir_list):
                 logging.info(dir_name[-3:]) # County FIPS code
 
-                tmp_df           = read_ssurgo_tables(dir_name+os.sep+constants.TABULAR)  
+                tmp_df           = read_ssurgo_tables(dir_name+os.sep+constants.TABULAR)
+
                 tmp_df['state']  = st
                 tmp_df['county'] = dir_name[-3:]
                 tmp_df['FIPS']   = int(us.states.lookup(st).fips+dir_name[-3:])
-                sgo_data         = pd.concat([tmp_df,sgo_data],ignore_index =True)                
+
+                sgo_data         = pd.concat([tmp_df,sgo_data],ignore_index =True)
 
     # Drop columns with all missing values
     sgo_data.dropna(axis=1,how='all',inplace=True)

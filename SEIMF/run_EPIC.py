@@ -29,7 +29,7 @@ def run_EPIC_store_output():
         with open(os.devnull, "w") as f:
             subprocess.call(constants.EPIC_EXE, stdout=f, stderr=f)
     except:
-        logging.info('Error in running '+constants.EPIC_EXE)
+        logging.info('Error in running ' + constants.EPIC_EXE)
 
     # Create output directory
     out_dir = constants.make_dir_if_missing(constants.epic_dir + os.sep + 'output' + os.sep + time_stamp)

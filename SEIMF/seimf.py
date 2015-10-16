@@ -77,11 +77,11 @@ def write_epicrun_fl(state, site_dict, site_num=0):
     # Find the closest NARR station to each site
     for key, val in site_dict.iteritems(): # key: 1 val: 107 1444414 500 -90.7574996948 46.4774017334
         min_sit_wth = constants.MAX
-        lat_lon_sit = (val[4],val[3])
+        lat_lon_sit = (val[4], val[3])
 
         # If soil is missing in soil_dict, then continue onto next site
         if not(val[1] in soil_dict):
-           no_soils_fl.write(str(val[1])+'\n')
+           no_soils_fl.write(state + ', ' + str(val[1])+'\n')
            continue
 
         wth_fl  = open(constants.sims_dir+os.sep+constants.EPIC_DLY,'r')
@@ -127,7 +127,7 @@ def write_epic_site_fl(state, out_raster, site_num=0):
 
                 # Write SITE file (.sit)
                 logging.info('Creating site file ' + str(row[0])+'.sit')
-                site_fl = open(constants.site_dir+os.sep+state+'_'+str(row[0])+'.sit','w')
+                site_fl = open(constants.site_dir+os.sep+state+'_'+str(int(row[0])+add_val)+'.sit','w')
                 site_fl.write(constants.site_fl_line1+'\n')                    # Line 1
                 site_fl.write(state+'\n')                                      # Line 2
                 site_fl.write(constants.site_fl_line3+'\n')                    # Line 3

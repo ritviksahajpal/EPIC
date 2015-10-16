@@ -77,9 +77,11 @@ class EPIC_Output_File():
             return
             self.parse_DGN(fls)
         elif(self.ftype == 'ACY'):
-            self.parse_ACY(fls)
+            return
+            #self.parse_ACY(fls)
         elif(self.ftype == 'ANN'):
-            self.parse_ANN(fls)
+            return
+            #self.parse_ANN(fls)
         elif(self.ftype == 'ATG'):
             self.parse_ATG(fls)
         else:
@@ -89,9 +91,13 @@ class EPIC_Output_File():
         epic_fl_types = constants.GET_PARAMS
 
         for idx, fl_name in enumerate(epic_fl_types):
+            if fl_name <> 'ATG':
+                continue
+            print fl_name
             try:
                 df = pandas.read_sql_table(self.db_name, self.engine)
-                #df.to_csv()
+                pdb.set_trace()
+                df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv')
             except:
                 logging.info('table not found: ' + self.db_name)
 
@@ -100,7 +106,8 @@ if __name__ == '__main__':
     epic_fl_types = constants.GET_PARAMS
 
     for idx, fl_name in enumerate(epic_fl_types):
+        print idx, fl_name
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
         obj.collect_epic_output(list_fls)
-        obj.sql_to_csv()
+        #obj.sql_to_csv()
