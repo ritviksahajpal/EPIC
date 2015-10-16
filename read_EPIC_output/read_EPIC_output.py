@@ -16,10 +16,12 @@ class EPIC_Output_File():
         self.epic_out_dir = constants.epic_dir + os.sep + 'output' + os.sep + self.ldir # Latest output directory
 
         # Create a sqlite database in the analysis directory
-        self.db_name = 'sqlite:///' + constants.anly_dir + '/' + ftype + '_' + tag + '_' + self.ldir + '.db'
+        self.db_path = constants.anly_dir + os.sep + ftype + '_' + tag + '_' + self.ldir + '.db'
+        self.db_name = 'sqlite:///' + self.db_path
+
         # If database already exists, delete it
         try:
-            os.remove(self.db_name)
+            os.remove(self.db_path)
         except OSError:
             pass
         self.engine  = create_engine(self.db_name)
