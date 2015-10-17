@@ -43,15 +43,17 @@ def read_ssurgo_tables(soil_dir):
     chorizon_agg = pd_chorizon.groupby('cokey').apply(component_aggregation)    
 
     # Join chfrags and chorizon_agg data
-    chfrags_chor = chorizon_agg.merge(pd_chfrags,left_on='chkey',right_on='chkey', how='outer')
+    chfrags_chor = chorizon_agg.merge(pd_chfrags,left_on='chkey',right_on='chkey')
 
     # Join chfrags_chor data to the component table
-    ccomp = chfrags_chor.merge(pd_component,left_on='cokey',right_on='cokey', how='outer')
+    ccomp = chfrags_chor.merge(pd_component,left_on='cokey',right_on='cokey')
 
     # Join the chor_comp data to pd_muaggatt table
+    # Set how='outer' since we do not want to miss any mukey's
     muag_ccomp = ccomp.merge(pd_muaggatt,left_on='mukey',right_on='mukey', how='outer')
 
     # Join muag_ccomp to mapunit data
+    # Set how='outer' since we do not want to miss any mukey's
     map_data   = muag_ccomp.merge(pd_mapunit,left_on='mukey',right_on='mukey', how='outer')
 
     return map_data
@@ -129,8 +131,8 @@ def SSURGO_to_csv():
     return dom_df
 
 def write_epic_soil_file(group):
-    if(not(os.path.isfile(constants.t_soil_dir+str(group.mukey.iloc[0])+'.sol'))):
-        epic_file  = open(constants.t_soil_dir+str(group.mukey.iloc[0])+'.sol', 'w')
+    if(not(os.path.isfile(constants.t_soil_dir+str(int(group.mukey.iloc[0]))+'.sol'))):
+        epic_file  = open(constants.t_soil_dir+str(int(group.mukey.iloc[0]))+'.sol', 'w')
         num_layers = len(group.hzdepb_r)
 
         # Line 1
@@ -184,7 +186,7 @@ def csv_to_EPIC(df):
 
     idx = 1
     for filename in glob.iglob(os.path.join(constants.t_soil_dir, '*.sol')):
-        epic_SlList_file.write(('%5s     "soils//%-20s"\n')%(idx,os.path.basename(filename)))
+        epic_SlList_file.write(('%5s     "soils//%s"\n')%(idx,os.path.basename(filename)))
         idx += 1
     epic_SlList_file.close()
 
