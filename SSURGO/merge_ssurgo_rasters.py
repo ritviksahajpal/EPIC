@@ -112,7 +112,7 @@ def merge_ssurgo_rasters(st):
         logging.info('File present: '+merged_soil_folder+os.sep+merged_soil_file)
     delete_temp_files(files_to_delete)
 
-def run_merge_ssurgo_rasters(): 
+def run_merge_ssurgo_rasters():
     pool = multiprocessing.Pool(constants.max_threads)
     pool.map(merge_ssurgo_rasters,constants.list_st)
     pool.close()

@@ -97,14 +97,14 @@ def SSURGO_to_csv():
         else:
             pass
 
-            # If any null values remain, replace by state mean
-            logging.info('If any null values remain, replace by state mean')
-            if(np.any(df3.isnull())):
-                df1     = df3.reset_index().set_index('state')
-                st_mean = sgo_data.groupby(['state']).mean()
-                df3     = df1.combine_first(st_mean)
-            else:
-                pass
+        # If any null values remain, replace by state mean
+        logging.info('If any null values remain, replace by state mean')
+        if(np.any(df3.isnull())):
+            df1     = df3.reset_index().set_index('state')
+            st_mean = sgo_data.groupby(['state']).mean()
+            df3     = df1.combine_first(st_mean)
+        else:
+            pass
     else:
         pass
 
