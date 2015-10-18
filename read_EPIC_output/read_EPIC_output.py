@@ -1,4 +1,4 @@
-import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, sqlite3
+import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime
 from sqlalchemy import create_engine
 
 class EPIC_Output_File():
@@ -22,6 +22,7 @@ class EPIC_Output_File():
         # If database already exists, delete it
         try:
             os.remove(self.db_path)
+            logging.info('Deleted ' + self.db_path)
         except OSError:
             pass
         self.engine  = create_engine(self.db_name)
@@ -67,23 +68,26 @@ class EPIC_Output_File():
             time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
     def parse_ATG(self, fls):
-        for fl in fls:
+        for idx, fl in enumerate(fls):
+            if idx % 100 == 0:
+                print idx
             df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
                                       skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
-            time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
-            time_df['site'] = fl[:-4]
-            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
+            #time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
+            df['site'] = fl[:-4]
+            if idx == 0:
+                df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv', mode='w', header=True)
+            else:
+                df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv', mode='a', header=False)
+        df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
     def collect_epic_output(self, fls):
         if(self.ftype == 'DGN'):
-            return
             self.parse_DGN(fls)
         elif(self.ftype == 'ACY'):
-            return
-            #self.parse_ACY(fls)
+            self.parse_ACY(fls)
         elif(self.ftype == 'ANN'):
-            return
-            #self.parse_ANN(fls)
+            self.parse_ANN(fls)
         elif(self.ftype == 'ATG'):
             self.parse_ATG(fls)
         else:
@@ -93,12 +97,8 @@ class EPIC_Output_File():
         epic_fl_types = constants.GET_PARAMS
 
         for idx, fl_name in enumerate(epic_fl_types):
-            if fl_name <> 'ATG':
-                continue
-            print fl_name
             try:
                 df = pandas.read_sql_table(self.db_name, self.engine)
-                pdb.set_trace()
                 df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv')
             except:
                 logging.info('table not found: ' + self.db_name)
@@ -112,4 +112,4 @@ if __name__ == '__main__':
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
         obj.collect_epic_output(list_fls)
-        #obj.sql_to_csv()
+        obj.sql_to_csv()
