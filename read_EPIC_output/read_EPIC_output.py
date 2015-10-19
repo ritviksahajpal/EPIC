@@ -1,4 +1,4 @@
-import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime
+import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, re, StringIO
 from sqlalchemy import create_engine
 
 class EPIC_Output_File():
@@ -16,8 +16,9 @@ class EPIC_Output_File():
         self.epic_out_dir = constants.epic_dir + os.sep + 'output' + os.sep + self.ldir # Latest output directory
 
         # Create a sqlite database in the analysis directory
-        self.db_path = constants.anly_dir + os.sep + ftype + '_' + tag + '_' + self.ldir + '.db'
+        self.db_path = constants.db_dir + os.sep + ftype + '_' + tag + '_' + self.ldir + '.db'
         self.db_name = 'sqlite:///' + self.db_path
+        self.csv_path = constants.csv_dir + os.sep + ftype + '_' + tag + '_' + self.ldir + '.csv'
 
         # If database already exists, delete it
         try:
@@ -30,16 +31,43 @@ class EPIC_Output_File():
         self.tag     = tag
         self.ifexist = 'append'
 
+    def get_col_widths(self, fl):
+        pdb.set_trace()
+        df = pandas.read_table(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, header=None, nrows=1)
+        wt = df.iloc[0][0]
+        # Assume the columns (right-aligned) are one or more spaces followed by one or more non-space
+        cols = re.findall('\s+\S+', wt)
+
+        return [len(col) for col in cols]
+
+    def parse_ACM(self, fls):
+        list_df = []
+        for idx, fl in enumerate(fls):
+            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
+                            skipinitialspace=True, usecols=constants.ACM_PARAMS, sep=' ')
+            df['site'] = fl[:-4]
+            list_df.append(df)
+
+        frame_df = pandas.concat(list_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine)
+
     def parse_ACY(self, fls):
-        for fl in fls:
+        list_df = []
+        for idx, fl in enumerate(fls):
             df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
                             skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
-            time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-            time_df['site'] = fl[:-4]
-            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
+            df['site'] = fl[:-4]
+            list_df.append(df)
+
+        frame_df = pandas.concat(list_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine)
 
     def parse_ANN(self, fls):
-        for fl in fls:
+        list_df = []
+
+        for idx, fl in enumerate(fls):
             # Get column widths
             cols_df  = pandas.read_table(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
                                          sep=' ', skipinitialspace=True)
@@ -50,11 +78,28 @@ class EPIC_Output_File():
             df = pandas.read_fwf(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, sep=' ',
                                  skipinitialspace=True, widths=widths)
 
-            time_df = df[(df.YR >= constants.START_YR) & (df.YR <= constants.END_YR)]
-            time_df['site'] = fl[:-4]
-            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
+            df['site'] = fl[:-4]
+            list_df.append(df)
+
+        frame_df = pandas.concat(list_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine)
+
+    def parse_ATG(self, fls):
+        list_df = []
+        for fl in fls:
+            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
+                                      skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
+            #time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
+            df['site'] = fl[:-4]
+            list_df.append(df)
+
+        frame_df = pandas.concat(list_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine)
 
     def parse_DGN(self, fls):
+        list_df = []
         for fl in fls:
             df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, delim_whitespace=True,
                                       usecols=constants.DGN_PARAMS, parse_dates={"datetime": [0,1,2]}, index_col="datetime",
@@ -65,21 +110,26 @@ class EPIC_Output_File():
 
             time_df = time_df.groupby(time_df.index.map(lambda x: x.year)).max()
             time_df['site'] = fl[:-4]
-            time_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
+            list_df.append(time_df)
 
-    def parse_ATG(self, fls):
-        for idx, fl in enumerate(fls):
-            if idx % 100 == 0:
-                print idx
-            df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
-                                      skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
-            #time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
+        frame_df = pandas.concat(list_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine)
+
+    def parse_SCN(self, fls):
+        list_df = []
+        temp_df = pandas.DataFrame()
+        for fl in fls:
+            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
+                                 skiprows=constants.SKIP_SCN, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
             df['site'] = fl[:-4]
-            if idx == 0:
-                df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv', mode='w', header=True)
-            else:
-                df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv', mode='a', header=False)
-        df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
+            pdb.set_trace()
+            for var in constants.SKIP_SCN:
+                temp_df[var]    = df.TOT.ix[var]
+
+        frame_df = pandas.concat(temp_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine)
 
     def collect_epic_output(self, fls):
         if(self.ftype == 'DGN'):
@@ -90,6 +140,8 @@ class EPIC_Output_File():
             self.parse_ANN(fls)
         elif(self.ftype == 'ATG'):
             self.parse_ATG(fls)
+        elif(self.ftype == 'SCN'):
+            self.parse_SCN(fls)
         else:
             logging.info('Wrong file type')
 
@@ -99,17 +151,22 @@ class EPIC_Output_File():
         for idx, fl_name in enumerate(epic_fl_types):
             try:
                 df = pandas.read_sql_table(self.db_name, self.engine)
-                df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv')
+                #df.to_csv(constants.anly_dir + os.sep + fl_name + '.csv')
             except:
                 logging.info('table not found: ' + self.db_name)
 
 
 if __name__ == '__main__':
-    epic_fl_types = constants.GET_PARAMS
-
-    for idx, fl_name in enumerate(epic_fl_types):
-        print idx, fl_name
+    df = pandas.read_csv('C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\EPIC\\OpenLands_LS\\simulations\\LS_2013_10_18_2015_23h_42m\\0.SCN',
+                         skiprows=14, skipinitialspace=True, sep=' ')
+    pdb.set_trace()
+    for idx, fl_name in enumerate(constants.GET_PARAMS):
+        print fl_name
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
-        list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
+        # Get list of all output files for each EPIC output category
+        list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)[:100]
+
+        # Collec EPIC output to database and csv
         obj.collect_epic_output(list_fls)
-        obj.sql_to_csv()
+        # Extract results
+        # obj.sql_to_csv()
