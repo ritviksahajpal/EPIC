@@ -145,7 +145,7 @@ def write_epic_site_fl(state, out_raster, site_num=0):
     logging.info('Wrote site files '+state)
     return site_dict
 
-def seimf(state, init_site=0):
+def seimf(state, init_site=1):
     """
     1. Combine soil and landuse data
     2. Invokes other functions to create sites (write_epic_site_fl) and EPICRUN.dat (write_epicrun_fl)
@@ -213,7 +213,7 @@ def seimf(state, init_site=0):
     return max_site
 
 if __name__ == '__main__':
-    site_num = 0
+    site_num = 1
 
     for st in constants.list_st:
         print st
