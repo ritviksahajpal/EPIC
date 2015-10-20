@@ -48,9 +48,9 @@ meta_dir    = parser.get('PATHS', 'meta_dir') + os.sep
 narr_dir    = parser.get('PATHS', 'narr_dir') + os.sep
 out_dir     = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + parser.get('PATHS', 'sims_dir')
 epic_dly    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep \
-              + parser.get('PROJECT', 'OUT_TAG') + 'daily' + os.sep
+              + parser.get('PROJECT', 'OUT_TAG') + os.sep + 'daily' + os.sep
 epic_mon    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep + \
-              parser.get('PROJECT', 'OUT_TAG') + 'monthly' + os.sep
+              parser.get('PROJECT', 'OUT_TAG') + os.sep + 'monthly' + os.sep
 
 # Create directories
 util.make_dir_if_missing(meta_dir)

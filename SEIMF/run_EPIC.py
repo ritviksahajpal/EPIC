@@ -38,7 +38,7 @@ def run_EPIC_store_output():
         logging.info('Error in running ' + constants.EPIC_EXE)
 
     # Create output directory
-    out_dir = constants.make_dir_if_missing(constants.epic_dir + os.sep + 'output' + os.sep + time_stamp)
+    out_dir = constants.make_dir_if_missing(constants.epic_dir + os.sep + 'output' + os.sep + constants.OUT_TAG + '_' + time_stamp)
 
     # Loop over all EPIC output files and move them to separate subfolders in the output directory
     for fl_type in constants.EPICOUT_FLS:

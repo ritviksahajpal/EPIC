@@ -31,6 +31,7 @@ ANN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ANN_PARAMS'))
 SCN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','SCN_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 
+OUT_TAG  = parser.get('PROJECT', 'OUT_TAG')
 base_dir = parser.get('PATHS','base_dir') + os.sep
 epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
 sims_dir = epic_dir + os.sep + EPIC_OUTPUT
