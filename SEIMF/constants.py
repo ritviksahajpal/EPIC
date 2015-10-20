@@ -13,6 +13,8 @@ parser.read('../config_EPIC.txt')
 MAX           = 100000.0                             # Maximum distance between any two points
 NARR_RES      = 20.0                                 # NARR resolution (approx) at higher latitudes
 M2_TO_HA      = 0.0001
+RECL_RAS      = 'recl_'
+MOSAIC_RAS    = 'mosaic_ras'
 TAG           = parser.get('PROJECT','SEMF_TAG')     # Tag of SEIMF folder
 SITELIST      = parser.get('PARAMETERS','SITELIST')
 year          = parser.getint('PARAMETERS','YEAR')  
@@ -32,6 +34,7 @@ sims_dir = epic_dir + os.sep + parser.get('PATHS', 'sims_dir')
 site_dir = epic_dir + os.sep + 'inputs' + os.sep + SITES + os.sep
 mgt_dir  = epic_dir + os.sep + 'inputs' # Directory in which EPIC inputs (mgt, soils, weather etc.) are kept
 run_dir  = epic_dir + os.sep + parser.get('PROJECT', 'OUT_TAG') # Directory in which epic.exe is run
+out_dir  = epic_dir + os.sep + parser.get('PROJECT', 'SEMF_TAG') + os.sep
 
 # EPIC simulation specific values
 EPIC_EXE    = parser.get('RUN_EPIC', 'EPIC_EXE')

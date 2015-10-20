@@ -11,6 +11,7 @@ parser.read('../config_EPIC.txt')
 #
 ###############################################################################
 SKIP = 10
+SKIP_SCN = 14
 
 ###############################################################################
 # User modifiable values
@@ -27,6 +28,7 @@ ACY_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACY_PARAMS'))
 DGN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','DGN_PARAMS'))
 ATG_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ATG_PARAMS'))
 ANN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ANN_PARAMS'))
+SCN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','SCN_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 
 base_dir = parser.get('PATHS','base_dir') + os.sep
@@ -34,6 +36,8 @@ epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
 sims_dir = epic_dir + os.sep + EPIC_OUTPUT
 run_dir  = epic_dir + os.sep + parser.get('PROJECT', 'OUT_TAG') # Directory in which epic.exe is run
 anly_dir = epic_dir + os.sep + 'analysis' + os.sep
+db_dir   = anly_dir + os.sep + 'databases' # Store sqlite databases
+csv_dir  = anly_dir + os.sep + 'csvs' # Store EPIC output csvs
 
 # Maximum number of cpus to use at a time
 max_threads = psutil.cpu_count() - 1
@@ -54,6 +58,8 @@ def make_dir_if_missing(d):
 make_dir_if_missing(epic_dir)
 make_dir_if_missing(sims_dir)
 make_dir_if_missing(anly_dir)
+make_dir_if_missing(db_dir)
+make_dir_if_missing(csv_dir)
 
 # Logging
 LOG_FILENAME   = epic_dir+os.sep+'Log_'+TAG+'.txt'

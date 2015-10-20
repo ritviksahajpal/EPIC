@@ -35,7 +35,7 @@ soil_df.drop_duplicates(subset='mukey', inplace=True) # Drop all duplicates of m
 sdf_dict = soil_df.set_index('mukey').T.to_dict() # Get transpose of dataframe and convert to dict, Each mukey becomes a key
 
 def increment_raster_VAT(ras, incr_val=0, state=''):
-    out_ras = os.path.dirname(ras) + os.sep + 'new_' + os.path.basename(ras)
+    out_ras = os.path.dirname(ras) + os.sep + constants.RECL_RAS + os.path.basename(ras)
     max_val = 0 # Maximum VALUE in raster attribute table
 
     try:
@@ -159,11 +159,10 @@ def seimf(state, init_site=1):
     sgo_dir = constants.epic_dir + os.sep + 'Data' + os.sep + 'ssurgo' + os.sep + state + os.sep
     lu_dir  = constants.epic_dir + os.sep + 'Data' + os.sep + 'LU' + os.sep + state + os.sep
 
-    out_dir = constants.epic_dir + os.sep + 'SEIMF' + os.sep
-    constants.make_dir_if_missing(out_dir)
+    constants.make_dir_if_missing(constants.out_dir)
 
     # Combine SSURGO and land use data
-    out_raster = out_dir + os.sep + 'SEIMF_' + state
+    out_raster = constants.out_dir + os.sep + 'SEIMF_' + state
     inp_rasters = '"' # contains the list of rasters which are to be merged together to create the SEIMF geodatabase
 
     if not(arcpy.Exists(out_raster)):
@@ -180,8 +179,8 @@ def seimf(state, init_site=1):
     max_site = increment_raster_VAT(state=state, ras=out_raster, incr_val=init_site)
 
     # Compute centroid of each HSMU using zonal geometry
-    zgeom_dbf  = out_dir + os.sep + state + '.dbf'
-    reproj_ras = out_dir + os.sep + state + '_reproj'
+    zgeom_dbf  = constants.out_dir + os.sep + state + '.dbf'
+    reproj_ras = constants.out_dir + os.sep + state + '_reproj'
 
     try:
         # Spatial reference factory codes:
@@ -212,6 +211,19 @@ def seimf(state, init_site=1):
 
     return max_site
 
+def mosaic_rasters():
+    rasters = glob.glob(constants.out_dir + os.sep + constants.RECL_RAS + '*')
+    # Only select GRID rasters
+    ras = [x for x in rasters if len(os.path.splitext(x)[1]) == 0]
+
+    # Mosaic
+    mosaic_ras = constants.out_dir + os.sep + constants.MOSAIC_RAS
+    try:
+        arcpy.MosaicToNewRaster_management(';'.join(ras),'Mosaic2New', mosaic_ras, "",
+                                           "32_BIT_UNSIGNED", "", "1", "LAST","FIRST")
+    except:
+        logging.info(arcpy.GetMessages())
+
 if __name__ == '__main__':
     site_num = 1
 
@@ -220,6 +232,8 @@ if __name__ == '__main__':
         val = seimf(st, site_num)
         site_num += val
 
+    # Mosaic all state rasters
+    mosaic_rasters()
     iesite_fl.close()
     eprn_fl.close()
 
