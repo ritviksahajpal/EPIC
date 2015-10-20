@@ -59,15 +59,14 @@ class EPIC_Output_File():
 
     def parse_ANN(self, fls):
         list_df = []
+        # Get column widths
+        cols_df  = pandas.read_table(self.epic_out_dir + os.sep + self.ftype + os.sep + fls[0], skiprows=constants.SKIP,
+                                     sep=' ', skipinitialspace=True)
+        widths = [5,4]
+        for i in range(len(cols_df.columns.values)-2):
+            widths.append(8)
 
         for idx, fl in enumerate(fls):
-            # Get column widths
-            cols_df  = pandas.read_table(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
-                                         sep=' ', skipinitialspace=True)
-            widths = [5,4]
-            for i in range(len(cols_df.columns.values)-2):
-                widths.append(8)
-
             df = pandas.read_fwf(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, sep=' ',
                                  usecols=constants.ANN_PARAMS, skipinitialspace=True, widths=widths)
 
@@ -156,20 +155,21 @@ def sql_to_csv():
             if idx == 0:
                 dfs = fyr_df
             else:
-                dfs = pandas.merge(dfs, fyr_df, on=['YR','site'])
+                dfs = pandas.merge(dfs, fyr_df, on=['YR','site'], how='outer')
         else:
             if idx == 0:
                 dfs = df
             else:
-                dfs = pandas.merge(dfs, df, on=['YR','site'])
-        print len(dfs)
-    dfs.to_csv(constants.anly_dir + os.sep + 'EPIC_' + obj.ldir + '.csv')
+                dfs = pandas.merge(dfs, df, on=['YR','site'], how='outer')
+
+    dfs.to_csv(constants.csv_dir + os.sep + 'EPIC_' + obj.ldir + '.csv')
 
 if __name__ == '__main__':
     for idx, fl_name in enumerate(constants.GET_PARAMS):
+        print idx, fl_name
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         # Get list of all output files for each EPIC output category
-        list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)[:100]
+        list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
 
         # Collec EPIC output to database and csv
         obj.collect_epic_output(list_fls)
