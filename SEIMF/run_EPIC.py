@@ -1,6 +1,12 @@
 import constants, subprocess, logging, os, glob, shutil, pdb, time
 
 def run_EPIC_store_output():
+    # Copy over mgt directory (containing .ops files) to the EPIC input files directory
+    try:
+        shutil.copy(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', constants.mgt_dir)
+    except:
+        logging.info('Cannot copy over mgt directory to EPIC input files directory')
+
     # Change directory to where EPIC sims will take place
     cur_dir = os.getcwd()
     time_stamp = time.strftime('%m_%d_%Y_%Hh_%Mm')

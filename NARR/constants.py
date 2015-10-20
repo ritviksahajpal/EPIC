@@ -44,11 +44,13 @@ strt_date   = datetime.date(START_YR,1,1)
 end_date    = datetime.date(END_YR,12,31)
 
 # Directories
-meta_dir    = parser.get('PATHS','meta_dir')+os.sep
-narr_dir    = parser.get('PATHS','narr_dir')+os.sep
-out_dir     = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+parser.get('PATHS', 'sims_dir')
-epic_dly    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/daily'+os.sep
-epic_mon    = parser.get('PATHS','out_dir')+os.sep+parser.get('PROJECT','project_name')+os.sep+'inputs/monthly'+os.sep
+meta_dir    = parser.get('PATHS', 'meta_dir') + os.sep
+narr_dir    = parser.get('PATHS', 'narr_dir') + os.sep
+out_dir     = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + parser.get('PATHS', 'sims_dir')
+epic_dly    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep \
+              + parser.get('PROJECT', 'OUT_TAG') + 'daily' + os.sep
+epic_mon    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep + \
+              parser.get('PROJECT', 'OUT_TAG') + 'monthly' + os.sep
 
 # Create directories
 util.make_dir_if_missing(meta_dir)
