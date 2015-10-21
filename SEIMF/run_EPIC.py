@@ -1,9 +1,18 @@
 import constants, subprocess, logging, os, glob, shutil, pdb, time
 
+def copytree(src, dst, symlinks=False, ignore=None):
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
+
 def run_EPIC_store_output():
     # Copy over mgt directory (containing .ops files) to the EPIC input files directory
     try:
-        shutil.copy(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', constants.mgt_dir)
+        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', constants.mgt_dir)
     except:
         logging.info('Cannot copy over mgt directory to EPIC input files directory')
 
@@ -11,10 +20,11 @@ def run_EPIC_store_output():
     cur_dir = os.getcwd()
     time_stamp = time.strftime('%m_%d_%Y_%Hh_%Mm')
     epic_run_dir = constants.run_dir + '_' + time_stamp + os.sep
+    constants.make_dir_if_missing(epic_run_dir)
 
     # Copy all files from constants.sims_dir to constants.run_dir
     try:
-        shutil.copytree(constants.sims_dir + os.sep, epic_run_dir)
+        copytree(constants.sims_dir + os.sep, epic_run_dir)
     except:
         logging.info('Error in copying files to ' + constants.run_dir)
     os.chdir(epic_run_dir)

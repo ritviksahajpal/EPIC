@@ -112,6 +112,7 @@ def write_epic_site_fl(state, out_raster, site_num=0):
     :param out_raster: SEIMF raster: Combines SSURGO and land-use rasters
     :return: Dictionary containing for each site key, info to fill in site file. Side-effect: Creates EPIC file for each site
     """
+    print out_raster
     site_dict = {}
     fields    = ['VALUE','COUNT',state.upper()+'_SSURGO','OPEN_'+str(constants.year)+'_'+state.upper(),'XCENTROID','YCENTROID']
 
@@ -119,7 +120,7 @@ def write_epic_site_fl(state, out_raster, site_num=0):
     ras_area  = cell_size*cell_size*constants.M2_TO_HA # Assuming raster cell is in metres and not degrees!
 
     add_val = site_num
-    try:        
+    try:
         with arcpy.da.SearchCursor(out_raster, fields) as cursor:
             for row in cursor:  
                 iesite_fl.write(('%5s     "sites//%s_%s.sit"\n')%(int(row[0])+add_val,state,row[0]+add_val))
@@ -212,6 +213,7 @@ def seimf(state, init_site=1):
     return max_site
 
 def mosaic_rasters():
+    logging.info('mosaicing')
     rasters = glob.glob(constants.out_dir + os.sep + constants.RECL_RAS + '*')
     # Only select GRID rasters
     ras = [x for x in rasters if len(os.path.splitext(x)[1]) == 0]
