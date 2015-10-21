@@ -5,6 +5,7 @@ SRGO_TAG     = SSURGO
 SEMF_TAG     = SEIMF
 RUN_TAG      = simulations
 OUT_TAG      = LS_2013
+EPIC_files   = EPIC_files
 EPIC_TAG     = read_out
 LIST_STATES  = ['wi','mi','mn']                                                           ; List of states to process
 
@@ -13,7 +14,7 @@ base_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\
 meta_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Meta                      ; Contains WXPM3020.exe
 narr_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\NETCDF\\narr_download ; Directory for NETCDF NARR files
 out_dir    = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC                      ; Output directory
-sims_dir   = EPIC_files
+sims_dir   = Template
 ;;; SSURGO
 srgo_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\GIS\\SSURGO           ; Contains SSURGO input data
 
