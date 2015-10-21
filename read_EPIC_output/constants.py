@@ -22,7 +22,6 @@ PROJECT_NAME  = parser.get('PROJECT','project_name')
 TAG           = parser.get('PROJECT','EPIC_TAG')
 START_YR      = parser.getint('GET_OUTPUT','START_YR')
 END_YR        = parser.getint('GET_OUTPUT','END_YR')
-EPIC_OUTPUT   = parser.get('GET_OUTPUT','EPIC_OUTPUT')
 ACM_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACM_PARAMS'))
 ACY_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACY_PARAMS'))
 DGN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','DGN_PARAMS'))
@@ -34,7 +33,6 @@ GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 OUT_TAG  = parser.get('PROJECT', 'OUT_TAG')
 base_dir = parser.get('PATHS','base_dir') + os.sep
 epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
-sims_dir = epic_dir + os.sep + EPIC_OUTPUT
 run_dir  = epic_dir + os.sep + parser.get('PROJECT', 'RUN_TAG') + parser.get('PROJECT', 'OUT_TAG') # Directory in which epic.exe is run
 anly_dir = epic_dir + os.sep + 'analysis' + os.sep
 db_dir   = anly_dir + os.sep + 'databases' # Store sqlite databases
@@ -57,7 +55,6 @@ def make_dir_if_missing(d):
 
 # Create directories
 make_dir_if_missing(epic_dir)
-make_dir_if_missing(sims_dir)
 make_dir_if_missing(anly_dir)
 make_dir_if_missing(db_dir)
 make_dir_if_missing(csv_dir)
