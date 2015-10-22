@@ -219,10 +219,9 @@ def mosaic_rasters():
     ras = [x for x in rasters if len(os.path.splitext(x)[1]) == 0]
 
     # Mosaic
-    mosaic_ras = constants.out_dir + os.sep + constants.MOSAIC_RAS
     try:
-        arcpy.MosaicToNewRaster_management(';'.join(ras),'Mosaic2New', mosaic_ras, "",
-                                           "32_BIT_UNSIGNED", "", "1", "LAST","FIRST")
+        arcpy.MosaicToNewRaster_management(';'.join(ras), constants.out_dir + os.sep, constants.MOSAIC_RAS, "",
+                                           "32_BIT_SIGNED", "", "1", "LAST","FIRST")
     except:
         logging.info(arcpy.GetMessages())
 

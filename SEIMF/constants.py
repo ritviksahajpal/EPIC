@@ -36,7 +36,7 @@ sims_dir = epic_dir + os.sep + parser.get('PATHS', 'sims_dir')
 site_dir = epic_dir + os.sep + 'inputs' + os.sep + OUT_TAG + os.sep + SITES + os.sep
 mgt_dir  = epic_dir + os.sep + 'inputs' + os.sep + OUT_TAG + os.sep # Directory in which EPIC inputs (mgt, soils, weather etc.) are kept
 run_dir  = epic_dir + os.sep + EPIC_files + os.sep + OUT_TAG # Directory in which epic.exe is run
-out_dir  = epic_dir + os.sep + parser.get('PROJECT', 'SEMF_TAG') + os.sep
+out_dir  = epic_dir + os.sep + parser.get('PROJECT', 'SEMF_TAG') + os.sep + OUT_TAG + os.sep
 
 # EPIC simulation specific values
 EPIC_EXE    = parser.get('RUN_EPIC', 'EPIC_EXE')
@@ -69,7 +69,7 @@ make_dir_if_missing(epic_dir)
 make_dir_if_missing(site_dir)
 
 # Logging
-LOG_FILENAME   = epic_dir+os.sep+'Log_'+TAG+'.txt'
+LOG_FILENAME = epic_dir + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
 logging.basicConfig(filename = LOG_FILENAME, level=logging.INFO,\
                     format='%(asctime)s    %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

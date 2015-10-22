@@ -10,6 +10,7 @@ parser.read('../config_EPIC.txt')
 #
 #
 ###############################################################################
+OUT_TAG        = parser.get('PROJECT','OUT_TAG')
 TAG            = parser.get('PROJECT','SRGO_TAG')          # Tag of SSURGO folder
 ZERO_LINES     = parser.getint('PARAMETERS','ZERO_LINES')
 SLLIST         = parser.get('PARAMETERS','SLLIST')
@@ -89,7 +90,7 @@ make_dir_if_missing(r_soil_dir)
 make_dir_if_missing(t_soil_dir)
 
 # Logging
-LOG_FILENAME   = os.path.dirname(out_dir)+os.sep+'Log_'+TAG+'.txt'
+LOG_FILENAME   = os.path.dirname(out_dir) + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
 logging.basicConfig(filename = LOG_FILENAME, level=logging.INFO,\
                     format='%(asctime)s    %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

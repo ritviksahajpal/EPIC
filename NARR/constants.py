@@ -10,6 +10,7 @@ parser.read('../config_EPIC.txt')
 #
 #
 ###############################################################################
+OUT_TAG     = parser.get('PROJECT','OUT_TAG')
 START_YR    = parser.getint('PARAMETERS','START_YR')                  # Starting year of weather data
 END_YR      = parser.getint('PARAMETERS','END_YR')                    # Ending year of weather data
 LAT_BOUNDS  = ast.literal_eval(parser.get('PARAMETERS','LAT_BOUNDS')) # Lat boundary of study region  
@@ -60,7 +61,7 @@ util.make_dir_if_missing(epic_dly)
 util.make_dir_if_missing(epic_mon)
 
 # Logging
-LOG_FILENAME   = os.path.dirname(out_dir)+os.sep+'Log_'+TAG+'.txt'
+LOG_FILENAME   = os.path.dirname(out_dir) + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO,\
                     format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%m-%d %H:%M") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

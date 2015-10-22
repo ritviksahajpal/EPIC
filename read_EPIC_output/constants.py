@@ -19,7 +19,7 @@ SKIP_SCN = 14
 #
 ###############################################################################
 PROJECT_NAME  = parser.get('PROJECT','project_name')
-TAG           = parser.get('PROJECT','EPIC_TAG')
+TAG           = parser.get('PROJECT','OUT_TAG')
 START_YR      = parser.getint('GET_OUTPUT','START_YR')
 END_YR        = parser.getint('GET_OUTPUT','END_YR')
 ACM_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ACM_PARAMS'))
