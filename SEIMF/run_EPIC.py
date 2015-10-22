@@ -12,7 +12,8 @@ def copytree(src, dst, symlinks=False, ignore=None):
 def run_EPIC_store_output():
     # Copy over mgt directory (containing .ops files) to the EPIC input files directory
     try:
-        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', constants.mgt_dir)
+        constants.make_dir_if_missing(constants.mgt_dir + os.sep + 'mgt')
+        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', constants.mgt_dir + os.sep + 'mgt')
     except:
         logging.info('Cannot copy over mgt directory to EPIC input files directory')
 

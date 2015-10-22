@@ -4,7 +4,7 @@ NARR_TAG     = NARR                                                  ; A log fil
 SRGO_TAG     = SSURGO
 SEMF_TAG     = SEIMF
 RUN_TAG      = simulations
-OUT_TAG      = LS_2008
+OUT_TAG      = LS_2013
 EPIC_files   = EPIC_files
 LIST_STATES  = ['wi','mi','mn']                                      ; List of states to process
 
@@ -37,7 +37,7 @@ SIZE        = 56                                                                
 all         = All_SSURGO.csv
 dominant    = Dominant_SSURGO.csv
 ;;; SEIMF
-YEAR          = 2008 ; Which year LU data are we using (related to open lands project)
+YEAR          = 2013 ; Which year LU data are we using (related to open lands project)
 SITES         = sites
 SITELIST      = ieSite.dat                                                                  ; Site list file for EPIC
 EPIC_DLY      = iewedlst.dat

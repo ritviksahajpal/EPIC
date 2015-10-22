@@ -146,7 +146,7 @@ def write_epic_site_fl(state, out_raster, site_num=0):
     logging.info('Wrote site files '+state)
     return site_dict
 
-def seimf(state, init_site=1):
+def seimf(state, init_site=0):
     """
     1. Combine soil and landuse data
     2. Invokes other functions to create sites (write_epic_site_fl) and EPICRUN.dat (write_epicrun_fl)
@@ -221,12 +221,12 @@ def mosaic_rasters():
     # Mosaic
     try:
         arcpy.MosaicToNewRaster_management(';'.join(ras), constants.out_dir + os.sep, constants.MOSAIC_RAS, "",
-                                           "32_BIT_SIGNED", "", "1", "LAST","FIRST")
+                                           "8_BIT_UNSIGNED", "", "1", "LAST","FIRST")
     except:
         logging.info(arcpy.GetMessages())
 
 if __name__ == '__main__':
-    site_num = 1
+    site_num = 0
 
     for st in constants.list_st:
         print st
