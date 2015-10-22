@@ -47,7 +47,11 @@ end_date    = datetime.date(END_YR,12,31)
 # Directories
 meta_dir    = parser.get('PATHS', 'meta_dir') + os.sep
 narr_dir    = parser.get('PATHS', 'narr_dir') + os.sep
-out_dir     = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + parser.get('PATHS', 'sims_dir')
+data_dir    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep
+log_dir     = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + \
+              parser.get('PROJECT', 'LOGS') + os.sep + OUT_TAG + os.sep
+out_dir     = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + \
+              parser.get('PROJECT', 'EPIC_dat') + os.sep + OUT_TAG
 epic_dly    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep \
               + parser.get('PROJECT', 'OUT_TAG') + os.sep + 'daily' + os.sep
 epic_mon    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep + \
@@ -59,9 +63,10 @@ util.make_dir_if_missing(narr_dir)
 util.make_dir_if_missing(out_dir)
 util.make_dir_if_missing(epic_dly)
 util.make_dir_if_missing(epic_mon)
+util.make_dir_if_missing(log_dir)
 
 # Logging
-LOG_FILENAME   = os.path.dirname(out_dir) + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
+LOG_FILENAME   = log_dir + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO,\
                     format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%m-%d %H:%M") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

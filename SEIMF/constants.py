@@ -17,7 +17,7 @@ RECL_RAS      = 'recl_'
 MOSAIC_RAS    = 'mosaic_ras'
 TAG           = parser.get('PROJECT','SEMF_TAG')     # Tag of SEIMF folder
 SITELIST      = parser.get('PARAMETERS','SITELIST')
-year          = parser.getint('PARAMETERS','YEAR')  
+year          = parser.getint('PROJECT','YEAR')
 EPIC_DLY      = parser.get('PARAMETERS','EPIC_DLY')
 SLLIST        = parser.get('PARAMETERS','SLLIST')
 EPICRUN       = parser.get('PARAMETERS','EPICRUN')
@@ -30,13 +30,15 @@ missing_soils = parser.get('PARAMETERS','missing_soils')
 OUT_TAG  = parser.get('PROJECT','OUT_TAG')
 EPIC_files = parser.get('PROJECT','EPIC_files')
 list_st  = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
-base_dir = parser.get('PATHS','base_dir') + os.sep
-epic_dir = base_dir + os.sep + 'EPIC' + os.sep + parser.get('PROJECT','project_name') + os.sep
-sims_dir = epic_dir + os.sep + parser.get('PATHS', 'sims_dir')
+out_dir  = parser.get('PATHS', 'out_dir') + os.sep
+epic_dir = out_dir + os.sep + parser.get('PROJECT','project_name') + os.sep
+sims_dir = epic_dir + os.sep + parser.get('PROJECT', 'EPIC_dat') + os.sep + OUT_TAG # Directory containing .DAT files e.g. EPICRUN.dat
+temp_dir = epic_dir + os.sep + parser.get('PATHS', 'sims_dir') # Directory containing template
 site_dir = epic_dir + os.sep + 'inputs' + os.sep + OUT_TAG + os.sep + SITES + os.sep
 mgt_dir  = epic_dir + os.sep + 'inputs' + os.sep + OUT_TAG + os.sep # Directory in which EPIC inputs (mgt, soils, weather etc.) are kept
 run_dir  = epic_dir + os.sep + EPIC_files + os.sep + OUT_TAG # Directory in which epic.exe is run
 out_dir  = epic_dir + os.sep + parser.get('PROJECT', 'SEMF_TAG') + os.sep + OUT_TAG + os.sep
+log_dir  = epic_dir + os.sep + parser.get('PROJECT', 'LOGS') + os.sep + OUT_TAG + os.sep
 
 # EPIC simulation specific values
 EPIC_EXE    = parser.get('RUN_EPIC', 'EPIC_EXE')
@@ -67,9 +69,11 @@ def make_dir_if_missing(d):
 # Create directories
 make_dir_if_missing(epic_dir)
 make_dir_if_missing(site_dir)
+make_dir_if_missing(sims_dir)
+make_dir_if_missing(log_dir)
 
 # Logging
-LOG_FILENAME = epic_dir + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
+LOG_FILENAME = log_dir + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
 logging.basicConfig(filename = LOG_FILENAME, level=logging.INFO,\
                     format='%(asctime)s    %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

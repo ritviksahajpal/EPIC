@@ -63,10 +63,13 @@ chfrags_vars   = {1:'Fragvol_r',10:'chkey'}
 
 base_dir   = parser.get('PATHS', 'base_dir') + os.sep
 data_dir   = parser.get('PATHS', 'srgo_dir') + os.sep
-out_dir    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + parser.get('PATHS', 'sims_dir')
+out_dir    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + \
+             parser.get('PROJECT', 'EPIC_dat') + os.sep + OUT_TAG + os.sep
 r_soil_dir = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'Data' + os.sep
 t_soil_dir = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'inputs' + os.sep +\
              parser.get('PROJECT', 'OUT_TAG') + os.sep + 'soils' + os.sep
+log_dir    = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + \
+             parser.get('PROJECT', 'LOGS') + os.sep + OUT_TAG + os.sep
 
 # Maximum number of cpus to use at a time
 max_threads = multiprocessing.cpu_count() - 1
@@ -88,9 +91,10 @@ make_dir_if_missing(data_dir)
 make_dir_if_missing(out_dir)
 make_dir_if_missing(r_soil_dir)
 make_dir_if_missing(t_soil_dir)
+make_dir_if_missing(log_dir)
 
 # Logging
-LOG_FILENAME   = os.path.dirname(out_dir) + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
+LOG_FILENAME   = log_dir + os.sep + 'Log_' + TAG + '_' + OUT_TAG + '.txt'
 logging.basicConfig(filename = LOG_FILENAME, level=logging.INFO,\
                     format='%(asctime)s    %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL

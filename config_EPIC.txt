@@ -6,7 +6,10 @@ SEMF_TAG     = SEIMF
 RUN_TAG      = simulations
 OUT_TAG      = LS_2013
 EPIC_files   = EPIC_files
+EPIC_dat     = EPIC_dat
+LOGS         = LOGS
 LIST_STATES  = ['wi','mi','mn']                                      ; List of states to process
+YEAR         = 2013 ; Which year LU data are we using (related to open lands project)
 
 [PATHS]
 base_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\
@@ -37,7 +40,6 @@ SIZE        = 56                                                                
 all         = All_SSURGO.csv
 dominant    = Dominant_SSURGO.csv
 ;;; SEIMF
-YEAR          = 2013 ; Which year LU data are we using (related to open lands project)
 SITES         = sites
 SITELIST      = ieSite.dat                                                                  ; Site list file for EPIC
 EPIC_DLY      = iewedlst.dat

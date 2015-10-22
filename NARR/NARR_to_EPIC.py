@@ -39,13 +39,13 @@ def NARR_to_EPIC(vals):
             tmp_df.fillna(0.0,inplace=True)
             # Loop across variables
             for cur_var in constants.vars_to_get.keys():
-                e_fl           = open(os.path.dirname(constants.out_dir)+os.sep+'Data'+os.sep+cur_var+os.sep+str(lst_yrs[idx_yr].year)+\
-                                      os.sep+str(lat)+'_'+str(lon)+'.txt')
-                epic_vars      = filter(None,e_fl.readlines()[0].strip().split("'"))
+                e_fl      = open(constants.data_dir + os.sep + 'Data' + os.sep + cur_var + os.sep + str(lst_yrs[idx_yr].year)+\
+                                      os.sep + str(lat) + '_' + str(lon) + '.txt')
+                epic_vars = filter(None,e_fl.readlines()[0].strip().split("'"))
 
                 if cur_var == 'air.2m':
                     epic_min_tmp     = util.chunks(epic_vars,8,True)
-                    epic_max_tmp     = util.chunks(epic_vars,8,False)                    
+                    epic_max_tmp     = util.chunks(epic_vars,8,False)
 
                     tmp_df[cur_var] = pandas.Series(epic_min_tmp,index=cur_date_range)
                     tmp_df[cur_var] = tmp_df[cur_var].map(lambda x:float(x)+constants.K_To_C)
