@@ -29,6 +29,8 @@ ATG_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ATG_PARAMS'))
 ANN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','ANN_PARAMS'))
 SCN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','SCN_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
+DO_FOLDER     = parser.getboolean('PARAMETERS','DO_FOLDER')
+FOLDER_PATH   = parser.get('PARAMETERS','FOLDER_PATH')
 
 OUT_TAG  = parser.get('PROJECT', 'OUT_TAG')
 base_dir = parser.get('PATHS','base_dir') + os.sep

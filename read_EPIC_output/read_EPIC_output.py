@@ -18,7 +18,10 @@ class EPIC_Output_File():
 
         # Select the TAGged directory which is the latest
         self.ldir = sorted(cur_dirs, key=lambda x: os.path.getmtime(x), reverse=True)[:1][0]
-        self.epic_out_dir = constants.epic_dir + os.sep + 'output' + os.sep + self.ldir # Latest output directory
+        if constants.DO_FOLDER:
+            self.epic_out_dir = constants.FOLDER_PATH
+        else:
+            self.epic_out_dir = constants.epic_dir + os.sep + 'output' + os.sep + self.ldir # Latest output directory
 
         # Create a sqlite database in the analysis directory
         self.db_path = constants.db_dir + os.sep + ftype + '_' + tag + '_' + self.ldir + '.db'

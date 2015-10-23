@@ -10,6 +10,8 @@ EPIC_dat     = EPIC_dat
 LOGS         = LOGS
 LIST_STATES  = ['wi','mi','mn']                                      ; List of states to process
 YEAR         = 2013 ; Which year LU data are we using (related to open lands project)
+DO_FOLDER    = False ; Does EPIC need to be run from a single folder?
+FOLDER_PATH  = XXX ; If DO_FOLDER is True, then specify path of folder from which EPIC has to be run and output collected
 
 [PATHS]
 base_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\

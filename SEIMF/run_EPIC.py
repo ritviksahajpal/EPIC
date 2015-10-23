@@ -56,14 +56,14 @@ def copy_EPIC_input_folders():
 
     return time_stamp, epic_run_dir
 
-def store_EPIC_Output(time_stamp='', epic_run_dir=''):
+def store_EPIC_Output(dir_path='', epic_run_dir=''):
     """
     :param time_stamp:
     :param epic_run_dir:
     :return:
     """
     # Create output directory
-    out_dir = constants.make_dir_if_missing(constants.epic_dir + os.sep + 'output' + os.sep + constants.OUT_TAG + '_' + time_stamp)
+    out_dir = constants.make_dir_if_missing(constants.epic_dir + os.sep + 'output' + os.sep + dir_path)
 
     # Loop over all EPIC output files and move them to separate subfolders in the output directory
     for fl_type in constants.EPICOUT_FLS:
@@ -76,11 +76,15 @@ def run_EPIC_store_output():
     """
     :return:
     """
-    copy_EPIC_mgt_files()
+    tstmp = ''
+    erun_dir = ''
     cur_dir = os.getcwd()
+    if not constants.DO_FOLDER:
+        copy_EPIC_mgt_files()
+        tstmp, erun_dir = copy_EPIC_input_folders()
 
-    tstmp, erun_dir = copy_EPIC_input_folders()
-    store_EPIC_Output(time_stamp=tstmp, epic_run_dir=erun_dir)
+    if constants.DO_FOLDER:
+        os.chdir(constants.FOLDER_PATH)
 
     # Run EPIC model
     try:
@@ -88,6 +92,11 @@ def run_EPIC_store_output():
             subprocess.call(constants.EPIC_EXE, stdout=f, stderr=f)
     except:
         logging.info('Error in running ' + constants.EPIC_EXE)
+
+    if not constants.DO_FOLDER:
+        store_EPIC_Output(dir_path=constants.OUT_TAG + '_' + tstmp, epic_run_dir=erun_dir)
+    else:
+        store_EPIC_Output(dir_path=constants.FOLDER_PATH, epic_run_dir=erun_dir)
 
     # Change directory back to original
     os.chdir(cur_dir)
