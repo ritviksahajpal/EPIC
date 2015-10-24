@@ -1,4 +1,4 @@
-import pandas,pdb,os,csv,datetime,numpy,palettable,matplotlib,calendar
+import pandas,pdb,os,csv,datetime,numpy,palettable,matplotlib,calendar, math
 import matplotlib.pyplot as plt
 import matplotlib.colorbar as cbar
 from matplotlib import rcParams
@@ -25,11 +25,23 @@ def set_matplotlib_params():
 #
 #
 ###############################################################################
-def get_colors():    
+def get_colors(palette = 'colorbrewer', cmap = False):
     """
     Get palettable colors, which are nicer
-    """            
-    bmap=palettable.colorbrewer.sequential.BuPu_9.mpl_colors
+    """
+    if palette == 'colorbrewer':
+        bmap = palettable.colorbrewer.diverging.PRGn_11.mpl_colors
+        if cmap:
+            bmap = palettable.colorbrewer.diverging.PRGn_11.mpl_colormap
+    elif palette == 'tableau':
+        bmap = palettable.tableau.Tableau_20.mpl_colors
+        if cmap:
+            bmap = palettable.tableau.Tableau_20.mpl_colormap
+    elif palette == 'cubehelix':
+        bmap = palettable.cubehelix.cubehelix2_16.mpl_colors
+        if cmap:
+            bmap = palettable.cubehelix.cubehelix2_16.mpl_colormap
+
     return bmap
  
 ###############################################################################
@@ -40,30 +52,40 @@ def get_colors():
 ###############################################################################
 def draw_calendar(ax,df,col_name,horz=False):
     for i in range(len(df.index)):
-        if(df[col_name][i] > 0):
-            max_val = max(df[col_name])
-            min_val = min(df[col_name])
-            color_list = get_colors()
-            color_len  = len(color_list)
+        sqr_size = 0.9
+        max_val = df[col_name].max()
+        min_val = df[col_name].min()
+        color_list = get_colors()
+        color_len  = len(color_list)
 
-            cur_wk = datetime.date(df.YEAR[i],df.MONTH[i],df.DAY[i]).isocalendar()[1]
-            cur_yr = datetime.date(df.YEAR[i],df.MONTH[i],df.DAY[i]).isocalendar()[0]
+        cur_wk = datetime.date(df.YEAR[i],df.MONTH[i],df.DAY[i]).isocalendar()[1]
+        cur_yr = datetime.date(df.YEAR[i],df.MONTH[i],df.DAY[i]).isocalendar()[0]
 
-            if((cur_yr < df.YEAR[i]) and (df.DAY[i]<7)):
-                cur_wk = 0
-            if(cur_yr>df.YEAR[i]):
-                cur_wk = 53
-            day_of_week = df.index[i].weekday()
- 
-            #normalise each data point to val - note added a very small amount
-            #to data range, so that we never get exactly 1.0
-            val = float((df[col_name][i]-min_val)/float(max_val-min_val + 0.000001))
-            if(horz):
-                rect = matplotlib.patches.Rectangle((cur_wk,day_of_week), 1, 1, color = color_list[int(val*color_len)])                
+        if((cur_yr < df.YEAR[i]) and (df.DAY[i]<7)):
+            cur_wk = 0
+        if(cur_yr>df.YEAR[i]):
+            cur_wk = 53
+        day_of_week = df.index[i].weekday()
+
+        #normalise each data point to val - note added a very small amount
+        #to data range, so that we never get exactly 1.0
+        val = float((df[col_name][i]-min_val)/float(max_val-min_val + 0.000001))
+        if(horz):
+            if not math.isnan(df[col_name][i]):
+                rect = matplotlib.patches.Rectangle((cur_wk,day_of_week), sqr_size, sqr_size, linewidth = 0.0,
+                                                color = color_list[int(val*color_len)])
             else:
-                rect = matplotlib.patches.Rectangle((day_of_week,cur_wk), 1, 1, color = color_list[int(val*color_len)],label='a')                
- 
-            ax.add_patch(rect)
+                rect = matplotlib.patches.Rectangle((cur_wk,day_of_week), sqr_size, sqr_size, linewidth = 0.0,
+                                                color = 'white')
+        else:
+            if not math.isnan(df[col_name][i]):
+                rect = matplotlib.patches.Rectangle((day_of_week,cur_wk), sqr_size, sqr_size, linewidth = 0.0,
+                                        color = color_list[int(val*color_len)])
+            else:
+                rect = matplotlib.patches.Rectangle((day_of_week,cur_wk), sqr_size, sqr_size, linewidth = 0.0,
+                                                color = 'white')
+
+        ax.add_patch(rect)
        
 ###############################################################################
 # draw_daily_lines
@@ -118,7 +140,7 @@ def draw_month_boundary(ax,df,horz=False):
                 else:
                     ax.plot([day_of_week+1-adj,day_of_week+1-adj],[cur_wk+1,cur_wk],color=clr,linestyle=stl,lw=wth) # Parallel to Y-axis
                     ax.plot([day_of_week+1,7],[cur_wk-adj,cur_wk-adj],color=clr,linestyle=stl,lw=wth)
- 
+
 ###############################################################################
 #
 #
@@ -142,7 +164,7 @@ def plot_epic_dgn():
     # Draw blank figure
     fig = plt.figure()
     set_matplotlib_params()
-    plt.subplots_adjust(hspace=0.3)
+    plt.subplots_adjust(hspace=0.3, wspace=0.5)
     #plt.axis('off')       
     plt.axes().set_aspect('equal')
  
@@ -170,11 +192,11 @@ def plot_epic_dgn():
         ax.set_title(str(i),fontsize=12)
  
         if (horz):
-            plt.xlim(0,num_weeks)
+            plt.xlim(0,53)
             plt.ylim(0,7)
         else:
             plt.xlim(0,7)
-            plt.ylim(num_weeks,0)
+            plt.ylim(53,0)
 
         if(i == max(df['YEAR'].unique())):
             plt.text(8,3,'Jan',fontsize=10)
@@ -191,30 +213,37 @@ def plot_epic_dgn():
             plt.text(8,51,'Dec',fontsize=10)
  
         draw_calendar(ax,sub_df,col_name,horz)      # Draw the individual rectangles
-        draw_daily_lines(ax,sub_df,num_weeks,horz) # Draw separation between days
-        draw_month_boundary(ax,sub_df,horz)         # Draw separation between weeks
-        print idx, i
+        #draw_daily_lines(ax,sub_df,num_weeks,horz) # Draw separation between days
+        #draw_month_boundary(ax,sub_df,horz)         # Draw separation between weeks
+        #print idx, i
         idx += 1
         
     # plot an overall colorbar type legend    
     # You can change the boundaries kwarg to either make the scale look less boxy (increase 10)
     # or to get different values on the tick marks, or even omit it altogether to let
     ax_colorbar = plt.subplot2grid((9,num_yrs+1), (8,1),rowspan=1,colspan=num_yrs-1)   
-    mappableObject = matplotlib.cm.ScalarMappable(cmap = palettable.colorbrewer.sequential.BuPu_9.mpl_colormap)
-    mappableObject.set_array(numpy.array(df[col_name]))
+    mappableObject = matplotlib.cm.ScalarMappable(cmap = get_colors(cmap = True))
+    df_notnan = df[~numpy.isnan(df[col_name])]
+    mappableObject.set_array(numpy.array(df_notnan[col_name]))
 
     col_bar = fig.colorbar(mappableObject,cax=ax_colorbar,orientation='horizontal',\
                            boundaries=numpy.arange(min_val,max_val,(max_val-min_val)/100))
     col_bar.ax.tick_params(labelsize=8) 
     ###col_bar.set_label(col_name)
-    ###ax_colorbar.set_title(col_name + ' color mapping')        
-   
+    ###ax_colorbar.set_title(col_name + ' color mapping')
+
     #draw the top overall graph
-    ax0     = plt.subplot2grid((9,num_yrs+1), (0,0),rowspan=3,colspan=num_yrs)
-    x_axis  = numpy.arange(0.325,num_yrs+1,1.1)
+    ax0     = plt.subplot2grid((9, num_yrs + 1), (0,0),rowspan=3, colspan=num_yrs)
+    x_axis  = numpy.arange(0.325, num_yrs + 1, 1.1)
+    for tick in ax0.xaxis.get_major_ticks():
+        tick.label.set_fontsize(8)
     bar_val = df[col_name].groupby(df['YEAR']).mean()
     err_val = df[col_name].groupby(df['YEAR']).std()
-    ax0.bar(x_axis,bar_val,yerr=err_val,linewidth=0,width=0.25,color='g',
+    bar_val.fillna(0, inplace = True) # Replace nan's by 0. Needed because of missing data in several years
+    err_val.fillna(0, inplace = True)
+    # Insert 0's so that error plots are only one-sided
+    errs = [tuple(numpy.zeros(len(err_val))), tuple(err_val.values)]
+    ax0.bar(x_axis, bar_val.values, yerr=errs, linewidth=0,width=0.25,color='g',
             error_kw=dict(ecolor='gray', lw=1))
     ax0.axes.get_xaxis().set_ticks([])
     ax0.spines['top'].set_visible(False)
