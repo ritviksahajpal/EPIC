@@ -30,6 +30,7 @@ DO_FOLDER     = parser.getboolean('PROJECT','DO_FOLDER')
 FOLDER_PATH   = parser.get('PROJECT','FOLDER_PATH')
 
 OUT_TAG  = parser.get('PROJECT','OUT_TAG')
+MGT_TAG        = parser.get('PROJECT','MGT_TAG')
 EPIC_files = parser.get('PROJECT','EPIC_files')
 list_st  = ast.literal_eval(parser.get('PROJECT','LIST_STATES'))
 out_dir  = parser.get('PATHS', 'out_dir') + os.sep

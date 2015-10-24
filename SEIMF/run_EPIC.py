@@ -20,10 +20,10 @@ def copytree(src, dst, symlinks=False, ignore=None):
 def copy_EPIC_mgt_files():
     # Copy over mgt directory (containing .ops files) to the EPIC input files directory
     try:
-        constants.make_dir_if_missing(constants.mgt_dir + os.sep + 'mgt')
-        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', constants.mgt_dir + os.sep + 'mgt')
+        constants.make_dir_if_missing(constants.mgt_dir + os.sep + constants.MGT_TAG)
+        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + constants.MGT_TAG, constants.mgt_dir + os.sep + constants.MGT_TAG)
     except:
-        logging.info('Cannot copy over mgt directory to EPIC input files directory')
+        logging.info('Cannot copy over management directory to EPIC input files directory')
 
 def copy_EPIC_input_folders():
     """
@@ -38,7 +38,7 @@ def copy_EPIC_input_folders():
         # Copy all files from constants.sims_dir to constants.run_dir
         copytree(constants.temp_dir + os.sep, epic_run_dir)
         # Copy over .DAT files produced through NARR, SSURGO and seimf scripts
-        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + 'mgt', epic_run_dir)
+        copytree(constants.epic_dir + os.sep + 'Data' + os.sep + constants.MGT_TAG, epic_run_dir)
     except:
         logging.info('Error in copying files to ' + constants.run_dir)
     os.chdir(epic_run_dir)
