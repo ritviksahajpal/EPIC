@@ -38,6 +38,7 @@ epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
 anly_dir = epic_dir + os.sep + 'analysis' + os.sep
 db_dir   = anly_dir + os.sep + 'databases' # Store sqlite databases
 csv_dir  = anly_dir + os.sep + 'csvs' # Store EPIC output csvs
+gis_dir  = anly_dir + os.sep + 'gis' # Store gis analysis
 
 # Maximum number of cpus to use at a time
 max_threads = psutil.cpu_count() - 1
@@ -59,6 +60,7 @@ make_dir_if_missing(epic_dir)
 make_dir_if_missing(anly_dir)
 make_dir_if_missing(db_dir)
 make_dir_if_missing(csv_dir)
+make_dir_if_missing(gis_dir)
 
 # Logging
 LOG_FILENAME   = epic_dir+os.sep+'Log_'+TAG+'.txt'
