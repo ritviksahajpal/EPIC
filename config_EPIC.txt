@@ -11,7 +11,7 @@ EPIC_dat     = EPIC_dat
 LOGS         = LOGS
 LIST_STATES  = ['wi','mi','mn']                                      ; List of states to process
 YEAR         = 2013 ; Which year LU data are we using (related to open lands project)
-DO_FOLDER    = False ; Does EPIC need to be run from a single folder?
+DO_FOLDER    = False ; Does EPIC need to be run from a single folder (True) else False?
 FOLDER_PATH  = XXX ; If DO_FOLDER is True, then specify path of folder from which EPIC has to be run and output collected
 
 [PATHS]
@@ -19,7 +19,7 @@ base_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\
 meta_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Meta                      ; Contains WXPM3020.exe
 narr_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\NETCDF\\narr_download ; Directory for NETCDF NARR files
 out_dir    = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC                      ; Output directory
-sims_dir   = Template
+sims_dir   = Template/Baseline
 ;;; SSURGO
 srgo_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\GIS\\SSURGO           ; Contains SSURGO input data
 
@@ -52,6 +52,9 @@ SOIL_DATA     = Dominant_SSURGO.csv
 missing_soils = missing_soils.csv
 site_fl_line1 = SRWC
 site_fl_line3 = Sample:0000 Country:USA FIPS: 0000 MLRA:0 NRIPTR:0 HUC:0
+;;; Locate station
+EPIC_DLY      = iewedlst.dat
+site_loc      = [45.77,-87.20]                                                      ;ES 45.77,-87.20;RH 45.67,-89.21
 
 [RUN_EPIC]
 EPICOUT_FLS = ['ATG', 'ANN', 'ACY', 'SCN']

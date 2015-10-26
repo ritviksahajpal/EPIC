@@ -25,6 +25,13 @@ def copy_EPIC_mgt_files():
     except:
         logging.info('Cannot copy over management directory to EPIC input files directory')
 
+def copy_EPIC_dat_files(epic_folder):
+    # Copy EPIC dat files: EPICRUN.dat, iewedlst.dat, iewealst.dat, ieSllist and ieSitelist
+    try:
+        copytree(constants.sims_dir + os.sep, epic_folder)
+    except:
+        logging.info('Cannot copy EPIC dat files')
+
 def copy_EPIC_input_folders():
     """
     :return:
@@ -79,15 +86,18 @@ def run_EPIC_store_output():
     tstmp = ''
     erun_dir = ''
     cur_dir = os.getcwd()
+
+    # Copy the management directory containing .ops files
     if not constants.DO_FOLDER:
         copy_EPIC_mgt_files()
         tstmp, erun_dir = copy_EPIC_input_folders()
-
-    if constants.DO_FOLDER:
-        os.chdir(constants.FOLDER_PATH)
+        # Copy EPIC.dat files
+        copy_EPIC_dat_files(erun_dir)
 
     # Run EPIC model
     try:
+        if constants.DO_FOLDER:
+            os.chdir(constants.FOLDER_PATH)
         with open(os.devnull, "w") as f:
             subprocess.call(constants.EPIC_EXE, stdout=f, stderr=f)
     except:
