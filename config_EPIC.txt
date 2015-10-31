@@ -1,15 +1,17 @@
 [PROJECT]
+;;;;;;;;;;;;;;;;;;;;;;;;; MODIFY THESE PARAMETERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+OUT_TAG      = LS_2013
+YEAR         = 2013 ; Which year LU data are we using (related to open lands project)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 project_name = OpenLands_LS                                          ; Name of project directory (to be created within out_dir)
 NARR_TAG     = NARR                                                  ; A log file is created as Log_<NARR_TAG>.txt
 SRGO_TAG     = SSURGO
 SEMF_TAG     = SEIMF
-OUT_TAG      = LS_2008
 MGT_TAG      = mgt
 EPIC_files   = simulations
 EPIC_dat     = EPIC_dat
 LOGS         = LOGS
 LIST_STATES  = ['wi','mi','mn']                                      ; List of states to process
-YEAR         = 2008 ; Which year LU data are we using (related to open lands project)
 DO_FOLDER    = False ; Does EPIC need to be run from a single folder (True) else False?
 FOLDER_PATH  = XXX ; If DO_FOLDER is True, then specify path of folder from which EPIC has to be run and output collected
 LU_METRIC    = LCC ; Using LCC (SSURGO land capability class) or PI (MSU productivity index)
