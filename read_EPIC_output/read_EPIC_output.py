@@ -217,11 +217,14 @@ if __name__ == '__main__':
         print idx, fl_name
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         # Get list of all output files for each EPIC output category
-        list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
+        try:
+            list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
 
-        # Collect EPIC output to database and csv
-        if len(list_fls) > 0:
-            obj.collect_epic_output(list_fls)
+            # Collect EPIC output to database and csv
+            if len(list_fls) > 0:
+                obj.collect_epic_output(list_fls)
+        except:
+            logging.info('Error in reading ' + fl_name)
 
     # Extract results
     sql_to_csv()

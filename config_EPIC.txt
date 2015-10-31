@@ -23,6 +23,7 @@ base_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\
 meta_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Meta                      ; Contains WXPM3020.exe
 narr_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\NETCDF\\narr_download ; Directory for NETCDF NARR files
 out_dir    = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC                      ; Output directory
+gis_dir    = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\GIS\\               ; GIS directory
 sims_dir   = Template/Baseline
 ;;; SSURGO
 srgo_dir   = C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\Data\\GIS\\SSURGO           ; Contains SSURGO input data
@@ -101,3 +102,8 @@ SCN_PARAMS  = ['WOC0', 'WOCF', 'DWOC']
 ACM_PARAMS  = ['Y', 'NITR', 'AVOL', 'DN']
 START_YR    = 2008 ; Starting year of weather data
 END_YR      = 2013 ; Ending year of weather data
+
+[POST_PROCESS]
+IPCC_carbon_2000_path = IPCC_Carbon_2000
+IPCC_carbon_2000_file = c_1km
+zone_data = UScounties/LakeStateCounty.shp

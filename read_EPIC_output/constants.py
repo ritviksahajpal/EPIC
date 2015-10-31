@@ -32,13 +32,16 @@ GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 DO_FOLDER     = parser.getboolean('PROJECT','DO_FOLDER')
 FOLDER_PATH   = parser.get('PROJECT','FOLDER_PATH')
 
-OUT_TAG  = parser.get('PROJECT', 'OUT_TAG')
-base_dir = parser.get('PATHS','base_dir') + os.sep
-epic_dir = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
-anly_dir = epic_dir + os.sep + 'analysis' + os.sep
-db_dir   = anly_dir + os.sep + 'databases' # Store sqlite databases
-csv_dir  = anly_dir + os.sep + 'csvs' # Store EPIC output csvs
-gis_dir  = anly_dir + os.sep + 'gis' # Store gis analysis
+OUT_TAG   = parser.get('PROJECT', 'OUT_TAG')
+base_dir  = parser.get('PATHS','base_dir') + os.sep
+epic_dir  = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
+anly_dir  = epic_dir + os.sep + 'analysis' + os.sep + TAG + os.sep
+db_dir    = anly_dir + os.sep + 'databases' # Store sqlite databases
+csv_dir   = anly_dir + os.sep + 'csvs' # Store EPIC output csvs
+gis_dir   = anly_dir + os.sep + 'gis' # Store gis analysis
+IPCC_FILE = parser.get('POST_PROCESS', 'GIS_DIR') + os.sep + parser.get('POST_PROCESS', 'IPCC_carbon_2000_path') + os.sep \
+            + parser.get('POST_PROCESS', 'IPCC_carbon_2000_file')
+zone_data = parser.get('POST_PROCESS', 'GIS_DIR') + os.sep + parser.get('POST_PROCESS', 'zone_data')
 
 # Maximum number of cpus to use at a time
 max_threads = psutil.cpu_count() - 1
