@@ -41,6 +41,9 @@ class EPIC_Output_File():
 
         return [len(col) for col in cols]
 
+    ###############################
+    # ACM
+    ###############################
     def parse_ACM(self, fls):
         list_df = []
         for idx, fl in enumerate(fls):
@@ -56,6 +59,9 @@ class EPIC_Output_File():
         frame_df.to_csv(self.csv_path)
         frame_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
+    ###############################
+    # ACY
+    ###############################
     def parse_ACY(self, fls):
         list_df = []
         for idx, fl in enumerate(fls):
@@ -71,6 +77,9 @@ class EPIC_Output_File():
         frame_df.to_csv(self.csv_path)
         frame_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
+    ###############################
+    # ANN
+    ###############################
     def parse_ANN(self, fls):
         list_df = []
         # Get column widths
@@ -94,6 +103,9 @@ class EPIC_Output_File():
         frame_df.to_csv(self.csv_path)
         frame_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
+    ###############################
+    # ATG
+    ###############################
     def parse_ATG(self, fls):
         list_df = []
         for fl in fls:
@@ -111,6 +123,9 @@ class EPIC_Output_File():
         frame_df.to_csv(self.csv_path)
         frame_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
+    ###############################
+    # DGN
+    ###############################
     def parse_DGN(self, fls):
         list_df = []
         for fl in fls:
@@ -132,6 +147,9 @@ class EPIC_Output_File():
         frame_df.to_csv(self.csv_path)
         frame_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
+    ###############################
+    # SCN
+    ###############################
     def parse_SCN(self, fls):
         list_df = []
         for idx, fl in enumerate(fls):
