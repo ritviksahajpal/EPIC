@@ -44,8 +44,11 @@ class EPIC_Output_File():
     def parse_ACM(self, fls):
         list_df = []
         for idx, fl in enumerate(fls):
-            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
+            try:
+                df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
                             skipinitialspace=True, usecols=constants.ACM_PARAMS, sep=' ')
+            except:
+                logging.info('Error reading ' + fl)
             df['site'] = fl[:-4]
             list_df.append(df)
 
@@ -56,8 +59,11 @@ class EPIC_Output_File():
     def parse_ACY(self, fls):
         list_df = []
         for idx, fl in enumerate(fls):
-            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
+            try:
+                df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP,
                             skipinitialspace=True, usecols=constants.ACY_PARAMS, sep=' ')
+            except:
+                logging.info('Error reading ' + fl)
             df['site'] = fl[:-4]
             list_df.append(df)
 
@@ -75,8 +81,11 @@ class EPIC_Output_File():
             widths.append(8)
 
         for idx, fl in enumerate(fls):
-            df = pandas.read_fwf(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, sep=' ',
+            try:
+                df = pandas.read_fwf(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, sep=' ',
                                  usecols=constants.ANN_PARAMS, skipinitialspace=True, widths=widths)
+            except:
+                logging.info('Error reading ' + fl)
 
             df['site'] = fl[:-4]
             list_df.append(df)
@@ -88,8 +97,11 @@ class EPIC_Output_File():
     def parse_ATG(self, fls):
         list_df = []
         for fl in fls:
-            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
+            try:
+                df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
                                       skiprows=constants.SKIP, skipinitialspace=True, usecols=constants.ATG_PARAMS, sep=' ')
+            except:
+                logging.info('Error reading ' + fl)
             #time_df = df[(df.Y >= int(constants.START_YR)) & (df.Y <= int(constants.END_YR))]
             df['site'] = fl[:-4]
             df.rename(columns={'Y': 'YR'}, inplace=True)
@@ -102,9 +114,12 @@ class EPIC_Output_File():
     def parse_DGN(self, fls):
         list_df = []
         for fl in fls:
-            df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, delim_whitespace=True,
+            try:
+                df      = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, skiprows=constants.SKIP, delim_whitespace=True,
                                       usecols=constants.DGN_PARAMS, parse_dates={"datetime": [0,1,2]}, index_col="datetime",
                                       date_parser=lambda x: pandas.datetime.strptime(x, '%Y %m %d'))
+            except:
+                logging.info('Error reading ' + fl)
             start = df.index.searchsorted(datetime.datetime(constants.START_YR, 1, 1))
             end = df.index.searchsorted(datetime.datetime(constants.END_YR, 12, 31))
             time_df = df.ix[start:end]
@@ -121,8 +136,11 @@ class EPIC_Output_File():
         list_df = []
         for idx, fl in enumerate(fls):
             temp_df = pandas.DataFrame(index=[constants.END_YR], columns=constants.SCN_PARAMS)
-            df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
+            try:
+                df = pandas.read_csv(self.epic_out_dir + os.sep + self.ftype + os.sep + fl,
                                  skiprows=constants.SKIP_SCN, skipinitialspace=True, sep=' ')
+            except:
+                logging.info('Error reading ' + fl)
 
             for var in constants.SCN_PARAMS:
                 temp_df[var]    = df.TOT.ix[var]
@@ -179,8 +197,9 @@ if __name__ == '__main__':
         # Get list of all output files for each EPIC output category
         list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
 
-        # Collec EPIC output to database and csv
-        obj.collect_epic_output(list_fls)
+        # Collect EPIC output to database and csv
+        if len(list_fls) > 0:
+            obj.collect_epic_output(list_fls)
 
     # Extract results
     sql_to_csv()
