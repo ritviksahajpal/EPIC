@@ -186,6 +186,10 @@ class EPIC_Output_File():
             logging.info('Wrong file type')
 
 def sql_to_csv():
+    """
+    SQL stores information from all years. We then extract information for the latest year from this file
+    :return:
+    """
     epic_fl_types = constants.GET_PARAMS
     dfs = pandas.DataFrame()
 
