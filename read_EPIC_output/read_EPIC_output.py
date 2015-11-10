@@ -221,7 +221,7 @@ def sql_to_csv():
     # Merge with EPICRUN
     dfs = pandas.merge(dfs, epic_df, left_on='site', right_on='ASTN', how='outer')
     # Merge with SSURGO file
-    dfs = pandas.merge(dfs, grp_sgo, left_on='INPS', right_on='ASTN', how='outer')
+    dfs = pandas.merge(dfs, grp_sgo, left_on='INPS', right_on='mukey', how='outer')
     dfs.to_csv(constants.csv_dir + os.sep + 'EPIC_' + obj.ldir + '.csv')
 
 if __name__ == '__main__':
