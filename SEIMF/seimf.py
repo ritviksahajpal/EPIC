@@ -102,7 +102,8 @@ def write_epicrun_fl(state, site_dict, site_num=0):
                 if sep < constants.NARR_RES/2.0:
                     break
         # Sample output: Sitename,Site#, Monthly#,0,Wind#,Soil#,Ops#,Daily#
-        eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(idx,eprun_ln[0],eprun_ln[1],0,1,soil_dict[eprun_ln[2]],1,eprun_ln[1]))
+        # Making sitename same as site # so that it is easier to join with SEIMF raster datasets later
+        eprn_fl.write(('{:>8d}'+'{:>6d}'*7+'\n').format(eprun_ln[0],eprun_ln[0],eprun_ln[1],0,1,soil_dict[eprun_ln[2]],1,eprun_ln[1]))
         idx += 1
 
 def write_epic_site_fl(state, out_raster, site_num=0):
