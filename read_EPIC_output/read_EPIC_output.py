@@ -214,7 +214,14 @@ def sql_to_csv():
     epic_df = pandas.read_csv(constants.sims_dir + os.sep + obj.ldir + os.sep + 'EPICRUN.DAT', sep='\s+', header=None)
     epic_df.columns = ['ASTN', 'ISIT', 'IWP1','IWP5', 'IWND', 'INPS', 'IOPS', 'IWTH']
 
+    # Read SSURGO file
+    sgo_file = pandas.read_csv(constants.sgo_dir + os.sep + constants.dominant)
+    grp_sgo  = sgo_file.groupby('mukey').mean().reset_index()
+
+    # Merge with EPICRUN
     dfs = pandas.merge(dfs, epic_df, left_on='site', right_on='ASTN', how='outer')
+    # Merge with SSURGO file
+    dfs = pandas.merge(dfs, grp_sgo, left_on='INPS', right_on='ASTN', how='outer')
     dfs.to_csv(constants.csv_dir + os.sep + 'EPIC_' + obj.ldir + '.csv')
 
 if __name__ == '__main__':

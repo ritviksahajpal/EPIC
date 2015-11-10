@@ -18,6 +18,7 @@ SKIP_SCN = 14
 #
 #
 ###############################################################################
+SOIL          = 'ssurgo' # Should be same as SSURGO python code
 PROJECT_NAME  = parser.get('PROJECT','project_name')
 TAG           = parser.get('PROJECT','OUT_TAG')
 START_YR      = parser.getint('GET_OUTPUT','START_YR')
@@ -31,6 +32,7 @@ SCN_PARAMS    = ast.literal_eval(parser.get('GET_OUTPUT','SCN_PARAMS'))
 GET_PARAMS    = ast.literal_eval(parser.get('RUN_EPIC','EPICOUT_FLS'))
 DO_FOLDER     = parser.getboolean('PROJECT','DO_FOLDER')
 FOLDER_PATH   = parser.get('PROJECT','FOLDER_PATH')
+dominant      = parser.get('PARAMETERS','dominant')
 
 OUT_TAG   = parser.get('PROJECT', 'OUT_TAG')
 base_dir  = parser.get('PATHS','base_dir') + os.sep
@@ -40,6 +42,8 @@ anly_dir  = epic_dir + os.sep + 'analysis' + os.sep + TAG + os.sep
 db_dir    = anly_dir + os.sep + 'databases' # Store sqlite databases
 csv_dir   = anly_dir + os.sep + 'csvs' # Store EPIC output csvs
 gis_dir   = anly_dir + os.sep + 'gis' # Store gis analysis
+sgo_dir   = parser.get('PATHS', 'out_dir') + os.sep + parser.get('PROJECT', 'project_name') + os.sep + 'Data' + os.sep +\
+            SOIL + os.sep
 IPCC_FILE = parser.get('POST_PROCESS', 'GIS_DIR') + os.sep + parser.get('POST_PROCESS', 'IPCC_carbon_2000_path') + os.sep \
             + parser.get('POST_PROCESS', 'IPCC_carbon_2000_file')
 zone_data = parser.get('POST_PROCESS', 'GIS_DIR') + os.sep + parser.get('POST_PROCESS', 'zone_data')
