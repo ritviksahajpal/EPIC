@@ -104,6 +104,7 @@ START_YR    = 2008 ; Starting year of weather data
 END_YR      = 2013 ; Ending year of weather data
 
 [POST_PROCESS]
+GIS_DIR = ''
 IPCC_carbon_2000_path = IPCC_Carbon_2000
 IPCC_carbon_2000_file = c_1km
 zone_data = UScounties/LakeStateCounty.shp

@@ -35,6 +35,7 @@ FOLDER_PATH   = parser.get('PROJECT','FOLDER_PATH')
 OUT_TAG   = parser.get('PROJECT', 'OUT_TAG')
 base_dir  = parser.get('PATHS','base_dir') + os.sep
 epic_dir  = base_dir + os.sep + 'EPIC' + os.sep + PROJECT_NAME + os.sep
+sims_dir  = epic_dir + os.sep + 'simulations' # Stores simulations
 anly_dir  = epic_dir + os.sep + 'analysis' + os.sep + TAG + os.sep
 db_dir    = anly_dir + os.sep + 'databases' # Store sqlite databases
 csv_dir   = anly_dir + os.sep + 'csvs' # Store EPIC output csvs

@@ -210,12 +210,18 @@ def sql_to_csv():
             else:
                 dfs = pandas.merge(dfs, df, on=['YR','site'], how='outer')
 
+    # Merge with EPICRUN.DAT
+    epic_df = pandas.read_csv(constants.sims_dir + os.sep + obj.ldir + '.csv')
+
     dfs.to_csv(constants.csv_dir + os.sep + 'EPIC_' + obj.ldir + '.csv')
 
 if __name__ == '__main__':
     for idx, fl_name in enumerate(constants.GET_PARAMS):
         print idx, fl_name
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
+        epic_df = pandas.read_csv(constants.sims_dir + os.sep + obj.ldir + os.sep + 'EPICRUN.DAT', sep='\s+', header=None)
+        epic_df.columns = ['','','','','','','','']
+        pdb.set_trace()
         # Get list of all output files for each EPIC output category
         try:
             list_fls = fnmatch.filter(os.listdir(obj.epic_out_dir + os.sep + constants.GET_PARAMS[idx] + os.sep), '*.' + fl_name)
