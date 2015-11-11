@@ -42,11 +42,8 @@ def get_arcpy():
   install_dir = locate_arcgis()  
   arcpy = path.join(install_dir, "arcpy")
 
-  # Set the 'binary' directory according to the bitness of our interpreter:  
-  if sys.maxsize > 2**32:
-    bin_dir = path.join(install_dir, "bin64")
-  else:  
-    bin_dir = path.join(install_dir, "bin")
+  # Using 32 bit directory for now
+  bin_dir = path.join(install_dir, "bin")
 
   scripts = path.join(install_dir, "ArcToolbox", "Scripts")  
   sys.path.extend([arcpy, bin_dir, scripts])
