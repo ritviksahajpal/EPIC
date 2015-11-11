@@ -213,7 +213,11 @@ def sql_to_csv():
     epic_df = pandas.read_csv(constants.sims_dir + os.sep + obj.ldir + os.sep + 'EPICRUN.DAT', sep='\s+', header=None)
     epic_df.columns = ['ASTN', 'ISIT', 'IWP1','IWP5', 'IWND', 'INPS', 'IOPS', 'IWTH']
 
-    # Read SSURGO file
+    # 1. Read ieSllist.dat and get mukey and corresponding index
+    # 2. Convert to dataframe
+    # 3. Merge with SSURGO properties csv file
+    # 4. Merge EPIC outputs with EPICRUN.DAT
+    # 5. Merge EPIC and SSURGO and output to csv
     soil_dict = {}
     with open(constants.sims_dir + os.sep + obj.ldir + os.sep + constants.SLLIST) as f:
         for line in f:
