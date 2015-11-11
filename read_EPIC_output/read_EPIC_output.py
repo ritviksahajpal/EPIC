@@ -197,7 +197,10 @@ def sql_to_csv():
 
     for idx, fl_name in enumerate(epic_fl_types):
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
-        df = pandas.read_sql_table(obj.db_name, obj.engine)
+        try:
+            df = pandas.read_sql_table(obj.db_name, obj.engine)
+        except:
+            logging.info(obj.db_name + ' not found')
         if fl_name <> 'SCN':
             max_yr = df.YR.unique().max()
             fyr_df = df[df.YR == max_yr] # final year df, maybe use constants.END_YR instead of max_yr?
