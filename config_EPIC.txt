@@ -93,13 +93,12 @@ opt_numpkgs = 10
 opt_outdir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\output\
 
 [GET_OUTPUT]
-ACM_PARAMS  = ['YR', 'PET', 'ET']
+ACM_PARAMS  = ['YR', 'PET', 'ET', 'NITR', 'AVOL', 'DN']
 ACY_PARAMS  = ['YR', 'CPNM', 'YLDF', 'YLN', 'WUEF', 'WS', 'NS']
 DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'NMN']
 ATG_PARAMS  = ['Y', 'BIOM', 'RWT']
 ANN_PARAMS  = ['YR', 'DN']
 SCN_PARAMS  = ['WOC0', 'WOCF', 'DWOC']
-ACM_PARAMS  = ['Y', 'NITR', 'AVOL', 'DN']
 START_YR    = 2008 ; Starting year of weather data
 END_YR      = 2013 ; Ending year of weather data
 

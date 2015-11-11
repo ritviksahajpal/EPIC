@@ -72,7 +72,7 @@ make_dir_if_missing(csv_dir)
 make_dir_if_missing(gis_dir)
 
 # Logging
-LOG_FILENAME   = epic_dir+os.sep+'Log_'+TAG+'.txt'
+LOG_FILENAME   = epic_dir+os.sep+'Log_Read_'+TAG+'.txt'
 logging.basicConfig(filename = LOG_FILENAME, level=logging.INFO,\
                     format='%(asctime)s    %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%Y-%m-%d %H:%M:%S") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL
