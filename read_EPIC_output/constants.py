@@ -19,6 +19,7 @@ SKIP_SCN = 14
 #
 ###############################################################################
 SOIL          = 'ssurgo' # Should be same as SSURGO python code
+SLLIST        = parser.get('PARAMETERS','SLLIST')
 PROJECT_NAME  = parser.get('PROJECT','project_name')
 TAG           = parser.get('PROJECT','OUT_TAG')
 START_YR      = parser.getint('GET_OUTPUT','START_YR')

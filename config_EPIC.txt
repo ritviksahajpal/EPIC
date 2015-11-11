@@ -84,7 +84,7 @@ WATER       = 504
 OTHER       = 502
 
 [RUN_EPIC]
-EPICOUT_FLS = ['ATG', 'ANN', 'ACY', 'SCN']
+EPICOUT_FLS = ['ATG', 'ACY']
 EPIC_EXE    = epic1102.exe
 opt_rundir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\
 opt_epicrun = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\EPICRUN.dat

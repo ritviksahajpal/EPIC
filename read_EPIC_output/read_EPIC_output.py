@@ -194,7 +194,6 @@ def sql_to_csv():
     dfs = pandas.DataFrame()
 
     for idx, fl_name in enumerate(epic_fl_types):
-        print idx, fl_name
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         df = pandas.read_sql_table(obj.db_name, obj.engine)
         if fl_name <> 'SCN':
@@ -215,13 +214,28 @@ def sql_to_csv():
     epic_df.columns = ['ASTN', 'ISIT', 'IWP1','IWP5', 'IWND', 'INPS', 'IOPS', 'IWTH']
 
     # Read SSURGO file
+    soil_dict = {}
+    with open(constants.sims_dir + os.sep + obj.ldir + os.sep + constants.SLLIST) as f:
+        for line in f:
+            #Sample line from soil file:     1     "Soils//1003958.sol"
+            (key, val)     = int(line.split()[0]), int(line.split('//')[1].split('.')[0])
+            soil_dict[key] = val
+
+    soil_df = pandas.DataFrame.from_dict(soil_dict, orient='index').reset_index()
+    soil_df.columns = ['INPS', 'mukey']
+
     sgo_file = pandas.read_csv(constants.sgo_dir + os.sep + constants.dominant)
     grp_sgo  = sgo_file.groupby('mukey').mean().reset_index()
+    grp_sgo  = pandas.merge(grp_sgo, soil_df, on='mukey')
 
     # Merge with EPICRUN
-    dfs = pandas.merge(dfs, epic_df, left_on='site', right_on='ASTN', how='outer')
+    dfs[['site']] = dfs[['site']].astype(int)
+    epic_df[['ASTN']] = epic_df[['ASTN']].astype(int) # ASTN is site number
+    dfs = pandas.merge(dfs, epic_df, left_on='site', right_on='ASTN')
+
     # Merge with SSURGO file
-    dfs = pandas.merge(dfs, grp_sgo, left_on='INPS', right_on='mukey', how='outer')
+    dfs = pandas.merge(dfs, grp_sgo, on='INPS') # INPS is identifier of soil files
+
     dfs.to_csv(constants.csv_dir + os.sep + 'EPIC_' + obj.ldir + '.csv')
 
 if __name__ == '__main__':
