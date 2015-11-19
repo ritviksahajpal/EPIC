@@ -1,6 +1,12 @@
 import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, re, StringIO
 from sqlalchemy import create_engine
 
+dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\simulations\\LS_2013_11_19_2015_10h_35m\\1.ACN'
+# read in file
+fl = pandas.read_csv(dd, skiprows=12)
+import pdb
+pdb.set_trace()
+
 class EPIC_Output_File():
     """
     Class to read EPIC Output files
