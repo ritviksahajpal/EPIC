@@ -1,7 +1,16 @@
 import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, re, StringIO
 from sqlalchemy import create_engine
 
-dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\simulations\\LS_2013_11_19_2015_10h_35m\\1.ACN'
+dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\simulations\\LS_2013_10_25_2015_21h_51m\\0.ACN'
+
+import re
+def GetTheSentences(infile):
+     with open(infile) as fp:
+         for result in re.findall('ATMOS CO2(.*?)ATMOS CO2', fp.read(), re.S):
+             pdb.set_trace()
+             print result
+             print '-----'
+
 # read in file
 fl = pandas.read_csv(dd, skiprows=12)
 import pdb
