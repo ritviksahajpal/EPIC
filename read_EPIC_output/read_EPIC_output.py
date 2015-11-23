@@ -13,8 +13,7 @@ def GetTheSentences(infile):
 
 # read in file
 fl = pandas.read_csv(dd, skiprows=12)
-import pdb
-pdb.set_trace()
+
 
 class EPIC_Output_File():
     """
