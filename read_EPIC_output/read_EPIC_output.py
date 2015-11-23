@@ -1,27 +1,38 @@
-import constants, pandas, pdb, os, fnmatch, logging, pdb, numpy, datetime, re, StringIO
+import constants, pandas, os, fnmatch, logging, pdb, numpy, datetime, re
 from sqlalchemy import create_engine
 
 dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\simulations\\LS_2013_10_25_2015_21h_51m\\0.ACN'
 
-import re
-def GetTheSentences(infile):
-     with open(infile) as fp:
-         for result in re.findall('ATMOS CO2(.*?)ATMOS CO2', fp.read(), re.S):
-             print result
-             last_line = len(result.split('\n'))
-             df = pandas.DataFrame(result.split('\n')[2:last_line-1])
-             df.to_csv(constants.csv_dir+os.sep+'qw.csv')
-             df = pandas.read_csv(constants.csv_dir+os.sep+'qw.csv',skiprows = 1,
-                      sep='[\s,]{2,20}',
-                      index_col=0)
-             pdb.set_trace()
-             print '-----'
+def read_repeat_blocks(inp_file, start_sep='', end_sep=''):
+    tmp_csv = constants.csv_dir + os.sep + 'tmp.csv'
+    list_df = []
+
+    with open(inp_file) as fp:
+        for idx, result in enumerate(re.findall(start_sep + '(.*?)' + end_sep, fp.read(), re.S)):
+            if idx == 0:
+                continue
+            pdb.set_trace()
+            last_line_idx = len(result.split('\n'))
+            print(result.split('\n')[last_line_idx-1])
+            last_yr = result.split('\n')[last_line_idx-1].split()[0]
+            df = pandas.DataFrame(result.split('\n')[2:last_line_idx-1])
+            df.to_csv(tmp_csv)
+            df = pandas.read_csv(tmp_csv, skiprows=1,
+                                 engine='python',
+                                 sep='[\s,]{2,20}',
+                                 index_col=0)
+            odf = pandas.DataFrame()
+            odf['site'] = inp_file[:-4]
+
+
+            list_df.append(df)
+    pdb.set_trace()
+    frame_df = pandas.concat(list_df)
+    return frame_df
 
 # read in file
-GetTheSentences(dd)
-fl = pandas.read_csv(dd, skiprows=12)
-import pdb
-pdb.set_trace()
+read_repeat_blocks(dd, start_sep='CO2', end_sep='CFEM')
+
 
 class EPIC_Output_File():
     """
