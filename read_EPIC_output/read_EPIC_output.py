@@ -7,13 +7,21 @@ import re
 def GetTheSentences(infile):
      with open(infile) as fp:
          for result in re.findall('ATMOS CO2(.*?)ATMOS CO2', fp.read(), re.S):
-             pdb.set_trace()
              print result
+             last_line = len(result.split('\n'))
+             df = pandas.DataFrame(result.split('\n')[2:last_line-1])
+             df.to_csv(constants.csv_dir+os.sep+'qw.csv')
+             df = pandas.read_csv(constants.csv_dir+os.sep+'qw.csv',skiprows = 1,
+                      sep='[\s,]{2,20}',
+                      index_col=0)
+             pdb.set_trace()
              print '-----'
 
 # read in file
+GetTheSentences(dd)
 fl = pandas.read_csv(dd, skiprows=12)
-
+import pdb
+pdb.set_trace()
 
 class EPIC_Output_File():
     """
