@@ -1,8 +1,6 @@
 import constants, pandas, os, fnmatch, logging, pdb, numpy, datetime, re
 from sqlalchemy import create_engine
 
-dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\simulations\\LS_2013_10_25_2015_21h_51m\\0.ACN'
-
 class EPIC_Output_File():
     """
     Class to read EPIC Output files
@@ -69,7 +67,7 @@ class EPIC_Output_File():
                                      engine='python',
                                      sep='[\s,]{2,20}',
                                      index_col=0)
-                df.set_index('Unnamed: 1', inplace=True)
+                df.set_index(df.columns[0], inplace=True)
 
                 odf = odf.append({'site': os.path.basename(inp_file)[:-4],
                                   'year': cur_yr,
