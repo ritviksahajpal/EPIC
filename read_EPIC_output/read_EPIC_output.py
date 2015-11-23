@@ -44,6 +44,15 @@ class EPIC_Output_File():
         return [len(col) for col in cols]
 
     def read_repeat_blocks(self, inp_file, start_sep='', end_sep=''):
+        """
+        Read repeated blocks of data with data lying between start_sep and end_sep
+        Assumes atleast 2 spaces between columns
+        Currently tested on ACN files
+        :param inp_file:
+        :param start_sep:
+        :param end_sep:
+        :return:
+        """
         tmp_csv = constants.csv_dir + os.sep + 'tmp.csv'
         odf = pandas.DataFrame()
         cur_yr = constants.START_YR
