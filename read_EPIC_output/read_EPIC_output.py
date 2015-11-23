@@ -3,38 +3,6 @@ from sqlalchemy import create_engine
 
 dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_LS\\simulations\\LS_2013_10_25_2015_21h_51m\\0.ACN'
 
-def read_repeat_blocks(inp_file, start_sep='', end_sep=''):
-    tmp_csv = constants.csv_dir + os.sep + 'tmp.csv'
-    list_df = []
-    odf = pandas.DataFrame()
-    cur_yr = constants.START_YR
-
-    with open(inp_file) as fp:
-        for idx, result in enumerate(re.findall(str(cur_yr) + '(.*?)' + end_sep, fp.read(), re.S)):
-            cur_yr += 1
-            if idx == 0:
-                continue
-
-            last_line_idx = len(result.split('\n'))
-            df = pandas.DataFrame(result.split('\n')[2:last_line_idx-1])
-            df.to_csv(tmp_csv)
-            df = pandas.read_csv(tmp_csv, skiprows=1,
-                                 engine='python',
-                                 sep='[\s,]{2,20}',
-                                 index_col=0)
-            pdb.set_trace()
-            odf['site'] = os.path.basename(inp_file)[:-4]
-            odf['year'] = cur_yr
-
-            list_df.append(df)
-    pdb.set_trace()
-    frame_df = pandas.concat(list_df)
-    return frame_df
-
-# read in file
-read_repeat_blocks(dd, start_sep='CO2', end_sep='CFEM')
-
-
 class EPIC_Output_File():
     """
     Class to read EPIC Output files
@@ -74,6 +42,48 @@ class EPIC_Output_File():
         cols = re.findall('\s+\S+', wt)
 
         return [len(col) for col in cols]
+
+    def read_repeat_blocks(self, inp_file, start_sep='', end_sep=''):
+        tmp_csv = constants.csv_dir + os.sep + 'tmp.csv'
+        odf = pandas.DataFrame()
+        cur_yr = constants.START_YR
+
+        with open(inp_file) as fp:
+            for idx, result in enumerate(re.findall(start_sep + '(.*?)' + end_sep, fp.read(), re.S)):
+                if idx == 0:
+                    continue
+
+                last_line_idx = len(result.split('\n'))
+                df = pandas.DataFrame(result.split('\n')[2:last_line_idx-1])
+                df.to_csv(tmp_csv)
+                df = pandas.read_csv(tmp_csv, skiprows=1,
+                                     engine='python',
+                                     sep='[\s,]{2,20}',
+                                     index_col=0)
+                df.set_index('Unnamed: 1', inplace=True)
+
+                odf = odf.append({'site': os.path.basename(inp_file)[:-4],
+                                  'year': cur_yr,
+                                  'WOC': df.loc['WOC(kg/ha)']['TOT']}, ignore_index=True)
+                cur_yr += 1
+
+        return odf
+
+    ###############################
+    # ACN
+    ###############################
+    def parse_ACN(self, fls):
+        list_df = []
+        for idx, fl in enumerate(fls):
+            try:
+                df = self.read_repeat_blocks(fl, start_sep='CO2', end_sep='CFEM')
+            except:
+                logging.info('Error reading ' + fl)
+            list_df.append(df)
+
+        frame_df = pandas.concat(list_df)
+        frame_df.to_csv(self.csv_path)
+        frame_df.to_sql(self.db_name, self.engine, if_exists=self.ifexist)
 
     ###############################
     # ACM
