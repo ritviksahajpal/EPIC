@@ -6,24 +6,25 @@ dd = 'C:\\Users\\ritvik\\Documents\\PhD\\Projects\\Lake_States\\EPIC\\OpenLands_
 def read_repeat_blocks(inp_file, start_sep='', end_sep=''):
     tmp_csv = constants.csv_dir + os.sep + 'tmp.csv'
     list_df = []
+    odf = pandas.DataFrame()
+    cur_yr = constants.START_YR
 
     with open(inp_file) as fp:
-        for idx, result in enumerate(re.findall(start_sep + '(.*?)' + end_sep, fp.read(), re.S)):
+        for idx, result in enumerate(re.findall(str(cur_yr) + '(.*?)' + end_sep, fp.read(), re.S)):
+            cur_yr += 1
             if idx == 0:
                 continue
-            pdb.set_trace()
+
             last_line_idx = len(result.split('\n'))
-            print(result.split('\n')[last_line_idx-1])
-            last_yr = result.split('\n')[last_line_idx-1].split()[0]
             df = pandas.DataFrame(result.split('\n')[2:last_line_idx-1])
             df.to_csv(tmp_csv)
             df = pandas.read_csv(tmp_csv, skiprows=1,
                                  engine='python',
                                  sep='[\s,]{2,20}',
                                  index_col=0)
-            odf = pandas.DataFrame()
-            odf['site'] = inp_file[:-4]
-
+            pdb.set_trace()
+            odf['site'] = os.path.basename(inp_file)[:-4]
+            odf['year'] = cur_yr
 
             list_df.append(df)
     pdb.set_trace()
