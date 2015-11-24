@@ -84,7 +84,7 @@ WATER       = 504
 OTHER       = 502
 
 [RUN_EPIC]
-EPICOUT_FLS = ['ATG', 'ACY', 'ACN', 'ANN', 'SCN', 'ACM']
+EPICOUT_FLS = ['ATG', 'ACY', 'ACN', 'ANN', 'ACM']
 EPIC_EXE    = epic1102.exe
 opt_rundir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\
 opt_epicrun = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\EPICRUN.dat
@@ -101,6 +101,7 @@ ANN_PARAMS  = ['YR', 'DN']
 SCN_PARAMS  = ['WOC0', 'WOCF', 'DWOC']
 START_YR    = 2008 ; Starting year of weather data
 END_YR      = 2013 ; Ending year of weather data
+EXTR_YRS    = [2008, 2013] ; Years for which to extract data
 
 [POST_PROCESS]
 GIS_DIR = ''

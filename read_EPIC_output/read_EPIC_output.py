@@ -253,17 +253,23 @@ def sql_to_csv():
         except:
             logging.info(obj.db_name + ' not found')
         if fl_name <> 'SCN':
-            max_yr = df.YR.unique().max()
-            fyr_df = df[df.YR == max_yr] # final year df, maybe use constants.END_YR instead of max_yr?
+            # Get df for all sites and in tears in constants.EXTR_YRS
+            slice = df[df['YR'].isin(constants.EXTR_YRS)]
+            slice['isite'] = slice['site']
+            slice = slice.set_index(['site', 'YR']).unstack('YR')
+
             if idx == 0:
-                dfs = fyr_df
+                dfs = slice
             else:
-                dfs = pandas.merge(dfs, fyr_df, on=['YR','site'], how='outer')
-        else:
+                dfs = pandas.merge(dfs, slice, how='outer')
+        else: # SCN
+            # SCN should not be parsed since we are reading the annual ACN now
+            continue
             if idx == 0:
                 dfs = df
             else:
-                dfs = pandas.merge(dfs, df, on=['YR','site'], how='outer')
+                dfs = pandas.merge(dfs, df, how='outer')
+    dfs.columns = ['{}_{}'.format(col[0], col[1]) for col in dfs.columns.values]
 
     # Merge with EPICRUN.DAT
     epic_df = pandas.read_csv(constants.sims_dir + os.sep + obj.ldir + os.sep + 'EPICRUN.DAT', sep='\s+', header=None)
@@ -289,9 +295,10 @@ def sql_to_csv():
     grp_sgo  = pandas.merge(grp_sgo, soil_df, on='mukey')
 
     # Merge with EPICRUN
-    dfs[['site']] = dfs[['site']].astype(int)
+    site_col = 'isite_' + str(constants.EXTR_YRS[0])
+    dfs[[site_col]] = dfs[[site_col]].astype(int)
     epic_df[['ASTN']] = epic_df[['ASTN']].astype(int) # ASTN is site number
-    dfs = pandas.merge(dfs, epic_df, left_on='site', right_on='ASTN')
+    dfs = pandas.merge(dfs, epic_df, left_on=site_col, right_on='ASTN')
 
     # Merge with SSURGO file
     dfs = pandas.merge(dfs, grp_sgo, on='INPS') # INPS is identifier of soil files
