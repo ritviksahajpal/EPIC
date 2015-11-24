@@ -243,6 +243,7 @@ def sql_to_csv():
     SQL stores information from all years. We then extract information for the latest year from this file
     :return:
     """
+    # @TODO: Exclude columns which have already been read from other files
     epic_fl_types = constants.GET_PARAMS
     dfs = pandas.DataFrame()
 

@@ -93,7 +93,7 @@ opt_numpkgs = 10
 opt_outdir  = C:\Users\ritvik\Documents\PhD\Projects\Lake_States\EPIC\OpenLands_LS\EPIC_files\output\
 
 [GET_OUTPUT]
-ACM_PARAMS  = ['YR', 'PET', 'ET', 'NITR', 'AVOL', 'DN']
+ACM_PARAMS  = ['YR', 'PET', 'ET', 'NITR', 'AVOL']
 ACY_PARAMS  = ['YR', 'CPNM', 'YLDF', 'YLN', 'WUEF', 'WS', 'NS']
 DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'NMN']
 ATG_PARAMS  = ['Y', 'BIOM', 'RWT']
