@@ -1,7 +1,7 @@
 [PROJECT]
 ;;;;;;;;;;;;;;;;;;;;;;;;; MODIFY THESE PARAMETERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-OUT_TAG      = LS_2013
-YEAR         = 2013 ; Which year LU data are we using (related to open lands project)
+OUT_TAG      = LS_2008
+YEAR         = 2008 ; Which year LU data are we using (related to open lands project)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 project_name = OpenLands_LS                                          ; Name of project directory (to be created within out_dir)
 NARR_TAG     = NARR                                                  ; A log file is created as Log_<NARR_TAG>.txt
