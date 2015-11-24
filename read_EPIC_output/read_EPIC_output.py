@@ -83,7 +83,7 @@ class EPIC_Output_File():
         list_df = []
         for idx, fl in enumerate(fls):
             try:
-                df = self.read_repeat_blocks(fl, start_sep='CO2', end_sep='CFEM')
+                df = self.read_repeat_blocks(self.epic_out_dir + os.sep + self.ftype + os.sep + fl, start_sep='CO2', end_sep='CFEM')
             except:
                 logging.info('Error reading ' + fl)
             list_df.append(df)
@@ -257,6 +257,7 @@ def sql_to_csv():
             logging.info(obj.db_name + ' not found')
         if fl_name <> 'SCN':
             # Get df for all sites and in tears in constants.EXTR_YRS
+            pdb.set_trace()
             slice = df[df['YR'].isin(constants.EXTR_YRS)]
             slice['isite'] = slice['site']
             slice = slice.set_index(['site', 'YR']).unstack('YR')
