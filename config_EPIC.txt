@@ -99,6 +99,7 @@ DGN_PARAMS  = ['Y', 'M', 'D', 'BIOM', 'NMN']
 ATG_PARAMS  = ['Y', 'BIOM', 'RWT']
 ANN_PARAMS  = ['YR', 'DN']
 SCN_PARAMS  = ['WOC0', 'WOCF', 'DWOC']
+ACN_PARAMS  = ['YR', 'WOC(kg/ha)']
 START_YR    = 2008 ; Starting year of weather data
 END_YR      = 2013 ; Ending year of weather data
 EXTR_YRS    = [2008, 2013] ; Years for which to extract data

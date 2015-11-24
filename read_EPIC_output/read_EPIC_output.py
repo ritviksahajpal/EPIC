@@ -235,6 +235,8 @@ class EPIC_Output_File():
             self.parse_SCN(fls)
         elif(self.ftype == 'ACM'):
             self.parse_ACM(fls)
+        elif(self.ftype == 'ACN'):
+            self.parse_ACN(fls)
         else:
             logging.info('Wrong file type')
 
