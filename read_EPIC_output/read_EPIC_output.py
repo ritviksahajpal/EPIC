@@ -253,11 +253,12 @@ def sql_to_csv():
         obj = EPIC_Output_File(ftype=fl_name, tag=constants.TAG)
         try:
             df = pandas.read_sql_table(obj.db_name, obj.engine)
+            # Rename year
+            df.rename(columns={'year': 'YR'}, inplace=True)
         except:
             logging.info(obj.db_name + ' not found')
         if fl_name <> 'SCN':
             # Get df for all sites and in tears in constants.EXTR_YRS
-            pdb.set_trace()
             slice = df[df['YR'].isin(constants.EXTR_YRS)]
             slice['isite'] = slice['site']
             slice = slice.set_index(['site', 'YR']).unstack('YR')
