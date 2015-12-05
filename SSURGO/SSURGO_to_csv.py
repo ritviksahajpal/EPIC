@@ -7,6 +7,21 @@ import constants, logging, os, us, csv, pdb, glob
 import numpy as np
 import pandas as pd
 
+def open_or_die(path_file, perm='r', header=None, sep=' ', delimiter=' ', usecols=[]):
+    """
+    Open file or quit gracefully
+    :param path_file: Path of file to open
+    :return: Handle to file (netCDF), or dataframe (csv) or numpy array
+    """
+    try:
+        if os.path.splitext(path_file)[1] == '.txt':
+            df = pd.read_csv(path_file, sep=sep, header=header, usecols=usecols)
+            return df
+        else:
+            logging.info('Invalid file type')
+    except:
+        logging.info('Error opening file '+path_file)
+
 def component_aggregation(group):  
     # Sort by depth, makes it easier to process later
     group.sort('hzdept_r',inplace=True)
@@ -22,11 +37,15 @@ def component_aggregation(group):
 
 def read_ssurgo_tables(soil_dir):    
     # Read in SSURGO data
-    pd_mapunit   = pd.read_csv(soil_dir+os.sep+constants.MAPUNIT+'.txt'  ,sep=constants.SSURGO_SEP,header=None,usecols=constants.mapunit_vars.keys())
-    pd_component = pd.read_csv(soil_dir+os.sep+constants.COMPONENT+'.txt',sep=constants.SSURGO_SEP,header=None,usecols=constants.component_vars.keys())
-    pd_chorizon  = pd.read_csv(soil_dir+os.sep+constants.CHORIZON+'.txt' ,sep=constants.SSURGO_SEP,header=None,usecols=constants.chorizon_vars.keys())    
-    pd_muaggatt  = pd.read_csv(soil_dir+os.sep+constants.MUAGGATT+'.txt' ,sep=constants.SSURGO_SEP,header=None,usecols=constants.muaggatt_vars.keys())
-    pd_chfrags   = pd.read_csv(soil_dir+os.sep+constants.CHFRAGS+'.txt'  ,sep=constants.SSURGO_SEP,header=None,usecols=constants.chfrags_vars.keys())
+    pd_mapunit   = open_or_die(soil_dir+os.sep+constants.MAPUNIT+'.txt'  ,sep=constants.SSURGO_SEP,header=None,usecols=constants.mapunit_vars.keys())
+    pd_component = open_or_die(soil_dir+os.sep+constants.COMPONENT+'.txt',sep=constants.SSURGO_SEP,header=None,usecols=constants.component_vars.keys())
+    pd_chorizon  = open_or_die(soil_dir+os.sep+constants.CHORIZON+'.txt' ,sep=constants.SSURGO_SEP,header=None,usecols=constants.chorizon_vars.keys())
+    pd_muaggatt  = open_or_die(soil_dir+os.sep+constants.MUAGGATT+'.txt' ,sep=constants.SSURGO_SEP,header=None,usecols=constants.muaggatt_vars.keys())
+    pd_chfrags   = open_or_die(soil_dir+os.sep+constants.CHFRAGS+'.txt'  ,sep=constants.SSURGO_SEP,header=None,usecols=constants.chfrags_vars.keys())
+
+    # if any of the dataframes are empty then return a error value
+    if ((pd_mapunit is None) or (pd_component is None) or (pd_chorizon is None) or (pd_muaggatt is None) or (pd_chfrags is None)):
+        raise ValueError('Empty dataframe from one of SSURGO files')
 
     # Rename dataframe columns from integers to SSURGO specific names
     pd_mapunit.rename(columns=constants.mapunit_vars    ,inplace=True)
@@ -69,7 +88,11 @@ def SSURGO_to_csv():
             if('_'+st+'_' in dir_name and constants.TABULAR in subdir_list):
                 logging.info(dir_name[-3:]) # County FIPS code
 
-                tmp_df           = read_ssurgo_tables(dir_name+os.sep+constants.TABULAR)
+                try:
+                    tmp_df = read_ssurgo_tables(dir_name+os.sep+constants.TABULAR)
+                except ValueError:
+                    logging.info('Empty dataframe from one of SSURGO files')
+                    continue
 
                 tmp_df['state']  = st
                 tmp_df['county'] = dir_name[-3:]

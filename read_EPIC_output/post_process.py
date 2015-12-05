@@ -35,6 +35,14 @@ def dbf_to_csv(file_name):
     return csv_fn
 
 def tabulate_area_ras(raster='', tab_field='', zone_data='', zone_fld='', out_fname=''):
+    """
+    :param raster:
+    :param tab_field:
+    :param zone_data:
+    :param zone_fld:
+    :param out_fname:
+    :return:
+    """
     out_dbf  = constants.gis_dir + os.sep + raster + '.dbf'
     merg_ras = constants.gis_dir + os.sep + 'lup_' + raster
 
@@ -51,10 +59,13 @@ def tabulate_area_ras(raster='', tab_field='', zone_data='', zone_fld='', out_fn
             # Zonal stat
             ZonalStatisticsAsTable(zone_data, zone_fld, merg_ras, out_dbf, "DATA", "SUM")
             dbf_to_csv(out_dbf)
-        except:
-            logging.info(arcpy.GetMessages())
 
-    logging.info('\t Tabulating area for ...' + raster)
+            out_zonal_statistics = ZonalStatistics(in_zone_data, 'FIPS', constants.out_dir+'lup_'+state+'_'+constants.METRIC,"SUM","DATA")
+            out_zonal_statistics.save(constants.out_dir+state+'_zsat')
+            logging.info('Zonal stat... '+constants.out_dir+state+'_zsat')
+
+        except:
+            logging.info('\t Tabulating area for ...' + raster)
     return out_dbf[:-4] + '.csv'
 
 def process_IPCC_carbon_2000(zone_data='', zone_fld=''):
@@ -84,4 +95,5 @@ def process_IPCC_carbon_2000(zone_data='', zone_fld=''):
         logging.info(arcpy.GetMessages())
 
 if __name__ == '__main__':
-    process_IPCC_carbon_2000(zone_data=constants.zone_data, zone_fld='FIPS')
+    tabulate_area_ras(raster='', tab_field='', zone_data='', zone_fld='', out_fname='')
+    #process_IPCC_carbon_2000(zone_data=constants.zone_data, zone_fld='FIPS')
