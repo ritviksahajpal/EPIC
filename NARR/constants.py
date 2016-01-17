@@ -72,7 +72,7 @@ logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO,\
                     format='%(asctime)s %(levelname)s %(module)s - %(funcName)s: %(message)s',\
                     datefmt="%m-%d %H:%M") # Logging levels are DEBUG, INFO, WARNING, ERROR, and CRITICAL
 # Add a rotating handler
-logging.getLogger().addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=10, backupCount=5))
+logging.getLogger().addHandler(logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=50000, backupCount=5))
 # Output to screen
 logging.getLogger().addHandler(logging.StreamHandler())
 
