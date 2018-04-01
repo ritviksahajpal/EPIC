@@ -119,6 +119,7 @@ def run_merge_ssurgo_rasters():
     pool.join()    
     logging.info('Done!')
 
+
 if __name__ == "__main__":
     run_merge_ssurgo_rasters()
     logging.info('Done!')

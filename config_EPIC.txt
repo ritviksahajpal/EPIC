@@ -43,14 +43,14 @@ SITE_LAT    = 42.0           ; If DO_SITE is True, then lat
 SITE_LON    = 86.0           ; If DO_SITE is True, then lon
 ;;; SSURGO
 ZERO_LINES  = 23                                                                          ; Number of lines with zero's
-SLLIST      = ieSlList.dat                                                                ;                                                                        ;
+; SLLIST      = ieSlList.dat                                                                ;                                                                        ;
 SIZE        = 56                                                                          ; Resolution of soil raster
 all         = All_SSURGO.csv
 dominant    = Dominant_SSURGO.csv
 ;;; SEIMF
 SITES         = sites
 SITELIST      = ieSite.dat                                                                  ; Site list file for EPIC
-EPIC_DLY      = iewedlst.dat
+; EPIC_DLY      = iewedlst.dat
 SLLIST        = ieSlList.dat
 EPICRUN       = EPICRUN.dat
 SOIL_DATA     = Dominant_SSURGO.csv
@@ -58,7 +58,7 @@ missing_soils = missing_soils.csv
 site_fl_line1 = SRWC
 site_fl_line3 = Sample:0000 Country:USA FIPS: 0000 MLRA:0 NRIPTR:0 HUC:0
 ;;; Locate station
-EPIC_DLY      = iewedlst.dat
+; EPIC_DLY      = iewedlst.dat
 site_loc      = [45.77,-87.20]                                                      ;ES 45.77,-87.20;RH 45.67,-89.21
 ;;; Land-use
 LU_START_YEAR = 2008           ; Starting year of weather data

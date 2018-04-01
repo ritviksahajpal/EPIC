@@ -1,9 +1,9 @@
 import os, sys, logging, pdb, errno, multiprocessing, ast
 import logging.handlers
-from ConfigParser import SafeConfigParser
+from configparser import ConfigParser
 
 # Parse config file
-parser = SafeConfigParser()
+parser = ConfigParser(inline_comment_prefixes=(';',))
 parser.read('../config_EPIC.txt')
 
 ###############################################################################
